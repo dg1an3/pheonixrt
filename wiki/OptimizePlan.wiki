@@ -1,14 +1,7 @@
 #summary Plan Optimization requirements
 #labels Phase-Requirements
 
-= Introduction =
-
-Add your content here.
-
-
-= Details =
-
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+== Requirements ==
+  * Start optimization
+  * Visualize optimized dose
+  * Stop / restart optimization

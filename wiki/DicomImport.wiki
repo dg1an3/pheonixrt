@@ -1,4 +1,4 @@
-#summary This describes the DICOM import feature
+#summary DICOM import requirements
 #labels Phase-Requirements
 
 == Requirements ==

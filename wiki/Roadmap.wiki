@@ -3,8 +3,8 @@
 
 = Release 1.0 Features =
 
-  * DICOM Import of CT and StructureSets
-  * Manual Contouring
-  * Plan Setup
-  * Prescription Definition
-  * Optimization
+  * [DicomImport DICOM Import of CT and StructureSets]
+  * [Contouring Manual Contouring]
+  * [PlanSetup Plan Setup]
+  * [PrescriptionDefinition Prescription Definition]
+  * [OptimizePlan Plan Optimization]

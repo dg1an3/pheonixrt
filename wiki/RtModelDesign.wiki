@@ -1,4 +1,4 @@
-#summary Overview of the design of the RtModel library
+#summary RtModel library design
 #labels Phase-Design
 
 = Introduction =

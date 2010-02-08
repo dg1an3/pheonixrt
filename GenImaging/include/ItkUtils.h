@@ -8,9 +8,11 @@
 
 #pragma once
 
+#ifdef USE_IPP
 #include <ippi.h>
+#endif
 
-#include <itkImage.h>
+#include <itkOrientedImage.h>
 #include <itkImageRegionIterator.h>
 #include <itkImageRegionIteratorWithIndex.h>
 
@@ -21,9 +23,9 @@ typedef float VOXEL_REAL;
 typedef float VoxelReal;
 
 // helper typedef for the ITK Volume of pixel types
-typedef itk::Image<VOXEL_REAL,3> VolumeReal;
-typedef itk::Image<short,3> VolumeShort;
-typedef itk::Image<unsigned char, 3> VolumeChar;
+typedef itk::OrientedImage<VOXEL_REAL,3> VolumeReal;
+typedef itk::OrientedImage<short,3> VolumeShort;
+typedef itk::OrientedImage<unsigned char, 3> VolumeChar;
 
 typedef itk::ImageRegionConstIterator< VolumeReal > ConstVolumeRealIterator;
 typedef itk::ImageRegionIterator< VolumeReal > VolumeRealIterator;
@@ -808,7 +810,6 @@ void Accumulate(const VolumeReal *pVolume,
 
 }	// Accumulate
 
-
 //////////////////////////////////////////////////////////////////////
 template<class VOXEL_TYPE> INLINE
 void Accumulate3D(const VolumeReal *pVolume, 
@@ -926,6 +927,7 @@ inline void CalcBinomialFilter(itk::Image<TYPE,3> *pVol)
 }	// CalcBinomialFilter
 #endif
 
+#ifdef USE_IPP
 ///////////////////////////////////////////////////////////////////////////////
 inline void Resample(const VolumeReal *pOrig, 
 										 VolumeReal *pNew, 
@@ -1036,6 +1038,7 @@ inline void Resample3D(const VolumeReal *pOrig,
 	}
 
 }	// Resample3D
+#endif
 
 #ifdef DEPRECATED
 ///////////////////////////////////////////////////////////////////////////////

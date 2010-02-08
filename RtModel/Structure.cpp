@@ -243,18 +243,29 @@ VolumeReal *
 		vRegionPixelSpacing[0], vRegionPixelSpacing[1], vRegionPixelSpacing[2]);
 	//::AfxMessageBox(strMsg);
 
+#ifdef NEVER
+
 	// now resample to appropriate basis
 	::Resample3D(GetRegion(nLevel), pConformRegion, TRUE);
 
-#ifdef NEVER
+#else
 	itk::ResampleImageFilter<VolumeReal, VolumeReal>::Pointer resampler = 
 		itk::ResampleImageFilter<VolumeReal, VolumeReal>::New();
 	resampler->SetInput(GetRegion(nLevel));
+
+	typedef itk::AffineTransform<REAL, 3> TransformType;
+	TransformType::Pointer transform = TransformType::New();
+	transform->SetIdentity();
+	resampler->SetTransform(transform);
+
+	typedef itk::LinearInterpolateImageFunction<VolumeReal, REAL> InterpolatorType;
+	InterpolatorType::Pointer interpolator = InterpolatorType::New();
+	resampler->SetInterpolator( interpolator );
+
 	VolumeReal::Pointer pPointToVolume = static_cast<VolumeReal*>(pVolume);
 	resampler->SetOutputParametersFromImage(pPointToVolume);
 	resampler->Update();
-
-	pConformRegion = resampler->GetOutput();
+	CopyImage<VOXEL_REAL, 3>(resampler->GetOutput(), pConformRegion);
 	// and add to cache map
 	m_arrConformRegions.push_back(pConformRegion); 
 #endif

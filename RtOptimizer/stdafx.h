@@ -40,9 +40,11 @@
 // math include
 #include <math.h>
 
+#ifdef USE_IPP
 // IPP includes
 #include <ipps.h>
 #include <ippcv.h>
+#endif
 
 // utility macros
 #include <UtilMacros.h>

@@ -2,6 +2,7 @@
 // $Id: HistogramGradient.cpp 619 2009-03-01 17:43:35Z dglane001 $
 #include "StdAfx.h"
 #include "HistogramGradient.h"
+#include <itkResampleImageFilter.h>
 
 //////////////////////////////////////////////////////////////////////
 CHistogramWithGradient::CHistogramWithGradient()
@@ -83,7 +84,23 @@ int
 		ConformTo<VOXEL_REAL,3>(p_dVolume, m_groupVolRegion[nGroup]);
 		m_groupVolRegion[nGroup]->FillBuffer(0.0);
 		//Resample(GetRegion(), m_groupVolRegion[nGroup], TRUE);
-		Resample3D(GetRegion(), m_groupVolRegion[nGroup], TRUE);
+		//Resample3D(GetRegion(), m_groupVolRegion[nGroup], TRUE);
+		itk::ResampleImageFilter<VolumeReal, VolumeReal>::Pointer resampler = 
+			itk::ResampleImageFilter<VolumeReal, VolumeReal>::New();
+		resampler->SetInput(GetRegion());
+
+		typedef itk::AffineTransform<REAL, 3> TransformType;
+		TransformType::Pointer transform = TransformType::New();
+		transform->SetIdentity();
+		resampler->SetTransform(transform);
+
+		typedef itk::LinearInterpolateImageFunction<VolumeReal, REAL> InterpolatorType;
+		InterpolatorType::Pointer interpolator = InterpolatorType::New();
+		resampler->SetInterpolator( interpolator );
+
+		resampler->SetOutputParametersFromImage(m_groupVolRegion[nGroup]);
+		resampler->Update();
+		CopyImage<VOXEL_REAL, 3>(resampler->GetOutput(), m_groupVolRegion[nGroup]);
 	}
 
 	// set flag for computing bins for new dVolume
@@ -291,7 +308,25 @@ const VolumeShort *
 		ConformTo<VOXEL_REAL,3>(Get_dVolume(nAt), m_groupVolBinScaled);
 		m_groupVolBinScaled->FillBuffer(0.0);
 		// Resample(m_volBinScaled, m_groupVolBinScaled, TRUE);
-		Resample3D(m_volBinScaled, m_groupVolBinScaled, TRUE);
+		// Resample3D(m_volBinScaled, m_groupVolBinScaled, TRUE);
+
+		itk::ResampleImageFilter<VolumeReal, VolumeReal>::Pointer resampler = 
+			itk::ResampleImageFilter<VolumeReal, VolumeReal>::New();
+		resampler->SetInput(m_volBinScaled);
+
+		typedef itk::AffineTransform<REAL, 3> TransformType;
+		TransformType::Pointer transform = TransformType::New();
+		transform->SetIdentity();
+		resampler->SetTransform(transform);
+
+		typedef itk::LinearInterpolateImageFunction<VolumeReal, REAL> InterpolatorType;
+		InterpolatorType::Pointer interpolator = InterpolatorType::New();
+		resampler->SetInterpolator( interpolator );
+
+		resampler->SetOutputParametersFromImage(m_groupVolBinScaled);
+		resampler->Update();
+		CopyImage<VOXEL_REAL, 3>(resampler->GetOutput(), m_groupVolBinScaled);
+
 
 		// now convert to integer bin values
 

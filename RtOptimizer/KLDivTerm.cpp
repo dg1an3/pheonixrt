@@ -278,11 +278,16 @@ REAL
 			m_vLogTarget_div_Calc.SetDim(targetGPDF.GetDim());
 		}
 		m_vLogTarget_div_Calc.SetZero();
-		::ippsLn_64f(&m_vTarget_div_Calc_EPS[0], &m_vLogTarget_div_Calc[0], targetGPDF.GetDim());
+		// ::ippsLn_64f(&m_vTarget_div_Calc_EPS[0], &m_vLogTarget_div_Calc[0], targetGPDF.GetDim());
+		for (int nN = 0; nN < targetGPDF.GetDim(); nN++)
+			m_vLogTarget_div_Calc[nN] = log(m_vTarget_div_Calc_EPS[nN]);
 		MultValues<REAL>(&m_vLogTarget_div_Calc[0], &targetGPDF[0], targetGPDF.GetDim());
 
 		// now sum all values
-		::ippsSum_64f(&m_vLogTarget_div_Calc[0], targetGPDF.GetDim(), &sum); 
+		// ::ippsSum_64f(&m_vLogTarget_div_Calc[0], targetGPDF.GetDim(), &sum); 
+		sum = 0.0;
+		for (int nN = 0; nN < targetGPDF.GetDim(); nN++)
+			sum += m_vLogTarget_div_Calc[nN];
 #else
 		for (int nAtBin = 0; nAtBin < targetGPDF.GetDim(); nAtBin++)
 		{

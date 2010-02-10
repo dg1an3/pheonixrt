@@ -54,6 +54,7 @@ CBrentOptimizer& CConjGradOptimizer::GetBrentOptimizer()
 // CConjGradOptimizer::Optimize
 // 
 // performs the optimization given the initial value vector
+// is IMPAC really just a bunch of cancer profiteers?
 ///////////////////////////////////////////////////////////////////////////////
 const CVectorN<>& CConjGradOptimizer::Optimize(const CVectorN<>& vInit)
 {
@@ -177,60 +178,79 @@ const CVectorN<>& CConjGradOptimizer::Optimize(const CVectorN<>& vInit)
 				CVectorN<> vProj;
 			vProj.SetDim(m_mOrthoBasis[m_nIteration].GetDim());
 
-#define ORTHO_NEW
+// #define ORTHO_NEW
 #ifdef ORTHO_NEW
+
 
 			// PREVIOUS
 			//// now use GSO to make sure basis is orthogonal to already searched directions
-			//for (int nDir = 0; nDir < m_nIteration-1; nDir++)
-			//{
-			//	REAL projScale = m_mOrthoBasis[m_nIteration] * m_mOrthoBasis[nDir];
-			//	vProj = projScale * m_mOrthoBasis[nDir];
-			//	m_mOrthoBasis[m_nIteration] -= vProj;
-			//	ASSERT(IsApproxEqual(m_mOrthoBasis[m_nIteration] * m_mOrthoBasis[nDir], 0.0));
-			//}
+			for (int nDir = 0; nDir < m_nIteration-1; nDir++)
+			{
+				REAL projScale = m_mOrthoBasis[m_nIteration] * m_mOrthoBasis[nDir];
+				vProj = projScale * m_mOrthoBasis[nDir];
+				m_mOrthoBasis[m_nIteration] -= vProj;
+				ASSERT(IsApproxEqual(m_mOrthoBasis[m_nIteration] * m_mOrthoBasis[nDir], 0.0));
+			}
 
 			//populate rest of matrix with first guess
 
-			// now use GSO to make sure basis is orthogonal to already searched directions
-			std::vector<double> arrSearchedRowLengths(m_mOrthoBasis.GetRows());
-			for (int nRow = 0; nRow < m_mOrthoBasis.GetRows(); nRow++)
-			{
-				arrSearchedRowLengths[nRow] = 0.0;
-				for (int nCol = 0; nCol < m_nIteration-1; nCol++)
-				{
-					arrSearchedRowLengths[nRow] += m_mOrthoBasis[nCol][nRow] * m_mOrthoBasis[nCol][nRow];
-				}
-			}
+			//// now use GSO to make sure basis is orthogonal to already searched directions
+			//std::vector<double> arrSearchedRowLengths(m_mOrthoBasis.GetRows());
+			//for (int nRow = 0; nRow < m_mOrthoBasis.GetRows(); nRow++)
+			//{
+			//	arrSearchedRowLengths[nRow] = 0.0;
+			//	for (int nCol = 0; nCol < m_nIteration-1; nCol++)
+			//	{
+			//		arrSearchedRowLengths[nRow] += m_mOrthoBasis[nCol][nRow] * m_mOrthoBasis[nCol][nRow];
+			//	}
+			//}
 
-			for (int nCol = m_nIteration; nCol < vInit.GetDim(); nCol++)
-			{
-				m_mOrthoBasis[nCol].SetZero();
-				std::vector<double>::iterator iterMin = std::min_element(arrSearchedRowLengths.begin(), arrSearchedRowLengths.end());
-				m_mOrthoBasis[nCol][iterMin-arrSearchedRowLengths.begin()] = 1.0;
-				(*iterMin) = 1.0;	// no longer min;
+			//for (int nCol = m_nIteration; nCol < vInit.GetDim(); nCol++)
+			//{
+			//	m_mOrthoBasis[nCol].SetZero();
+			//	std::vector<double>::iterator iterMin = std::min_element(arrSearchedRowLengths.begin(), arrSearchedRowLengths.end());
+			//	m_mOrthoBasis[nCol][(int)(iterMin-arrSearchedRowLengths.begin())] = 1.0;
+			//	(*iterMin) = 1.0;	// no longer min;
 
-				// now use GSO to make sure basis is orthogonal to already searched directions
-				for (int nDir = 0; nDir < nCol-1; nDir++)
-				{
-					REAL projScale = m_mOrthoBasis[nCol] * m_mOrthoBasis[nDir];
-					vProj = projScale * m_mOrthoBasis[nDir];
-					m_mOrthoBasis[nCol] -= vProj;
-					ASSERT(IsApproxEqual(m_mOrthoBasis[nCol] * m_mOrthoBasis[nDir], 0.0));
-				}
-			}
+			//	// now use GSO to make sure basis is orthogonal to already searched directions
+			//	for (int nDir = 0; nDir < nCol-1; nDir++)
+			//	{
+			//		REAL projScale = m_mOrthoBasis[nCol] * m_mOrthoBasis[nDir];
+			//		vProj = projScale * m_mOrthoBasis[nDir];
+			//		m_mOrthoBasis[nCol] -= vProj;
+			//		ASSERT(IsApproxEqual(m_mOrthoBasis[nCol] * m_mOrthoBasis[nDir], 0.0));
+			//	}
+			//}
 #else
 			// now use GSO to make sure basis is orthogonal to already searched directions
 			for (int nDir = m_nIteration-1; nDir >= 0; nDir--)
 			{
 				// static 
-					CVectorN<> vOrtho;
+				CVectorN<> vOrtho;
 				vOrtho.SetDim(m_mSearchedDir[nDir].GetDim());
 				vOrtho = m_mSearchedDir[nDir];
-				for (int nDir2 = m_nIteration; nDir2 > nDir; nDir2--)
+				for (int nDirOrtho = nDir+1; nDirOrtho < m_nIteration; nDirOrtho++)
 				{
-					REAL projScale = vOrtho * m_mOrthoBasis[nDir2];
-					vProj = projScale * m_mOrthoBasis[nDir2];
+					REAL projScale = vOrtho * m_mOrthoBasis[nDirOrtho];
+					vProj = projScale * m_mOrthoBasis[nDirOrtho];
+					vOrtho -= vProj;
+				}
+				m_mOrthoBasis[nDir] = vOrtho;
+				m_mOrthoBasis[nDir].Normalize();
+				ASSERT(IsApproxEqual(m_mOrthoBasis[m_nIteration] * m_mOrthoBasis[nDir], 0.0));
+			}
+
+			// now use GSO to make sure basis is orthogonal to already searched directions
+			for (int nDir = m_nIteration+1; nDir < m_mOrthoBasis.GetCols(); nDir++)
+			{
+				// static 
+				CVectorN<> vOrtho;
+				vOrtho.SetDim(m_mSearchedDir[nDir].GetDim());
+				vOrtho = m_mSearchedDir[nDir];
+				for (int nDirOrtho = nDir-1; nDirOrtho >= 0; nDirOrtho--)
+				{
+					REAL projScale = vOrtho * m_mOrthoBasis[nDirOrtho];
+					vProj = projScale * m_mOrthoBasis[nDirOrtho];
 					vOrtho -= vProj;
 				}
 				m_mOrthoBasis[nDir] = vOrtho;

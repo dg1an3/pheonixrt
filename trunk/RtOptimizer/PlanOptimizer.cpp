@@ -291,7 +291,7 @@ void
 		// calculate the variance range for this level
 		const REAL sigma = GetProfileRealAt(LEVELSIGMA_KEY, nLevel, DEFAULT_LEVELSIGMA[nLevel]);
 		const REAL binVar = pow(GBinSigma / sigma, 2);
-		const REAL varMin = binVar * 0.25;
+		const REAL varMin = binVar * 0.125;
 		const REAL varMax = binVar;
 
 		// set the variance range in the objective function

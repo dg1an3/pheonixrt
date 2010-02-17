@@ -649,46 +649,4 @@ CArchive&
 
 #endif	// __AFX_H__
 
-
-//////////////////////////////////////////////////////////////////////
-template<class TYPE>
-void 
-	LogExprExt(const CVectorN<TYPE> & vVec, 
-			const char *pszName, const char *pszModule)
-	// helper function for XML logging of vectors
-{
-	// get the global log file
-	CXMLLogFile *pLog = CXMLLogFile::GetLogFile();
-
-	// only if we are logging --
-	if (pLog->IsLogging())
-	{
-		// create a new expression element
-		CXMLElement *pVarElem = pLog->NewElement("lx", pszModule);
-
-		// if there is a name,
-		if (strlen(pszName) > 0)
-		{
-			// set it.
-			pVarElem->Attribute("name", pszName);
-		}
-
-		// set type to generice "CVector"
-		pVarElem->Attribute("type", "CVector");
-		
-		// get the current format for the element type
-		const char *pszFormat = pLog->GetFormat((TYPE) 0);
-		for (int nAt = 0; nAt < vVec.GetDim(); nAt++)
-		{
-			// format each element
-			pLog->Format(pszFormat, vVec[nAt]);
-		}
-
-		// done.
-		pLog->GetLogFile()->CloseElement();
-	}
-
-}	// LogExprExt
-
-
 #endif	// !defined(VECTORN_H)

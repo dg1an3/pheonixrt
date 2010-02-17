@@ -129,7 +129,24 @@ VolumeReal *
 
 			VolumeReal *pBeamDose = GetBeamAt(nAt)->GetDoseMatrix();
 			// Resample(pBeamDose, m_pBeamDoseRot, TRUE);
-			Resample3D(pBeamDose, m_pBeamDoseRot, TRUE);
+			// Resample3D(pBeamDose, m_pBeamDoseRot, TRUE);
+			itk::ResampleImageFilter<VolumeReal, VolumeReal>::Pointer resampler = 
+				itk::ResampleImageFilter<VolumeReal, VolumeReal>::New();
+			resampler->SetInput(pBeamDose);
+
+			typedef itk::AffineTransform<REAL, 3> TransformType;
+			TransformType::Pointer transform = TransformType::New();
+			transform->SetIdentity();
+			resampler->SetTransform(transform);
+
+			typedef itk::LinearInterpolateImageFunction<VolumeReal, REAL> InterpolatorType;
+			InterpolatorType::Pointer interpolator = InterpolatorType::New();
+			resampler->SetInterpolator( interpolator );
+
+			VolumeReal::Pointer pPointToVolume = static_cast<VolumeReal*>(m_pBeamDoseRot);
+			resampler->SetOutputParametersFromImage(m_pBeamDoseRot);
+			resampler->Update();
+			CopyImage<VOXEL_REAL, 3>(resampler->GetOutput(), m_pBeamDoseRot);
 
 			// add this beam's dose matrix to the total
 			ConformTo<VOXEL_REAL,3>(m_pDose, m_pTempBuffer);

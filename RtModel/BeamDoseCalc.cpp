@@ -43,7 +43,24 @@ void
 
 	VolumeReal *pMassDensity = m_pBeam->GetPlan()->GetMassDensity();
 	// ::Resample(pMassDensity, m_densityRep, TRUE); 
-	Resample3D(pMassDensity, m_densityRep, TRUE); 
+	// Resample3D(pMassDensity, m_densityRep, TRUE); 
+	itk::ResampleImageFilter<VolumeReal, VolumeReal>::Pointer resampler = 
+		itk::ResampleImageFilter<VolumeReal, VolumeReal>::New();
+	resampler->SetInput(pMassDensity);
+
+	typedef itk::AffineTransform<REAL, 3> TransformType;
+	TransformType::Pointer transform = TransformType::New();
+	transform->SetIdentity();
+	resampler->SetTransform(transform);
+
+	typedef itk::LinearInterpolateImageFunction<VolumeReal, REAL> InterpolatorType;
+	InterpolatorType::Pointer interpolator = InterpolatorType::New();
+	resampler->SetInterpolator( interpolator );
+
+	VolumeReal::Pointer pPointToVolume = static_cast<VolumeReal*>(m_densityRep);
+	resampler->SetOutputParametersFromImage(pPointToVolume);
+	resampler->Update();
+	CopyImage<VOXEL_REAL, 3>(resampler->GetOutput(), m_densityRep);
 
 #ifdef USE_2D
 	// TODO: now, replicate slices

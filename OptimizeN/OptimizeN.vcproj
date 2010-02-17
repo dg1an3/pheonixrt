@@ -177,7 +177,7 @@
 				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories=".\include;..\GenImaging\include"
+				AdditionalIncludeDirectories=".\include;..\GenImaging\include;&quot;$(ITK_DIR)\Utilities\vxl\vcl&quot;;&quot;$(ITK_BUILD_DIR)\Utilities\vxl\vcl&quot;;&quot;$(ITK_DIR)\Utilities\vxl\core&quot;;&quot;$(ITK_BUILD_DIR)\Utilities\vxl\core&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="2"

@@ -62,10 +62,6 @@ public:
 	//		elements
 	void Reshape(int nCols, int nRows, bool bPreserve = TRUE);
 
-	// row-vector access
-	//void GetRow(int nAtRow, CVectorN<TYPE>& vRow) const;
-	//void SetRow(int nAtRow, const CVectorN<TYPE>& vRow);
-
 	// IsApproxEqual -- tests for approximate equality using the EPS
 	//		defined at the top of this file
 	bool IsApproxEqual(const CMatrixNxM& m, TYPE epsilon = DEFAULT_EPSILON) const;
@@ -336,43 +332,6 @@ CMatrixNxM<TYPE>::operator const TYPE *() const
 
 }	// CMatrixNxM<TYPE>::operator const TYPE *
 
-#ifdef USE_ROW_OPERATIONS
-//////////////////////////////////////////////////////////////////
-template<class TYPE>
-void 
-	CMatrixNxM<TYPE>::GetRow(int nAtRow, CVectorN<TYPE>& vRow) const
-	// constructs and returns a row vector
-{
-	// make the row vector the same size
-	ASSERT(vRow.GetDim() == GetCols());
-
-	// populate the row vector
-	for (int nAtCol = 0; nAtCol < GetCols(); nAtCol++)
-	{
-		vRow[nAtCol] = (*this)[nAtCol][nAtRow];
-	}
-
-}	// CMatrixNxM<TYPE>::GetRow
-
-
-//////////////////////////////////////////////////////////////////
-template<class TYPE>
-void 
-	CMatrixNxM<TYPE>::SetRow(int nAtRow, const CVectorN<TYPE>& vRow)
-	// sets the rows vector
-{
-	if (vRow.GetDim() == GetCols())
-	{
-		// de-populate the row vector
-		for (int nAtCol = 0; nAtCol < GetCols(); nAtCol++)
-		{
-			(*this)[nAtCol][nAtRow] = vRow[nAtCol];
-		}
-	}
-
-}	// CMatrixNxM<TYPE>::SetRow
-#endif
-
 //////////////////////////////////////////////////////////////////
 template<class TYPE> INLINE
 bool 
@@ -486,121 +445,6 @@ void
 	SetElements(GetRows(), GetCols(), pElements, TRUE);
 
 }	// CMatrixD<TYPE>::Transpose
-
-
-#ifdef NEVER // USE_IPP
-
-//////////////////////////////////////////////////////////////////////
-template<> INLINE									
-void 
-	CMatrixNxM<float>::Transpose()					
-	// transposes the matrix
-{													
-	float *pElements = NULL;							
-	AllocValues(GetRows() * GetCols(), pElements);	
-
-	CK_IPP(ippmTranspose_m_32f(&(*this)[0][0],		
-		GetRows() * sizeof(float),					
-		GetRows(), GetCols(),						
-		pElements, GetCols() * sizeof(float)));		
-
-	SetElements(GetRows(), GetCols(), pElements, true);
-
-}	// CMatrixNxM<TYPE>::Transpose
-
-//////////////////////////////////////////////////////////////////////
-template<> INLINE									
-void 
-	CMatrixNxM<double>::Transpose()					
-	// transposes the matrix
-{							
-	double *pElements = NULL;							
-	AllocValues(GetRows() * GetCols(), pElements);	
-
-	CK_IPP(ippmTranspose_m_64f(&(*this)[0][0],		
-		GetRows() * sizeof(double),					
-		GetRows(), GetCols(),						
-		pElements, GetCols() * sizeof(double)));		
-
-	SetElements(GetRows(), GetCols(), pElements, true);
-
-}	// CMatrixNxM<TYPE>::Transpose
-
-#endif
-
-
-#ifdef NEVER // USE_IPP
-
-//////////////////////////////////////////////////////////////////////
-template<> INLINE
-bool 
-	CMatrixNxM<float>::Invert(bool bFlag)					
-	// invert the matrix, with full pivot or not???
-{															
-	ASSERT(GetRows() == GetCols());							
-	float *pElements = NULL;									
-	AllocValues(GetRows() * GetCols(), pElements);			
-	__declspec(thread) static float *arrBuffer = NULL;		
-	__declspec(thread) static int nLength = 0;				
-	if (nLength < GetRows() * GetCols())					
-	{														
-		FreeValues(arrBuffer);								
-		nLength = GetRows() * GetCols();					
-		/* TODO: fix this memory leak */					
-		AllocValues(2 * nLength, arrBuffer);				
-	}
-
-	IppStatus stat = ippmInvert_m_32f(&(*this)[0][0],
-		GetRows() * sizeof(float), sizeof(float),							
-		arrBuffer,											
-		pElements, 
-		GetRows() * sizeof(float), sizeof(float),
-		GetRows());
-
-	if (stat == ippStsOk)									
-	{														
-		SetElements(GetCols(), GetRows(), pElements, TRUE);	
-	}										
-
-	return (stat == ippStsOk);								
-
-}	// CMatrixNxM<TYPE>::Invert
-
-//////////////////////////////////////////////////////////////////////
-template<> INLINE
-bool 
-	CMatrixNxM<double>::Invert(bool bFlag)					
-	// invert the matrix, with full pivot or not???
-{															
-	ASSERT(GetRows() == GetCols());							
-	double *pElements = NULL;									
-	AllocValues(GetRows() * GetCols(), pElements);			
-	__declspec(thread) static double *arrBuffer = NULL;		
-	__declspec(thread) static int nLength = 0;				
-	if (nLength < GetRows() * GetCols())					
-	{														
-		FreeValues(arrBuffer);								
-		nLength = GetRows() * GetCols();					
-		/* TODO: fix this memory leak */					
-		AllocValues(2 * nLength, arrBuffer);				
-	}
-
-	IppStatus stat = ippmInvert_m_64f(&(*this)[0][0],
-		GetRows() * sizeof(double), sizeof(double),							
-		arrBuffer,											
-		pElements, 
-		GetRows() * sizeof(double), sizeof(double),
-		GetRows());
-	if (stat == ippStsOk)									
-	{														
-		SetElements(GetCols(), GetRows(), pElements, TRUE);	
-	}										
-
-	return (stat == ippStsOk);								
-
-}	// CMatrixNxM<TYPE>::Invert
-
-#endif
 
 //////////////////////////////////////////////////////////////////////
 template<class TYPE>
@@ -770,53 +614,6 @@ CVectorN<TYPE>
 }	// operator*(const CMatrixNxM<TYPE>&, const CVectorN<TYPE>&)
 
 
-#ifdef NEVER // USE_IPP
-
-//////////////////////////////////////////////////////////////////////
-template<> INLINE
-CVectorN<float> 
-	operator*(const CMatrixNxM<float>& mat,
-			const CVectorN<float>& v)
-	// matrix-vector multiplication for float override
-{											
-	// stores the product
-	CVectorN<float> vProduct(mat.GetRows());			
-
-	CK_IPP(ippmMul_mTv_32f(&mat[0][0], 
-		mat.GetRows() * sizeof(float),
-		mat.GetRows(), mat.GetCols(),
-		&v[0], v.GetDim(),											
-		&vProduct[0]));
-
-	// return the product
-	return vProduct;
-
-}	// operator*(const CMatrixNxM<TYPE>&, const CVectorN<TYPE>&)
-
-//////////////////////////////////////////////////////////////////////
-template<> INLINE
-CVectorN<double> 
-	operator*(const CMatrixNxM<double>& mat,
-			const CVectorN<double>& v)
-	// matrix-vector multiplication for float override
-{											
-	// stores the product
-	CVectorN<double> vProduct(mat.GetRows());			
-
-	CK_IPP(ippmMul_mTv_64f(&mat[0][0], 
-		mat.GetRows() * sizeof(double),
-		mat.GetRows(), mat.GetCols(),
-		&v[0], v.GetDim(),											
-		&vProduct[0]));
-
-	// return the product
-	return vProduct;
-
-}	// operator*(const CMatrixNxM<TYPE>&, const CVectorN<TYPE>&)
-
-#endif
-
-
 //////////////////////////////////////////////////////////////////////
 template<class TYPE> INLINE
 CMatrixNxM<TYPE> operator*(const CMatrixNxM<TYPE>& mLeft, 
@@ -831,50 +628,6 @@ CMatrixNxM<TYPE> operator*(const CMatrixNxM<TYPE>& mLeft,
 	return mProduct;
 
 }	// operator*(const CMatrixNxM<TYPE>&, const CMatrixNxM<TYPE>&)
-
-
-//////////////////////////////////////////////////////////////////////
-template<class TYPE>
-TYPE Determinant(const CMatrixNxM<TYPE>& mMat) 
-	// computes the determinant of the matrix, for square matrices
-	// TODO: move this to MatrixOps
-	// TODO: implement IPP determinant
-{
-	ASSERT(mMat.GetCols() == mMat.GetRows());
-
-	if (mMat.GetCols() > 2) 
-	{
-		TYPE det = 0.0;
-		for (int nAtCol = 0; nAtCol < mMat.GetCols(); nAtCol++) 
-		{
-			CMatrixNxM<TYPE> mMinor(mMat.GetCols()-1, mMat.GetRows()-1);
-			for (int nAtRow = 1; nAtRow < mMat.GetRows(); nAtRow++) 
-			{
-				int nAtMinorCol = 0;
-				for (int nAtCol2 = 0; nAtCol2 < mMat.GetCols(); nAtCol2++) 
-				{
-				   if (nAtCol2 != nAtCol)
-				   {
-					   mMinor[nAtMinorCol][nAtRow-1] = mMat[nAtCol2][nAtRow];
-					   nAtMinorCol++;
-				   }
-				}
-			}
-			det += ((nAtCol % 2 == 0) ? 1.0 : -1.0) 
-				* mMat[nAtCol][0] * Determinant(mMinor);
-		}
-
-		return det;
-	}
-	else if (mMat.GetCols() > 1) 
-	{
-		return mMat[0][0] * mMat[1][1] - mMat[1][0] * mMat[0][1];
-	}
-	
-	return mMat[0][0];
-
-}	// CMatrixNxM<TYPE>::Determinant
-
 
 // operator overloads for serialization
 #ifdef __AFX_H__
@@ -917,49 +670,5 @@ CArchive&
 }	// operator>>(CArchive &ar, CMatrixNxM<TYPE>& m)
 
 #endif	// __AFX_H__
-
-
-#ifdef USE_XMLLOGGING
-
-//////////////////////////////////////////////////////////////////////
-template<typename TYPE>
-void 
-	LogExprExt(const CMatrixNxM<TYPE>& mMat, 
-			const char *pszName, const char *pszModule)
-	// helper function for XML logging of matrices
-{
-	// get the global log file
-	CXMLLogFile *pLog = CXMLLogFile::GetLogFile();
-
-	// create a new expression element
-	CXMLElement *pVarElem = pLog->NewElement("lx", pszModule);
-
-	// if there is a name,
-	if (strlen(pszName) > 0)
-	{
-		// set it.
-		pVarElem->Attribute("name", pszName);
-	}
-
-	// set type to generice "CVector"
-	pVarElem->Attribute("type", "CMatrix");
-
-	// stores each row
-	CVectorN<TYPE> vRow(mMat.GetCols());
-	for (int nAtRow = 0; nAtRow < mMat.GetRows(); nAtRow++)
-	{
-		// get each row
-		mMat.GetRow(nAtRow, vRow);
-
-		// and output as sub-element
-		LogExprExt(vRow, "", pszModule);
-	}
-
-	// close the element
-	pLog->CloseElement();
-
-}	// LogExprExt
-
-#endif	// USE_XMLLOGGING
 
 #endif	// MATRIXNXM_H

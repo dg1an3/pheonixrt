@@ -46,6 +46,9 @@ public:
 	CVectorN<TYPE>& operator[](int nAtCol);
 	const CVectorN<TYPE>& operator[](int nAtCol) const;
 
+	vnl_vector<TYPE>& GetVnlColumn(int nAtCol) { return (*this)[nAtCol].GetVnlVector(); }
+	const vnl_vector<TYPE>& GetVnlColumn(int nAtCol) const { return (*this)[nAtCol].GetVnlVector(); }
+
 	// TYPE * conversion -- returns a pointer to the first element
 	//		WARNING: this allows for no-bounds-checking access
 	operator TYPE *();
@@ -60,8 +63,8 @@ public:
 	void Reshape(int nCols, int nRows, bool bPreserve = TRUE);
 
 	// row-vector access
-	void GetRow(int nAtRow, CVectorN<TYPE>& vRow) const;
-	void SetRow(int nAtRow, const CVectorN<TYPE>& vRow);
+	//void GetRow(int nAtRow, CVectorN<TYPE>& vRow) const;
+	//void SetRow(int nAtRow, const CVectorN<TYPE>& vRow);
 
 	// IsApproxEqual -- tests for approximate equality using the EPS
 	//		defined at the top of this file
@@ -333,7 +336,7 @@ CMatrixNxM<TYPE>::operator const TYPE *() const
 
 }	// CMatrixNxM<TYPE>::operator const TYPE *
 
-
+#ifdef USE_ROW_OPERATIONS
 //////////////////////////////////////////////////////////////////
 template<class TYPE>
 void 
@@ -368,7 +371,7 @@ void
 	}
 
 }	// CMatrixNxM<TYPE>::SetRow
-
+#endif
 
 //////////////////////////////////////////////////////////////////
 template<class TYPE> INLINE

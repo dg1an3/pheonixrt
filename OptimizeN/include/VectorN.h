@@ -7,6 +7,7 @@
 #include <ippm.h>
 #endif
 
+#include <vnl/vnl_vector_ref.h>
 #include <MathUtil.h>
 
 #include <VectorOps.h>
@@ -29,6 +30,9 @@ class CVectorN
 	// flag to indicate whether the elements should be freed
 	bool m_bFreeElements;
 
+	// the contained vector
+	vnl_vector_ref<TYPE> *m_pvVnlVector;
+
 public:
 	// constructors / destructor
 	CVectorN();
@@ -38,6 +42,12 @@ public:
 
 	// assignment operator
 	CVectorN& operator=(const CVectorN& vFrom);
+
+	// get the vnl vector
+	vnl_vector<TYPE>& GetVnlVector()
+	{
+		return *m_pvVnlVector;
+	}
 
 	// template helper for element type
 	typedef TYPE ELEM_TYPE;
@@ -89,7 +99,8 @@ template<class TYPE> INLINE
 CVectorN<TYPE>::CVectorN() 
 	: m_nDim(0),
 		m_pElements(NULL),
-		m_bFreeElements(TRUE)
+		m_bFreeElements(TRUE),
+		m_pvVnlVector(NULL)
 	// default constructor
 {
 }	// CVectorN<TYPE>::CVectorN<TYPE>
@@ -100,7 +111,8 @@ template<class TYPE> INLINE
 CVectorN<TYPE>::CVectorN(int nDim) 
 	: m_nDim(0),
 		m_pElements(NULL),
-		m_bFreeElements(TRUE)
+		m_bFreeElements(TRUE),
+		m_pvVnlVector(NULL)
 	// construct an arbitrary dimensioned vector
 {
 	// set the dimensionality of the vector
@@ -114,7 +126,8 @@ template<class TYPE> INLINE
 CVectorN<TYPE>::CVectorN(const CVectorN<TYPE>& vFrom)
 	: m_nDim(0),
 		m_pElements(NULL),
-		m_bFreeElements(TRUE)
+		m_bFreeElements(TRUE),
+		m_pvVnlVector(NULL)
 	// copy constructor
 {
 	// set the dimensionality of the vector
@@ -136,6 +149,11 @@ CVectorN<TYPE>::~CVectorN()
 	{
 		// free elements
 		FreeValues(m_pElements);
+	}
+
+	if (m_pvVnlVector)
+	{
+		delete m_pvVnlVector;
 	}
 
 }	// CVectorN<TYPE>::~CVectorN<TYPE>
@@ -245,6 +263,12 @@ void
 		TYPE *pOldElements = m_pElements;
 		m_pElements = NULL;
 
+		if (m_pvVnlVector)
+		{
+			delete m_pvVnlVector;
+			m_pvVnlVector = NULL;
+		}
+
 		// set the new dimensionality
 		int nOldDim = m_nDim;
 		m_nDim = nDim;
@@ -266,6 +290,8 @@ void
 			{
 				ZeroValues(&(*this)[nOldDim], GetDim() - nOldDim);
 			}
+
+			m_pvVnlVector = new vnl_vector_ref<TYPE>(GetDim(), &(*this)[0]);
 		}
 
 		// free the elements, if needed
@@ -273,6 +299,7 @@ void
 		{
 			FreeValues(pOldElements);
 		}
+
 	}
 
 }	// CVectorN<TYPE>::SetDim
@@ -360,7 +387,6 @@ CVectorN<TYPE>&
 
 }	// CVectorN<TYPE>::operator*=
 
-
 //////////////////////////////////////////////////////////////////
 template<class TYPE>
 void 
@@ -380,7 +406,6 @@ void
 	m_bFreeElements = bFreeElements;
 
 }	// CVectorN<TYPE>::SetElements
-
 
 //////////////////////////////////////////////////////////////////
 template<class TYPE>

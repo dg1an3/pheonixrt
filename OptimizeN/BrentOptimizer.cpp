@@ -5,6 +5,8 @@
 // the class definition
 #include "BrentOptimizer.h"
 
+#include <vnl/algo/vnl_bracket_minimum.h>
+
 ///////////////////////////////////////////////////////////////////////////////
 // macros used to manipulate parameters
 ///////////////////////////////////////////////////////////////////////////////
@@ -61,8 +63,9 @@ CBrentOptimizer::CBrentOptimizer(CObjectiveFunction *pFunc)
 		m_vX(1), 
 		m_vU(1),
 		m_vGrad(1),
-		m_Bracket(1.0),
-		m_GLimit(100.0)		
+		m_Bracket(4.0),
+		m_GLimit(100.0),
+		m_brentMinimizer(*pFunc)
 {
 	// make sure the brent optimizer's starting value is correct
 	ASSERT(0.0 == m_vBrentInit[0]);
@@ -78,26 +81,29 @@ const CVectorN<>& CBrentOptimizer::Optimize(const CVectorN<>& vInit)
 	BEGIN_LOG_SECTION(CBrentOptimizer::Optimize);
 
 	// find three values the bracket a minimum
-	REAL ax = vInit[0];
-	REAL bx = ax + m_Bracket;
-	REAL cx;
-	BracketMinimum(ax, bx, cx);
+	REAL ax = vInit[0] - m_Bracket;
+	REAL bx = vInit[0] ;
+	REAL cx = vInit[0] + m_Bracket;
+	REAL fa, fb, fc;
+	// 	BracketMinimum(ax, bx, cx);
+	vnl_bracket_minimum(*m_pFunc,ax,bx,cx,fa,fb,fc);
 	LOG_EXPR(ax);  LOG_EXPR(bx);  LOG_EXPR(cx);
 
 	// find the actual minimum
 	REAL finalx;
-	
+
+#define USE_THIS_IMPL
+#ifdef USE_THIS_IMPL
+
 	// which version of FindMinimum we use depends on whether
 	//		gradient information is available and should be used
-	if (m_pFunc->HasGradientInfo() && UseGradientInfo())
-	{
-		finalx = FindMinimumGrad(ax, bx, cx);
-	}
-	else
-	{
-		finalx = FindMinimum(ax, bx, cx);
-	}
+	finalx = FindMinimum(ax, bx, cx);
 	LOG_EXPR(finalx);
+
+#else
+	//m_brentMinimizer.set_x_tolerance(GetTolerance());
+	finalx = m_brentMinimizer.minimize_given_bounds_and_all_f(ax,bx,cx,fa,fb,fc);
+#endif
 
 	// set the member variable that holds the final value
 	m_vFinalParam.SetDim(1);	// 1-d for a brent optimizer
@@ -296,7 +302,7 @@ REAL CBrentOptimizer::FindMinimum (REAL ax, REAL bx, REAL cx)
 		LOG(_T("Iteration %i"), m_nIteration);
 
 		xm = (REAL) 0.5*(a+b);
-		tol1 = (REAL) (GetTolerance() * fabs(x)+ZEPS);
+		tol1 = (REAL) (GetTolerance() + fabs(x)*1e-8);
 		tol2 = (REAL) 2.0 * tol1;
 
 		// Test for done here. 
@@ -383,6 +389,7 @@ cleanup:
 	return x;
 }
 
+#ifdef NEVER
 //////////////////////////////////////////////////////////////////////
 // CBrentOptimizer<REAL>::FindMinimumGrad
 // 
@@ -569,6 +576,7 @@ REAL CBrentOptimizer::FindMinimumGrad(REAL ax, REAL bx, REAL cx)
 
 	return 0.0;
 }
+#endif
 
 const CVectorN<>& CBrentOptimizer::GetInitZero()
 {
@@ -579,4 +587,6 @@ void CBrentOptimizer::SetParams(REAL Bracket, REAL GLimit)
 {
 	m_Bracket = Bracket;
 	m_GLimit = GLimit;
+	m_brentMinimizer.set_g_tolerance(m_GLimit);
+	m_brentMinimizer.set_x_tolerance(GetTolerance());
 }

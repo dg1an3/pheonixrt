@@ -66,7 +66,7 @@ const CVectorN<>& CConjGradOptimizer::Optimize(const CVectorN<>& vInit)
 	// set the tolerance for the line optimizer
 	if (GetLineToleranceEqual())
 	{
-		m_pLineOptimizer->SetTolerance(GetTolerance());
+//		m_pLineOptimizer->SetTolerance(GetTolerance());
 	}
 	LOG_EXPR(GetTolerance());
 
@@ -168,60 +168,11 @@ const CVectorN<>& CConjGradOptimizer::Optimize(const CVectorN<>& vInit)
 			m_mSearchedDir[m_nIteration].Normalize();
 			m_mOrthoBasis[m_nIteration] = m_mSearchedDir[m_nIteration];
 
-#define ORTHOGONALIZE
-#ifndef ORTHOGONALIZE
-			// and normalize the new basis vector
-			m_mOrthoBasis[m_nIteration].Normalize();
-#else
 			// stores the projection vector
 			// static 
-				CVectorN<> vProj;
+			CVectorN<> vProj;
 			vProj.SetDim(m_mOrthoBasis[m_nIteration].GetDim());
 
-// #define ORTHO_NEW
-#ifdef ORTHO_NEW
-
-
-			// PREVIOUS
-			//// now use GSO to make sure basis is orthogonal to already searched directions
-			for (int nDir = 0; nDir < m_nIteration-1; nDir++)
-			{
-				REAL projScale = m_mOrthoBasis[m_nIteration] * m_mOrthoBasis[nDir];
-				vProj = projScale * m_mOrthoBasis[nDir];
-				m_mOrthoBasis[m_nIteration] -= vProj;
-				ASSERT(IsApproxEqual(m_mOrthoBasis[m_nIteration] * m_mOrthoBasis[nDir], 0.0));
-			}
-
-			//populate rest of matrix with first guess
-
-			//// now use GSO to make sure basis is orthogonal to already searched directions
-			//std::vector<double> arrSearchedRowLengths(m_mOrthoBasis.GetRows());
-			//for (int nRow = 0; nRow < m_mOrthoBasis.GetRows(); nRow++)
-			//{
-			//	arrSearchedRowLengths[nRow] = 0.0;
-			//	for (int nCol = 0; nCol < m_nIteration-1; nCol++)
-			//	{
-			//		arrSearchedRowLengths[nRow] += m_mOrthoBasis[nCol][nRow] * m_mOrthoBasis[nCol][nRow];
-			//	}
-			//}
-
-			//for (int nCol = m_nIteration; nCol < vInit.GetDim(); nCol++)
-			//{
-			//	m_mOrthoBasis[nCol].SetZero();
-			//	std::vector<double>::iterator iterMin = std::min_element(arrSearchedRowLengths.begin(), arrSearchedRowLengths.end());
-			//	m_mOrthoBasis[nCol][(int)(iterMin-arrSearchedRowLengths.begin())] = 1.0;
-			//	(*iterMin) = 1.0;	// no longer min;
-
-			//	// now use GSO to make sure basis is orthogonal to already searched directions
-			//	for (int nDir = 0; nDir < nCol-1; nDir++)
-			//	{
-			//		REAL projScale = m_mOrthoBasis[nCol] * m_mOrthoBasis[nDir];
-			//		vProj = projScale * m_mOrthoBasis[nDir];
-			//		m_mOrthoBasis[nCol] -= vProj;
-			//		ASSERT(IsApproxEqual(m_mOrthoBasis[nCol] * m_mOrthoBasis[nDir], 0.0));
-			//	}
-			//}
-#else
 			// now use GSO to make sure basis is orthogonal to already searched directions
 			for (int nDir = m_nIteration-1; nDir >= 0; nDir--)
 			{
@@ -257,12 +208,6 @@ const CVectorN<>& CConjGradOptimizer::Optimize(const CVectorN<>& vInit)
 				m_mOrthoBasis[nDir].Normalize();
 				ASSERT(IsApproxEqual(m_mOrthoBasis[m_nIteration] * m_mOrthoBasis[nDir], 0.0));
 			}
-#endif
-#endif
-
-			// and normalize the new basis vector
-			// m_mOrthoBasis[m_nIteration].Normalize();
-
 
 			CMatrixNxM<REAL> mScaling = m_mOrthoBasis;
 			mScaling.SetIdentity();
@@ -277,7 +222,7 @@ const CVectorN<>& CConjGradOptimizer::Optimize(const CVectorN<>& vInit)
 
 			CMatrixNxM<REAL> mOrthoBasisT = m_mOrthoBasis;
 			mOrthoBasisT.Transpose();
-			CMatrixNxM<REAL> covar = mOrthoBasisT * mScaling * m_mOrthoBasis;// m_mOrthoBasis * mScaling * mOrthoBasisT;
+			CMatrixNxM<REAL> covar = mOrthoBasisT * mScaling * m_mOrthoBasis;
 			for (int nDim = 0; nDim < m_vDir.GetDim(); nDim++)
 			{
 				double sum = 0.0;
@@ -285,51 +230,6 @@ const CVectorN<>& CConjGradOptimizer::Optimize(const CVectorN<>& vInit)
 					sum += covar[nDim][nRow];
 				m_vAdaptVariance[nDim] = 1.0 / sum;
 			}
-
-#ifdef MANUAL_SUM
-			for (int nDim = 0; nDim < m_vDir.GetDim(); nDim++)
-			{
-				// now calculate the variance due to searched subspace
-				REAL projSearchedSq = 0.0;
-				REAL projSearchedSq_scaled = 0.0;
-				REAL projSearchedSq_scaled_max = 0.0;
-				for (int nOrtho = 0; nOrtho < m_vDir.GetDim()/*m_nIteration*/; nOrtho++)
-				{
-					projSearchedSq += mOrthoBasisT[nOrtho][nDim]/*m_mOrthoBasis[nOrtho][nDim] * m_mOrthoBasis[nOrtho][nDim] */;
-
-					REAL scale = 1.0;
-					if (nOrtho < m_nIteration)
-						scale = pow(2.0, nOrtho) / pow(2.0, m_nIteration);
-					REAL projSearchedSq_scaled_element = 
-						m_mOrthoBasis[nOrtho][nDim] * m_mOrthoBasis[nOrtho][nDim]
-							/ (scale * (m_varMax - m_varMin) + m_varMin);
-						if (fabs(projSearchedSq_scaled_max) < fabs(projSearchedSq_scaled_element))
-							projSearchedSq_scaled_max = projSearchedSq_scaled_element;
-					projSearchedSq_scaled += 
-						mOrthoBasisT[nOrtho][nDim]/* m_mOrthoBasis[nOrtho][nDim] * m_mOrthoBasis[nOrtho][nDim] */
-							/ (scale * (m_varMax - m_varMin) + m_varMin);
-				}
-				projSearchedSq = __min(projSearchedSq, 1.0);
-
-				// now calculate factor for variance due to non-searched subspace
-				REAL projNSSq = 1.0 - projSearchedSq;
-
-				// and set the corresponding element of the variance vector
-				/// m_vAdaptVariance[nDim] = 1.0 / (projSearchedSq / m_varMin + projNSSq / m_varMax);
-				m_vAdaptVariance[nDim] = // 1.0 / (projSearchedSq_scaled_max); /// + projNSSq / m_varMax);
-					1.0 / (projSearchedSq_scaled + projNSSq / m_varMax);
-				if (m_vAdaptVariance[nDim] > m_varMax || m_vAdaptVariance[nDim] < m_varMin)
-				{
-					TRACE("projSearchedSq = %lf\n", projSearchedSq);
-					TRACE("m_varMax = %lf\n", m_varMax);
-					TRACE("projNSSq = %lf\n", projNSSq);
-					TRACE("m_varMin = %lf\n", m_varMin);
-					TRACE("m_vAdaptVariance[nDim] = %lf\n", m_vAdaptVariance[nDim]);
-					m_vAdaptVariance[nDim] = __max(m_vAdaptVariance[nDim], m_varMin);
-					m_vAdaptVariance[nDim] = __min(m_vAdaptVariance[nDim], m_varMax);
-				}				
-			}
-#endif
 
 			// now reset the final value, using the new AV vector
 			m_finalValue = (*m_pFunc)(m_vFinalParam);

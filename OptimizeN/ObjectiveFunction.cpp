@@ -18,6 +18,26 @@ CObjectiveFunction::CObjectiveFunction(BOOL bHasGradientInfo)
 }	// CObjectiveFunction::CObjectiveFunction
 
 ///////////////////////////////////////////////////////////////////////////////
+void 
+	CObjectiveFunction::compute(vnl_vector<double> const& x, 
+			double *f, vnl_vector<double>* g)
+{
+	CVectorN<REAL> vX(x.size());
+	CopyElements<REAL>(&vX[0], &x[0], x.size());
+
+	if (g != NULL)
+	{
+		CVectorN<REAL> vG(g->size());
+		(*f) = (*this)(vX, &vG);
+		CopyElements<REAL>(&(*g)[0], &vG[0], x.size());
+	}
+	else
+	{
+		(*f) = (*this)(vX);
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // CObjectiveFunction::HasGradientInfo
 // 
 // whether gradient information is available

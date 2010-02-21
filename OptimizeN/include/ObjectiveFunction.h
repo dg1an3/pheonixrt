@@ -3,6 +3,8 @@
 #if !defined(OBJECTIVEFUNCTION_H)
 #define OBJECTIVEFUNCTION_H
 
+#include <vnl/vnl_cost_function.h>
+
 // objective functions are vector-domained functions
 #include <VectorN.h>
 
@@ -13,7 +15,7 @@
 //		objective function to define a gradient, but a flag is provided
 //		in the case that no gradient is available
 //////////////////////////////////////////////////////////////////////
-class CObjectiveFunction : public CObject
+class CObjectiveFunction : public CObject, public vnl_cost_function
 {
 public:
 	// constructs an objective function; gets flag to indicate
@@ -23,6 +25,11 @@ public:
 	// evaluates the objective function
 	virtual REAL operator()(const CVectorN<>& vInput, 
 		CVectorN<> *pGrad = NULL) const = 0;
+
+	//:  Compute one or both of f and g.
+	//   Normally implemented in terms of the above two, but may be faster if specialized. f != 0 => compute f
+	virtual void compute(vnl_vector<double> const& x, 
+		double *f, vnl_vector<double>* g);
 
 	// whether gradient information is available
 	BOOL HasGradientInfo() const;

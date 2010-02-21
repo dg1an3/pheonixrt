@@ -5,6 +5,7 @@
 
 // include the optimizer base class
 #include "Optimizer.h"
+#include <vnl/algo/vnl_brent_minimizer.h>
 
 //////////////////////////////////////////////////////////////////////
 // class CBrentOptimizer
@@ -25,6 +26,8 @@ public:
 	// helper function to return an initial Zero vector
 	static const CVectorN<>& GetInitZero();
 
+	vnl_brent_minimizer m_brentMinimizer;
+
 protected:
 	// finds a bracket for the minimum value of the objective function
 	void BracketMinimum(REAL& ax, REAL& bx, REAL& cx);
@@ -33,7 +36,7 @@ protected:
 	REAL FindMinimum(REAL ax, REAL bx, REAL cx);
 
 	// finds the minimum of the objective function, using gradient information
-	REAL FindMinimumGrad(REAL ax, REAL bx, REAL cx);
+	// REAL FindMinimumGrad(REAL ax, REAL bx, REAL cx);
 
 private:
 	// these are "local" variables that are initialized here so that we do not

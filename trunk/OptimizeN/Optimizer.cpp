@@ -11,8 +11,8 @@
 // base class for all optimizers
 //////////////////////////////////////////////////////////////////////
 COptimizer::COptimizer(CObjectiveFunction *pFunc)
-	: m_tolerance(0.5f),
-		m_nIteration(0),
+	: // m_tolerance(0.5f),
+		//num_iterations_(0),
 		m_pFunc(pFunc),
 		m_pCallbackFunc(NULL),
 		m_pCallbackParam(NULL),
@@ -77,7 +77,7 @@ void COptimizer::SetUseGradientInfo(BOOL bUseGradientInfo)
 //////////////////////////////////////////////////////////////////////
 REAL COptimizer::GetTolerance() const
 {
-	return m_tolerance;
+	return xtol; // m_tolerance;
 
 }	// COptimizer::GetTolerance
 
@@ -89,7 +89,8 @@ REAL COptimizer::GetTolerance() const
 //////////////////////////////////////////////////////////////////////
 void COptimizer::SetTolerance(REAL tol)
 {
-	m_tolerance = tol;
+	// m_tolerance 
+		xtol = tol;
 
 }	// COptimizer::SetTolerance
 
@@ -102,7 +103,7 @@ void COptimizer::SetTolerance(REAL tol)
 //////////////////////////////////////////////////////////////////////
 int COptimizer::GetIterations() const
 {
-	return m_nIteration;
+	return num_iterations_; // m_nIteration;
 
 }	// COptimizer::GetIterations
 

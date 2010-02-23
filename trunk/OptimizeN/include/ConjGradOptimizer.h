@@ -27,7 +27,7 @@ public:
 	CConjGradOptimizer(CObjectiveFunction *pFunc);
 
 	// returns a reference to the embedded Brent optimizer
-	CBrentOptimizer& GetBrentOptimizer();
+	vnl_brent_minimizer& GetBrentOptimizer();
 
 	// optimize the objective function
 	virtual const CVectorN<>& Optimize(const CVectorN<>& vInit);
@@ -44,10 +44,10 @@ private:
 	CLineFunction m_lineFunction;
 
 	// points to the line optimizer to be used
-	COptimizer *m_pLineOptimizer;
+	// COptimizer *m_pLineOptimizer;
 
 	// brent optimizer along the line function
-	CBrentOptimizer m_optimizeBrent;
+	vnl_brent_minimizer m_optimizeBrent;
 
 	// "statics" for the optimization routine
 	CVectorN<> m_vGrad;

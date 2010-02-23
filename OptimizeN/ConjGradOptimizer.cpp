@@ -8,6 +8,45 @@
 #include <vector>
 #include <algorithm>
 
+class LineProjection_1dfun : public vnl_cost_function
+{
+public:
+	vnl_cost_function* f_;
+	unsigned int n_;
+	vnl_vector<REAL> x0_;
+	vnl_vector<REAL> dx_;
+	vnl_vector<REAL> tmpx_;
+
+	LineProjection_1dfun(int n, vnl_cost_function* f)
+		: vnl_cost_function(1)
+		, f_(f)
+		, n_(n)
+		, x0_(n)
+		, dx_(n)
+		, tmpx_(n) {}
+
+	void init(vnl_vector<double> const& x0, vnl_vector<double> const& dx)
+	{
+		x0_ = x0;
+		dx_ = dx;
+		//assert(x0.size() == n_);
+		//assert(dx.size() == n_);
+	}
+
+	double f(const vnl_vector<double>& x)
+	{
+		uninit(x[0], tmpx_);
+		double e = f_->f(tmpx_);
+		return e;
+	}
+
+	void uninit(double lambda, vnl_vector<double>& out)
+	{
+		for (unsigned int i = 0; i < n_; ++i)
+			out[i] = x0_[i] + lambda * dx_[i];
+	}
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 // constants used to optimize
 ///////////////////////////////////////////////////////////////////////////////
@@ -27,13 +66,13 @@ const REAL ZEPS = (REAL) 1.0e-10;
 CConjGradOptimizer::CConjGradOptimizer(CObjectiveFunction *pFunc)
 	: COptimizer(pFunc),
 		m_lineFunction(pFunc),
-		m_pLineOptimizer(&m_optimizeBrent),
-		m_optimizeBrent(&m_lineFunction),
-		m_LineToleranceEqual(true),
+		// m_pLineOptimizer(&m_optimizeBrent),
+		m_optimizeBrent(m_lineFunction),
+		//m_LineToleranceEqual(true),
 		m_bCalcVar(false)
 {
 	// set the Brent optimizer to use the gradient information
-	m_optimizeBrent.SetUseGradientInfo(FALSE);
+	// m_optimizeBrent.SetUseGradientInfo(FALSE);
 
 }	// CConjGradOptimizer::CConjGradOptimizer
 
@@ -43,7 +82,7 @@ CConjGradOptimizer::CConjGradOptimizer(CObjectiveFunction *pFunc)
 // 
 // returns the embedded line optimizer
 ///////////////////////////////////////////////////////////////////////////////
-CBrentOptimizer& CConjGradOptimizer::GetBrentOptimizer()
+vnl_brent_minimizer& CConjGradOptimizer::GetBrentOptimizer()
 {
 	return m_optimizeBrent;
 
@@ -63,12 +102,12 @@ const CVectorN<>& CConjGradOptimizer::Optimize(const CVectorN<>& vInit)
 	BEGIN_LOG_SECTION(CConjGradOptimizer::Optimize);
 	LOG_EXPR_EXT(vInit);
 
-	// set the tolerance for the line optimizer
-	if (GetLineToleranceEqual())
-	{
-//		m_pLineOptimizer->SetTolerance(GetTolerance());
-	}
-	LOG_EXPR(GetTolerance());
+//	// set the tolerance for the line optimizer
+//	if (GetLineToleranceEqual())
+//	{
+////		m_pLineOptimizer->SetTolerance(GetTolerance());
+//	}
+//	LOG_EXPR(GetTolerance());
 
 	// are we calculating adaptive variance?
 	if (m_bCalcVar)
@@ -113,9 +152,9 @@ const CVectorN<>& CConjGradOptimizer::Optimize(const CVectorN<>& vInit)
 	m_vDirPrev = m_vDir = m_vGrad;
 
 	BOOL bConvergence = FALSE;
-	for (m_nIteration = 0; (m_nIteration < ITER_MAX) && !bConvergence; m_nIteration++)
+	for (num_iterations_ = 0; (num_iterations_ < ITER_MAX) && !bConvergence; num_iterations_++)
 	{
-		LOG(_T("Iteration %i"), m_nIteration);
+		// LOG(_T("Iteration %i"), m_nIteration);
 
 		///////////////////////////////////////////////////////////////////////////////
 		// line minimization
@@ -124,9 +163,11 @@ const CVectorN<>& CConjGradOptimizer::Optimize(const CVectorN<>& vInit)
 
 		// set up the direction for the line minimization
 		m_lineFunction.SetLine(m_vFinalParam, m_vDir); // m_vGrad);
+		// of1d.init(m_vFinalParam.GetVnlVector(), m_vDir.GetVnlVector());
 
 		// now launch a line optimization
-		REAL lambda = m_pLineOptimizer->Optimize(CBrentOptimizer::GetInitZero())[0];
+		REAL lambda = // m_optimizeBrent.Optimize(CBrentOptimizer::GetInitZero())[0];
+			m_optimizeBrent.minimize(0);
 		LOG_EXPR(lambda);
 
 		// update the final parameter value
@@ -137,7 +178,7 @@ const CVectorN<>& CConjGradOptimizer::Optimize(const CVectorN<>& vInit)
 		LOG_EXPR_EXT(m_vFinalParam);
 
 		// store the final value from the line optimizer
-		REAL new_fv = m_pLineOptimizer->GetFinalValue();
+		REAL new_fv = m_optimizeBrent.f_at_last_minimum(); // ->GetFinalValue();
 
 		// test for convergence on line minimalization
 		bConvergence = (2.0 * fabs(m_finalValue - new_fv) 
@@ -155,7 +196,7 @@ const CVectorN<>& CConjGradOptimizer::Optimize(const CVectorN<>& vInit)
 			if (!(*m_pCallbackFunc)(this, m_pCallbackParam)) 
 			{
 				// request to terminate
-				m_nIteration = -1;
+				num_iterations_ = -1;
 				return m_vFinalParam;
 			}
 		}
@@ -164,23 +205,23 @@ const CVectorN<>& CConjGradOptimizer::Optimize(const CVectorN<>& vInit)
 		if (m_bCalcVar)
 		{
 			// add direction to orthogonal basis
-			m_mSearchedDir[m_nIteration] = m_vDir;
-			m_mSearchedDir[m_nIteration].Normalize();
-			m_mOrthoBasis[m_nIteration] = m_mSearchedDir[m_nIteration];
+			m_mSearchedDir[num_iterations_] = m_vDir;
+			m_mSearchedDir[num_iterations_].Normalize();
+			m_mOrthoBasis[num_iterations_] = m_mSearchedDir[num_iterations_];
 
 			// stores the projection vector
 			// static 
 			CVectorN<> vProj;
-			vProj.SetDim(m_mOrthoBasis[m_nIteration].GetDim());
+			vProj.SetDim(m_mOrthoBasis[num_iterations_].GetDim());
 
 			// now use GSO to make sure basis is orthogonal to already searched directions
-			for (int nDir = m_nIteration-1; nDir >= 0; nDir--)
+			for (int nDir = num_iterations_-1; nDir >= 0; nDir--)
 			{
 				// static 
 				CVectorN<> vOrtho;
 				vOrtho.SetDim(m_mSearchedDir[nDir].GetDim());
 				vOrtho = m_mSearchedDir[nDir];
-				for (int nDirOrtho = nDir+1; nDirOrtho < m_nIteration; nDirOrtho++)
+				for (int nDirOrtho = nDir+1; nDirOrtho < num_iterations_; nDirOrtho++)
 				{
 					REAL projScale = vOrtho * m_mOrthoBasis[nDirOrtho];
 					vProj = projScale * m_mOrthoBasis[nDirOrtho];
@@ -188,11 +229,11 @@ const CVectorN<>& CConjGradOptimizer::Optimize(const CVectorN<>& vInit)
 				}
 				m_mOrthoBasis[nDir] = vOrtho;
 				m_mOrthoBasis[nDir].Normalize();
-				ASSERT(IsApproxEqual(m_mOrthoBasis[m_nIteration] * m_mOrthoBasis[nDir], 0.0));
+				ASSERT(IsApproxEqual(m_mOrthoBasis[num_iterations_] * m_mOrthoBasis[nDir], 0.0));
 			}
 
 			// now use GSO to make sure basis is orthogonal to already searched directions
-			for (int nDir = m_nIteration+1; nDir < m_mOrthoBasis.GetCols(); nDir++)
+			for (int nDir = num_iterations_+1; nDir < m_mOrthoBasis.GetCols(); nDir++)
 			{
 				// static 
 				CVectorN<> vOrtho;
@@ -206,7 +247,7 @@ const CVectorN<>& CConjGradOptimizer::Optimize(const CVectorN<>& vInit)
 				}
 				m_mOrthoBasis[nDir] = vOrtho;
 				m_mOrthoBasis[nDir].Normalize();
-				ASSERT(IsApproxEqual(m_mOrthoBasis[m_nIteration] * m_mOrthoBasis[nDir], 0.0));
+				ASSERT(IsApproxEqual(m_mOrthoBasis[num_iterations_] * m_mOrthoBasis[nDir], 0.0));
 			}
 
 			CMatrixNxM<REAL> mScaling = m_mOrthoBasis;
@@ -214,8 +255,8 @@ const CVectorN<>& CConjGradOptimizer::Optimize(const CVectorN<>& vInit)
 			for (int nScale = 0; nScale < m_vDir.GetDim(); nScale++)
 			{
 				REAL scale = 1.0;
-				if (nScale < m_nIteration)
-					scale = pow(1.5, nScale) / pow(1.5, m_nIteration);
+				if (nScale < num_iterations_)
+					scale = pow(1.5, nScale) / pow(1.5, (double) num_iterations_);
 
 				mScaling[nScale][nScale] = 1.0 / (scale * (m_varMax - m_varMin) + m_varMin);
 			}
@@ -292,7 +333,7 @@ const CVectorN<>& CConjGradOptimizer::Optimize(const CVectorN<>& vInit)
 		// Too many iterations
 		LOG(_T("Too many iterations"));
 
-		m_nIteration = -1;
+		num_iterations_ = -1;
 	}
 
 	END_LOG_SECTION();	// CConjGradOptimizer

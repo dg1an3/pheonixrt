@@ -15,7 +15,7 @@
 //		objective function to define a gradient, but a flag is provided
 //		in the case that no gradient is available
 //////////////////////////////////////////////////////////////////////
-class CObjectiveFunction : public CObject, public vnl_cost_function
+class CObjectiveFunction :/* public CObject,*/ public vnl_cost_function
 {
 public:
 	// constructs an objective function; gets flag to indicate

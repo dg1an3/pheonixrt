@@ -9,6 +9,7 @@
 
 // include for the objective function
 #include "ObjectiveFunction.h"
+#include <vnl/vnl_nonlinear_minimizer.h>
 
 class COptimizer;
 
@@ -20,7 +21,7 @@ typedef BOOL OptimizerCallback(COptimizer *pOpt, void *pParam);
 // 
 // base template class for all optimizers
 //////////////////////////////////////////////////////////////////////
-class COptimizer
+class COptimizer : public vnl_nonlinear_minimizer
 {
 public:
 	// construct a new COptimizer object
@@ -62,10 +63,10 @@ protected:
 	void *m_pCallbackParam;
 
 	// holds the tolerance for the optimization
-	REAL m_tolerance;
+	// REAL m_tolerance;
 
 	// holds the number of iterations for the optimization
-	int m_nIteration;
+	// int m_nIteration;
 
 	// holds the value of the objective function at the final point
 	REAL m_finalValue;

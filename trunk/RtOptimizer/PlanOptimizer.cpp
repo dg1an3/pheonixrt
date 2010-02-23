@@ -306,7 +306,7 @@ void
 		pOptimizer->SetAdaptiveVariance(true, varMin, varMax);
 
 		// set the tolerances
-		pOptimizer->SetLineToleranceEqual(false);
+		//pOptimizer->SetLineToleranceEqual(false);
 
 		// set the line tolerance
 		const REAL cgTolerance = GetProfileRealAt(CGTOL_KEY, nLevel, DEFAULT_TOLERANCE);
@@ -314,7 +314,7 @@ void
 
 		// set the CG tolerance
 		const REAL lineTolerance = GetProfileRealAt(LINETOL_KEY, nLevel, DEFAULT_TOLERANCE);
-		pOptimizer->GetBrentOptimizer().SetTolerance(lineTolerance);
+		pOptimizer->GetBrentOptimizer().set_x_tolerance(lineTolerance);
 
 		// do not apply transform slope variance for lowest-res level
 		if (nLevel == PlanPyramid::MAX_SCALES-1)

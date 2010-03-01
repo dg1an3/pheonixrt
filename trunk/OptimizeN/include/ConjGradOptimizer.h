@@ -12,33 +12,51 @@
 // the line function for the Brent optimizer
 //#include "LineFunction.h"
 
-#include "MatrixNxM.h"
+//#include "MatrixNxM.h"
+
+
+class DynamicCovarianceOptimizer;
+
+typedef BOOL OptimizerCallback(DynamicCovarianceOptimizer *pOpt, void *pParam);
+
 
 //////////////////////////////////////////////////////////////////////
-// class CConjGradOptimizer
-// 
-// optimizer that implements the Powell algorithm explained in
-//		Numerical Recipes
-//////////////////////////////////////////////////////////////////////
-class CConjGradOptimizer : public COptimizer
+class DynamicCovarianceOptimizer : public vnl_nonlinear_minimizer
 {
 public:
 	// construct a gradient optimizer for an objective function
-	CConjGradOptimizer(DynamicCovarianceCostFunction/*CObjectiveFunction*/ *pFunc);
+	DynamicCovarianceOptimizer(DynamicCovarianceCostFunction *pFunc);
 
 	DeclareMember(LineOptimizerTolerance, REAL);
 
 	// optimize the objective function
-	virtual const CVectorN<>& Optimize(const CVectorN<>& vInit);
+	// virtual const CVectorN<>& 
+	vnl_nonlinear_minimizer::ReturnCodes minimize(vnl_vector<REAL>& vInit);
 
 	// used to set up the variance min / max calculation
 	void SetAdaptiveVariance(bool bCalcVar, REAL varMin, REAL varMax);
+
+	// holds the final value of the optimization
+	DeclareMember(FinalValue, REAL);
+
+	// holds the final value of the parameters for the minimum f
+	DeclareMember(FinalParameter, vnl_vector<REAL>);
+
+	// sets the callback function
+	void SetCallback(OptimizerCallback *pCallback, void *pParam = NULL)
+	{
+		m_pCallbackFunc = pCallback;
+		m_pCallbackParam = pParam;
+	}
 
 protected:
 	void InitializeDynamicCovariance(int nDim);
 	void UpdateDynamicCovariance();
 
 private:
+	// the objective function over which optimization is to occur
+	DynamicCovarianceCostFunction *m_pCostFunction;
+
 	// "statics" for the optimization routine
 	vnl_vector<REAL> m_vGrad;
 	vnl_vector<REAL> m_vGradPrev;
@@ -59,7 +77,11 @@ private:
 	// stores the calculated AV
 	CVectorN<> m_vAdaptVariance;
 
-};	// class CConjGradOptimizer
+	// stores the callback info
+	OptimizerCallback *m_pCallbackFunc;
+	void *m_pCallbackParam;
+
+};	// class DynamicCovarianceOptimizer
 
 
 #endif

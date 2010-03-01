@@ -10,13 +10,13 @@
 // 
 // base class for all optimizers
 //////////////////////////////////////////////////////////////////////
-COptimizer::COptimizer(CObjectiveFunction *pFunc)
+COptimizer::COptimizer(vnl_cost_function/*CObjectiveFunction*/ *pFunc)
 	: // m_tolerance(0.5f),
 		//num_iterations_(0),
 		m_pFunc(pFunc),
 		m_pCallbackFunc(NULL),
-		m_pCallbackParam(NULL),
-		m_bUseGradientInfo(FALSE)
+		m_pCallbackParam(NULL)/*,
+		m_bUseGradientInfo(FALSE)*/
 {
 }	// COptimizer::COptimizer
 
@@ -50,24 +50,24 @@ void COptimizer::SetCallback(OptimizerCallback *pCallback, void *pParam)
 // returns the flag to indicate that gradient information should
 //		be used
 //////////////////////////////////////////////////////////////////////
-BOOL COptimizer::UseGradientInfo() const
-{
-	return m_bUseGradientInfo;
-
-}	// COptimizer::UseGradientInfo
-
-
-//////////////////////////////////////////////////////////////////////
-// COptimizer::SetUseGradientInfo
-// 
-// sets the flag to indicate that gradient information should
-//		be used
-//////////////////////////////////////////////////////////////////////
-void COptimizer::SetUseGradientInfo(BOOL bUseGradientInfo)
-{
-	m_bUseGradientInfo = bUseGradientInfo;
-
-}	// COptimizer::SetUseGradientInfo
+//BOOL COptimizer::UseGradientInfo() const
+//{
+//	return m_bUseGradientInfo;
+//
+//}	// COptimizer::UseGradientInfo
+//
+//
+////////////////////////////////////////////////////////////////////////
+//// COptimizer::SetUseGradientInfo
+//// 
+//// sets the flag to indicate that gradient information should
+////		be used
+////////////////////////////////////////////////////////////////////////
+//void COptimizer::SetUseGradientInfo(BOOL bUseGradientInfo)
+//{
+//	m_bUseGradientInfo = bUseGradientInfo;
+//
+//}	// COptimizer::SetUseGradientInfo
 
 
 //////////////////////////////////////////////////////////////////////
@@ -75,24 +75,24 @@ void COptimizer::SetUseGradientInfo(BOOL bUseGradientInfo)
 // 
 // returns the tolerance for exit from optimization loop
 //////////////////////////////////////////////////////////////////////
-REAL COptimizer::GetTolerance() const
-{
-	return xtol; // m_tolerance;
-
-}	// COptimizer::GetTolerance
-
-
-//////////////////////////////////////////////////////////////////////
-// COptimizer::SetTolerance
-// 
-// sets the tolerance for exit from optimization loop
-//////////////////////////////////////////////////////////////////////
-void COptimizer::SetTolerance(REAL tol)
-{
-	// m_tolerance 
-		xtol = tol;
-
-}	// COptimizer::SetTolerance
+//REAL COptimizer::GetTolerance() const
+//{
+//	return xtol; // m_tolerance;
+//
+//}	// COptimizer::GetTolerance
+//
+//
+////////////////////////////////////////////////////////////////////////
+//// COptimizer::SetTolerance
+//// 
+//// sets the tolerance for exit from optimization loop
+////////////////////////////////////////////////////////////////////////
+//void COptimizer::SetTolerance(REAL tol)
+//{
+//	// m_tolerance 
+//		xtol = tol;
+//
+//}	// COptimizer::SetTolerance
 
 
 //////////////////////////////////////////////////////////////////////
@@ -101,12 +101,12 @@ void COptimizer::SetTolerance(REAL tol)
 // returns the number of iterations needed for the previous 
 //		optimization
 //////////////////////////////////////////////////////////////////////
-int COptimizer::GetIterations() const
-{
-	return num_iterations_; // m_nIteration;
-
-}	// COptimizer::GetIterations
-
+//int COptimizer::GetIterations() const
+//{
+//	return num_iterations_; // m_nIteration;
+//
+//}	// COptimizer::GetIterations
+//
 
 //////////////////////////////////////////////////////////////////////
 // COptimizer::GetFinalValue
@@ -125,9 +125,11 @@ REAL COptimizer::GetFinalValue() const
 // 
 // holds the final value of the parameters for the minimum f
 //////////////////////////////////////////////////////////////////////
-const CVectorN<>& COptimizer::GetFinalParameter() const
+// const CVectorN<>& 
+const vnl_vector<REAL>& COptimizer::GetFinalParameter() const
 {
-	return m_vFinalParam;
+	return // const_cast<CVectorN<>&>(m_vFinalParam).GetVnlVector();
+		m_vFinalParam;
 
 }	// COptimizer::GetFinalParameter
 

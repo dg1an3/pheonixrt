@@ -18,8 +18,8 @@ const REAL SIGMOID_SCALE = 0.2; // 0.1; // 0.3; // 0.1; // 1.0;
 
 ///////////////////////////////////////////////////////////////////////////////
 Prescription::Prescription(CPlan *pPlan/*, int nLevel*/)
-	: CObjectiveFunction(FALSE)
-		, m_pPlan(pPlan)
+	: /*CObjectiveFunction(FALSE)
+		, */m_pPlan(pPlan)
 		, m_inputScale(GetProfileReal("Prescription", "InputScale", 0.5))
 		, m_Slice(0)
 		, m_TransformSlopeVariance(true)

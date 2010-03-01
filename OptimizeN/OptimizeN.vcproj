@@ -182,7 +182,6 @@
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -293,10 +292,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\LineFunction.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\ObjectiveFunction.cpp"
 				>
 			</File>
@@ -352,10 +347,6 @@
 			</File>
 			<File
 				RelativePath=".\include\ConjGradOptimizer.h"
-				>
-			</File>
-			<File
-				RelativePath=".\include\LineFunction.h"
 				>
 			</File>
 			<File

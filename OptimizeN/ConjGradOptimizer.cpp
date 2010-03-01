@@ -51,8 +51,9 @@ const int ITER_MAX = 500;
 const REAL ZEPS = (REAL) 1.0e-10;	
 
 ///////////////////////////////////////////////////////////////////////////////
-CConjGradOptimizer::CConjGradOptimizer(DynamicCovarianceCostFunction/*CObjectiveFunction*/ *pFunc)
-	: COptimizer(pFunc)
+DynamicCovarianceOptimizer::DynamicCovarianceOptimizer(DynamicCovarianceCostFunction *pFunc)
+	: // COptimizer(pFunc)
+	m_pCostFunction(pFunc)
 	, m_bCalcVar(false)
 {
 }	// CConjGradOptimizer::CConjGradOptimizer
@@ -60,26 +61,27 @@ CConjGradOptimizer::CConjGradOptimizer(DynamicCovarianceCostFunction/*CObjective
 ///////////////////////////////////////////////////////////////////////////////
 // bool 
 //	CConjGradOptimizer::minimize(vnl_vector<REAL>& v)
-const CVectorN<>& 
-	CConjGradOptimizer::Optimize(const CVectorN<>& vInit)
+// const CVectorN<>& 
+vnl_nonlinear_minimizer::ReturnCodes 
+	DynamicCovarianceOptimizer::minimize(vnl_vector<REAL>& vInit)
 {
-	LineProjectionFunction m_lineFunction(*m_pFunc);
+	LineProjectionFunction m_lineFunction(*m_pCostFunction);
 	vnl_brent_minimizer m_optimizeBrent(m_lineFunction);
 	m_optimizeBrent.set_x_tolerance(GetLineOptimizerTolerance());
 
 	// initialize, if we are calculating adaptive variance?
-	InitializeDynamicCovariance(vInit.GetDim());
+	InitializeDynamicCovariance(vInit.size());
 
 	// store the initial parameter vector
 	// m_vFinalParam.SetDim(vInit.GetDim());
-	m_vFinalParam = const_cast<CVectorN<>&>(vInit).GetVnlVector();
+	m_FinalParameter = vInit; // const_cast<CVectorN<>&>(vInit).GetVnlVector();
 
 	// set the dimension of the current direction
-	m_vGrad.set_size(vInit.GetDim());		// TODO: is this needed (check logic of compute)
+	m_vGrad.set_size(vInit.size());		// TODO: is this needed (check logic of compute)
 
 	// evaluate the function at the initial point, storing
 	//		the gradient as the current direction
-	m_pFunc->compute(m_vFinalParam, &m_finalValue, &m_vGrad);
+	m_pCostFunction->compute(m_FinalParameter, &m_FinalValue, &m_vGrad);
 	m_vGrad *= R(-1.0);
 
 	// if we are too short,
@@ -93,13 +95,14 @@ const CVectorN<>&
 	m_vDir = m_vGrad;
 
 	BOOL bConvergence = FALSE;
+	ReturnCodes retCode = FAILED_TOO_MANY_ITERATIONS;
 	for (num_iterations_ = 0; (num_iterations_ < ITER_MAX) && !bConvergence; num_iterations_++)
 	{
 		///////////////////////////////////////////////////////////////////////////////
 		// line minimization
 
 		// set up the direction for the line minimization
-		m_lineFunction.SetPoint(m_vFinalParam);
+		m_lineFunction.SetPoint(m_FinalParameter);
 		m_lineFunction.SetDirection(m_vDir);
 
 		// now launch a line optimization
@@ -108,17 +111,17 @@ const CVectorN<>&
 		// update the final parameter value
 		m_vLambdaScaled = m_lineFunction.GetDirection();
 		m_vLambdaScaled *= lambda;
-		m_vFinalParam += m_vLambdaScaled;
+		m_FinalParameter += m_vLambdaScaled;
 
 		// store the final value from the line optimizer
 		REAL new_fv = m_optimizeBrent.f_at_last_minimum();
 
 		// test for convergence on line minimalization
-		bConvergence = (2.0 * fabs(m_finalValue - new_fv) 
-			<= get_x_tolerance() * (fabs(m_finalValue) + fabs(new_fv) + ZEPS));
+		bConvergence = (2.0 * fabs(m_FinalValue - new_fv) 
+			<= get_x_tolerance() * (fabs(m_FinalValue) + fabs(new_fv) + ZEPS));
 
 		// store the previous lambda value
-		m_finalValue = new_fv;
+		m_FinalValue = new_fv;
 
 		// need to call-back?
 		if (m_pCallbackFunc)
@@ -126,8 +129,11 @@ const CVectorN<>&
 			if (!(*m_pCallbackFunc)(this, m_pCallbackParam)) 
 			{
 				// request to terminate
-				num_iterations_ = -1;
-				return m_vFinalParam;
+				// num_iterations_ = -1;
+				//vInit = m_vFinalParam;
+				retCode = FAILED_USER_REQUEST;
+				break;
+				//return retCode; // m_vFinalParam;
 			}
 		}
 
@@ -148,7 +154,7 @@ const CVectorN<>&
 			m_vGradPrev = m_vGrad;
 
 			// compute the gradient at the current parameter value
-			m_pFunc->gradf(m_vFinalParam, m_vGrad);
+			m_pCostFunction->gradf(m_FinalParameter, m_vGrad);
 			m_vGrad *= -1.0;
 
 			// compute numerator for gamma (Polak-Ribiera formula)
@@ -160,26 +166,28 @@ const CVectorN<>&
 		}
 		else
 		{
-			
+			retCode = CONVERGED_XTOL;
 		}
 	}
 
-	if (!bConvergence)
-	{
-		num_iterations_ = -1;
-	}
+	//if (!bConvergence)
+	//{
+	//	retCode = FAILED_TOO_MANY_ITERATIONS;
+	//}
+
+	vInit = m_FinalParameter;
 
 	// return the last parameter vector
-	m_vFinalParamTemp.SetDim(m_vFinalParam.size());
-	m_vFinalParamTemp.GetVnlVector() = m_vFinalParam;
-	return m_vFinalParamTemp;
+	//m_vFinalParamTemp.SetDim(m_vFinalParam.size());
+	//m_vFinalParamTemp.GetVnlVector() = m_vFinalParam;
+	return retCode; // m_vFinalParamTemp;
 
 }	// CConjGradOptimizer::Optimize
 
 
 //////////////////////////////////////////////////////////////////////////////
 void 
-	CConjGradOptimizer::SetAdaptiveVariance(bool bCalcVar, REAL varMin, REAL varMax)
+	DynamicCovarianceOptimizer::SetAdaptiveVariance(bool bCalcVar, REAL varMin, REAL varMax)
 	// used to set up the variance min / max calculation
 {
 	// set the flag
@@ -190,14 +198,14 @@ void
 	m_varMax = varMax;
 
 	// set up for the objective function
-	((DynamicCovarianceCostFunction*)m_pFunc)->SetAdaptiveVariance(&m_vAdaptVariance, m_varMin, m_varMax);
+	m_pCostFunction->SetAdaptiveVariance(&m_vAdaptVariance, m_varMin, m_varMax);
 
 }	// CConjGradOptimizer::SetAdaptiveVariance
 
 
 //////////////////////////////////////////////////////////////////////////////
 void 
-	CConjGradOptimizer::InitializeDynamicCovariance(int nDim)
+	DynamicCovarianceOptimizer::InitializeDynamicCovariance(int nDim)
 {
 	if (!m_bCalcVar)
 		return;
@@ -214,12 +222,12 @@ void
 		m_vAdaptVariance[nN] = m_varMax;
 	}
 
-	((DynamicCovarianceCostFunction*)m_pFunc)->SetAdaptiveVariance(&m_vAdaptVariance, m_varMin, m_varMax);
+	m_pCostFunction->SetAdaptiveVariance(&m_vAdaptVariance, m_varMin, m_varMax);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 void 
-	CConjGradOptimizer::UpdateDynamicCovariance()
+	DynamicCovarianceOptimizer::UpdateDynamicCovariance()
 {
 	if (!m_bCalcVar)
 		return;
@@ -289,5 +297,5 @@ void
 	}
 
 	// now reset the final value, using the new AV vector
-	m_finalValue = m_pFunc->f(m_vFinalParam/*.GetVnlVector()*/);
+	m_FinalValue = m_pCostFunction->f(m_FinalParameter);
 }

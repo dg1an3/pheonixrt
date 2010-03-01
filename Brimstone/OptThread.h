@@ -3,6 +3,7 @@
 #pragma once
 
 // #include <Optimizer.h>
+#include <ConjGradOptimizer.h>
 
 #define WM_OPTIMIZER_START WM_APP+7
 #define WM_OPTIMIZER_STOP  WM_APP+8
@@ -41,7 +42,7 @@ public:
 	DECLARE_ATTRIBUTE_PTR(MsgTarget, CWnd);
 
 	// callback for optimizer iterations
-	static BOOL OnIteration(COptimizer *pOpt, void *pParam);
+	static BOOL OnIteration(DynamicCovarianceOptimizer *pOpt, void *pParam);
 
 	// stores data for current iteration
 	class COptIterData

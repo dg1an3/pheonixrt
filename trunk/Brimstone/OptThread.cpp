@@ -6,6 +6,7 @@
 
 #ifdef USE_RTOPT
 #include <PlanOptimizer.h>
+#include <ConjGradOptimizer.h>
 #endif
 
 // COptThread
@@ -53,7 +54,7 @@ END_MESSAGE_MAP()
 
 //////////////////////////////////////////////////////////////////////////////
 BOOL 
-	COptThread::OnIteration(COptimizer *pOpt, void *pParam)
+	COptThread::OnIteration(DynamicCovarianceOptimizer *pOpt, void *pParam)
 {
 #ifdef USE_RTOPT
 	COptThread *pThread = static_cast<COptThread*>(pParam);
@@ -65,7 +66,7 @@ BOOL
 	// now find the level that we are at
 	for (int nLevel = dH::PlanPyramid::MAX_SCALES-1; nLevel >= 0; nLevel--)
 	{
-		COptimizer *pOptLevel = pPlanOpt->GetOptimizer(nLevel);			
+		DynamicCovarianceOptimizer *pOptLevel = pPlanOpt->GetOptimizer(nLevel);			
 		if (pOpt == pOptLevel)
 		{
 			// construct the iteration data object

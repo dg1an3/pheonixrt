@@ -112,24 +112,24 @@ void COptimizer::SetCallback(OptimizerCallback *pCallback, void *pParam)
 // COptimizer::GetFinalValue
 // 
 // holds the final value of the optimization
-//////////////////////////////////////////////////////////////////////
-REAL COptimizer::GetFinalValue() const
-{
-	return m_finalValue;
-
-}	// COptimizer::GetFinalValue
-
-
-//////////////////////////////////////////////////////////////////////
-// COptimizer::GetFinalParameter
-// 
-// holds the final value of the parameters for the minimum f
-//////////////////////////////////////////////////////////////////////
-// const CVectorN<>& 
-const vnl_vector<REAL>& COptimizer::GetFinalParameter() const
-{
-	return // const_cast<CVectorN<>&>(m_vFinalParam).GetVnlVector();
-		m_vFinalParam;
-
-}	// COptimizer::GetFinalParameter
-
+////////////////////////////////////////////////////////////////////////
+//REAL COptimizer::GetFinalValue() const
+//{
+//	return m_finalValue;
+//
+//}	// COptimizer::GetFinalValue
+//
+//
+////////////////////////////////////////////////////////////////////////
+//// COptimizer::GetFinalParameter
+//// 
+//// holds the final value of the parameters for the minimum f
+////////////////////////////////////////////////////////////////////////
+//// const CVectorN<>& 
+//const vnl_vector<REAL>& COptimizer::GetFinalParameter() const
+//{
+//	return // const_cast<CVectorN<>&>(m_vFinalParam).GetVnlVector();
+//		m_vFinalParam;
+//
+//}	// COptimizer::GetFinalParameter
+//

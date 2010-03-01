@@ -7,10 +7,10 @@
 #include "Optimizer.h"
 
 // subordinate brent optimizer
-#include "BrentOptimizer.h"
+// #include "BrentOptimizer.h"
 
 // the line function for the Brent optimizer
-#include "LineFunction.h"
+//#include "LineFunction.h"
 
 #include "MatrixNxM.h"
 
@@ -24,37 +24,26 @@ class CConjGradOptimizer : public COptimizer
 {
 public:
 	// construct a gradient optimizer for an objective function
-	CConjGradOptimizer(CObjectiveFunction *pFunc);
+	CConjGradOptimizer(DynamicCovarianceCostFunction/*CObjectiveFunction*/ *pFunc);
 
-	// returns a reference to the embedded Brent optimizer
-	vnl_brent_minimizer& GetBrentOptimizer();
+	DeclareMember(LineOptimizerTolerance, REAL);
 
 	// optimize the objective function
 	virtual const CVectorN<>& Optimize(const CVectorN<>& vInit);
 
-	// flag to indicate that line opt tolerance should always be same
-	DECLARE_ATTRIBUTE(LineToleranceEqual, bool);
-
 	// used to set up the variance min / max calculation
 	void SetAdaptiveVariance(bool bCalcVar, REAL varMin, REAL varMax);
 
+protected:
+	void InitializeDynamicCovariance(int nDim);
+	void UpdateDynamicCovariance();
+
 private:
-	// line function that projects the objective function along 
-	//		a given line
-	CLineFunction m_lineFunction;
-
-	// points to the line optimizer to be used
-	// COptimizer *m_pLineOptimizer;
-
-	// brent optimizer along the line function
-	vnl_brent_minimizer m_optimizeBrent;
-
 	// "statics" for the optimization routine
-	CVectorN<> m_vGrad;
-	CVectorN<> m_vGradPrev;
-	CVectorN<> m_vDir;
-	CVectorN<> m_vDirPrev;
-	CVectorN<> m_vLambdaScaled;
+	vnl_vector<REAL> m_vGrad;
+	vnl_vector<REAL> m_vGradPrev;
+	vnl_vector<REAL> m_vDir;
+	vnl_vector<REAL> m_vLambdaScaled;
 
 	// flag to indicate adaptive variance calculation
 	bool m_bCalcVar;
@@ -64,8 +53,8 @@ private:
 	REAL m_varMax;
 
 	// stores orthogonal basis for searched directions (used to calculate adaptive variance)
-	CMatrixNxM<> m_mOrthoBasis;
-	CMatrixNxM<> m_mSearchedDir;
+	vnl_matrix<REAL> m_mOrthoBasis;
+	vnl_matrix<REAL> m_mSearchedDir;
 
 	// stores the calculated AV
 	CVectorN<> m_vAdaptVariance;

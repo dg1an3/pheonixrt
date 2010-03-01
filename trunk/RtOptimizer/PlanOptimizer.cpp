@@ -72,7 +72,7 @@ Prescription *
 }	// PlanOptimizer::GetPrescription
 
 ///////////////////////////////////////////////////////////////////////////////
-COptimizer *
+DynamicCovarianceOptimizer *
 	PlanOptimizer::GetOptimizer(int nLevel)
 	// returns the given level of the pyramid
 {
@@ -113,7 +113,7 @@ bool
 	for (int nLevel = m_arrPrescriptions.size()-1; nLevel >= 0; nLevel--)
 	{
 		dH::Prescription *pPresc = GetPrescription(nLevel);
-		COptimizer *pOpt = GetOptimizer(nLevel);
+		DynamicCovarianceOptimizer *pOpt = GetOptimizer(nLevel);
 
 		// update the histogram regions
 		pPresc->UpdateHistogramRegions();
@@ -126,10 +126,12 @@ bool
 
 		// NOTE: this needs to be in the form of an initializer, 
 		//	or else SetDim needs to be called for vRes before the call
-		CVectorN<> vRes = pOpt->Optimize(vInit);
+		// CVectorN<> vRes = pOpt->Optimize(vInit);
+		pOpt->minimize(vInit.GetVnlVector());
+		CVectorN<> vRes = vInit;
 
 		// check for problem with optimization
-		if (pOpt->get_num_iterations/*GetIterations*/() == -1)
+		if (pOpt->get_num_iterations() == -1)
 		{
 			return false;
 		}
@@ -300,7 +302,7 @@ void
 		// pPresc->SetGBinVar(varMin, varMax);
 
 		// construct the optimizer
-		CConjGradOptimizer *pOptimizer = new CConjGradOptimizer(pPresc);
+		DynamicCovarianceOptimizer *pOptimizer = new DynamicCovarianceOptimizer(pPresc);
 
 		// set the variance range for the optimizer
 		pOptimizer->SetAdaptiveVariance(true, varMin, varMax);
@@ -326,7 +328,7 @@ void
 		//		it will over-ride some of those settings
 		pPresc->SetGBinVar(varMin, varMax);
 
-		m_arrPrescriptions.push_back(std::pair<Prescription*, COptimizer*>(pPresc, pOptimizer));
+		m_arrPrescriptions.push_back(std::pair<Prescription*, DynamicCovarianceOptimizer*>(pPresc, pOptimizer));
 	}
 
 }	// PlanOptimizer::SetupPrescription

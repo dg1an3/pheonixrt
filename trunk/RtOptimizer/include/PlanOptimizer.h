@@ -5,6 +5,8 @@
 #include <Prescription.h>
 #include <PlanPyramid.h>
 
+#include <ConjGradOptimizer.h>
+
 namespace dH
 {
 
@@ -27,7 +29,7 @@ public:
 
 	// accessors for the prescription objects
 	Prescription *GetPrescription(int nLevel);
-	COptimizer *GetOptimizer(int nLevel);
+	DynamicCovarianceOptimizer *GetOptimizer(int nLevel);
 
 	// handles cloning to separate layers
 	void AddStructureTerm(VOITerm *pST);
@@ -61,7 +63,7 @@ protected:
 
 private:
 	// pointers to the other prescription objects
-	vector< std::pair<dH::Prescription*, COptimizer*> > m_arrPrescriptions;
+	vector< std::pair<dH::Prescription*, DynamicCovarianceOptimizer*> > m_arrPrescriptions;
 };
 
 }	// namespace dH

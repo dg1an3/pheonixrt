@@ -23,7 +23,7 @@ class PlanOptimizer;
 // 
 // represents the Prescription objective function
 ///////////////////////////////////////////////////////////////////////////////
-class Prescription : public CObjectiveFunction  
+class Prescription : public DynamicCovarianceCostFunction /* CObjectiveFunction */
 {
 public:
 	// constructors / destructors

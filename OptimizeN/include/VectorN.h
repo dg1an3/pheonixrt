@@ -38,10 +38,24 @@ public:
 	CVectorN();
 	explicit CVectorN(int nDim);
 	CVectorN(const CVectorN& vFrom);
+	CVectorN(const vnl_vector<TYPE>& vFrom)
+	: m_nDim(0),
+		m_pElements(NULL),
+		m_bFreeElements(TRUE),
+		m_pvVnlVector(NULL)
+	{
+		this->SetDim(vFrom.size());
+		(*this) = vFrom;
+	}
 	~CVectorN();
 
 	// assignment operator
 	CVectorN& operator=(const CVectorN& vFrom);
+	CVectorN& operator=(const vnl_vector<TYPE>& vFrom)
+	{
+		::CopyElements<TYPE>(&(*this)[0], &vFrom[0], GetDim());
+		return (*this);
+	}
 
 	// get the vnl vector
 	vnl_vector<TYPE>& GetVnlVector()

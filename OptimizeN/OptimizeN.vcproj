@@ -296,10 +296,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Optimizer.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\stdafx.cpp"
 				>
 				<FileConfiguration
@@ -341,10 +337,6 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
-			<File
-				RelativePath=".\include\BrentOptimizer.h"
-				>
-			</File>
 			<File
 				RelativePath=".\include\ConjGradOptimizer.h"
 				>

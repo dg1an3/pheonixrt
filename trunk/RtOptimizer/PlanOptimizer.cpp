@@ -129,7 +129,7 @@ bool
 		CVectorN<> vRes = pOpt->Optimize(vInit);
 
 		// check for problem with optimization
-		if (pOpt->GetIterations() == -1)
+		if (pOpt->get_num_iterations/*GetIterations*/() == -1)
 		{
 			return false;
 		}
@@ -310,11 +310,12 @@ void
 
 		// set the line tolerance
 		const REAL cgTolerance = GetProfileRealAt(CGTOL_KEY, nLevel, DEFAULT_TOLERANCE);
-		pOptimizer->SetTolerance(cgTolerance); 
+		pOptimizer->set_x_tolerance/*SetTolerance*/(cgTolerance); 
 
 		// set the CG tolerance
 		const REAL lineTolerance = GetProfileRealAt(LINETOL_KEY, nLevel, DEFAULT_TOLERANCE);
-		pOptimizer->GetBrentOptimizer().set_x_tolerance(lineTolerance);
+		// pOptimizer->GetBrentOptimizer().set_x_tolerance(lineTolerance);
+		pOptimizer->SetLineOptimizerTolerance(lineTolerance);
 
 		// do not apply transform slope variance for lowest-res level
 		if (nLevel == PlanPyramid::MAX_SCALES-1)

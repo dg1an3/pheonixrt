@@ -71,9 +71,9 @@ BOOL
 			// construct the iteration data object
 			pOID = new COptIterData();
 			pOID->m_nLevel = nLevel;
-			pOID->m_nIteration = pOpt->GetIterations();
+			pOID->m_nIteration = pOpt->get_num_iterations/*GetIterations*/();
 			pOID->m_ofvalue = pOpt->GetFinalValue();
-			pOID->m_vParam.SetDim(pOpt->GetFinalParameter().GetDim());
+			pOID->m_vParam.SetDim(pOpt->GetFinalParameter().size/*GetDim*/());
 			pOID->m_vParam = pOpt->GetFinalParameter();
 
 			// transform the final parameter

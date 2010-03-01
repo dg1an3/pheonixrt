@@ -9,18 +9,12 @@
 #include <VectorN.h>
 
 //////////////////////////////////////////////////////////////////////
-// class CObjectiveFunction
-// 
-// base class template for all objective functions.  allows the 
-//		objective function to define a gradient, but a flag is provided
-//		in the case that no gradient is available
-//////////////////////////////////////////////////////////////////////
-class CObjectiveFunction :/* public CObject,*/ public vnl_cost_function
+class DynamicCovarianceCostFunction : public vnl_cost_function
 {
 public:
 	// constructs an objective function; gets flag to indicate
 	//		whether gradient information is available
-	CObjectiveFunction(BOOL bHasGradientInfo);
+	DynamicCovarianceCostFunction(); // BOOL bHasGradientInfo);
 
 	// evaluates the objective function
 	virtual REAL operator()(const CVectorN<>& vInput, 
@@ -32,7 +26,7 @@ public:
 		double *f, vnl_vector<double>* g);
 
 	// whether gradient information is available
-	BOOL HasGradientInfo() const;
+	//BOOL HasGradientInfo() const;
 
 	// transform function from linear to other parameter space
 	virtual void Transform(CVectorN<> *pvInOut) const;
@@ -40,8 +34,8 @@ public:
 	virtual void InvTransform(CVectorN<> *pvInOut) const;
 
 	// function to evaluate gradiant at a point (uses difference method)
-	void Gradient(const CVectorN<>& vIn, REAL epsilon, 
-				CVectorN<>& vGrad_out) const;
+	//void Gradient(const CVectorN<>& vIn, REAL epsilon, 
+	//			CVectorN<>& vGrad_out) const;
 
 	// sets the OF to use adaptive variance
 	void SetAdaptiveVariance(CVectorN<> *pAV, REAL varMin, REAL varMax);
@@ -54,9 +48,9 @@ protected:
 	REAL m_varMin;
 	REAL m_varMax;
 
-private:
-	// flag to indicate that gradient information is available
-	BOOL m_bHasGradientInfo;
+//private:
+//	// flag to indicate that gradient information is available
+//	BOOL m_bHasGradientInfo;
 
 };	// class CObjectiveFunction
 

@@ -11,15 +11,15 @@
 // 
 // <description>
 ///////////////////////////////////////////////////////////////////////////////
-CObjectiveFunction::CObjectiveFunction(BOOL bHasGradientInfo)
-	: m_bHasGradientInfo(bHasGradientInfo)
-	, m_pAV(NULL)
+DynamicCovarianceCostFunction::DynamicCovarianceCostFunction(/*BOOL bHasGradientInfo*/)
+	: /*m_bHasGradientInfo(bHasGradientInfo)
+	, */m_pAV(NULL)
 {
 }	// CObjectiveFunction::CObjectiveFunction
 
 ///////////////////////////////////////////////////////////////////////////////
 void 
-	CObjectiveFunction::compute(vnl_vector<double> const& x, 
+	DynamicCovarianceCostFunction::compute(vnl_vector<double> const& x, 
 			double *f, vnl_vector<double>* g)
 {
 	CVectorN<REAL> vX(x.size());
@@ -28,7 +28,14 @@ void
 	if (g != NULL)
 	{
 		CVectorN<REAL> vG(g->size());
-		(*f) = (*this)(vX, &vG);
+		if (f != NULL)
+		{
+			(*f) = (*this)(vX, &vG);
+		}
+		else
+		{
+			(*this)(vX, &vG);
+		}
 		CopyElements<REAL>(&(*g)[0], &vG[0], x.size());
 	}
 	else
@@ -42,11 +49,11 @@ void
 // 
 // whether gradient information is available
 ///////////////////////////////////////////////////////////////////////////////
-BOOL CObjectiveFunction::HasGradientInfo() const
-{
-	return m_bHasGradientInfo;
-
-}	// CObjectiveFunction::HasGradientInfo
+//BOOL DynamicCovarianceCostFunction::HasGradientInfo() const
+//{
+//	return m_bHasGradientInfo;
+//
+//}	// CObjectiveFunction::HasGradientInfo
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -54,7 +61,7 @@ BOOL CObjectiveFunction::HasGradientInfo() const
 // 
 // over-ride for function to transform parameters
 ///////////////////////////////////////////////////////////////////////////////
-void CObjectiveFunction::Transform(CVectorN<> *pvInOut) const
+void DynamicCovarianceCostFunction::Transform(CVectorN<> *pvInOut) const
 {
 	// default is identity transform
 	ASSERT(false);
@@ -66,7 +73,7 @@ void CObjectiveFunction::Transform(CVectorN<> *pvInOut) const
 // 
 // over-ride for derivative transform parameters
 ///////////////////////////////////////////////////////////////////////////////
-void CObjectiveFunction::dTransform(CVectorN<> *pvInOut) const
+void DynamicCovarianceCostFunction::dTransform(CVectorN<> *pvInOut) const
 {
 	// set to all 1.0 for identity transform
 	ITERATE_VECTOR((*pvInOut), nAt, (*pvInOut)[nAt] = 1.0);
@@ -78,7 +85,7 @@ void CObjectiveFunction::dTransform(CVectorN<> *pvInOut) const
 // 
 // inverse of parameter transform
 ///////////////////////////////////////////////////////////////////////////////
-void CObjectiveFunction::InvTransform(CVectorN<> *pvInOut) const
+void DynamicCovarianceCostFunction::InvTransform(CVectorN<> *pvInOut) const
 {
 	// default is identity transform
 	ASSERT(false);
@@ -91,43 +98,43 @@ void CObjectiveFunction::InvTransform(CVectorN<> *pvInOut) const
 // 
 // approximates gradient using difference method
 ///////////////////////////////////////////////////////////////////////////////
-void CObjectiveFunction::Gradient(const CVectorN<>& vIn, REAL epsilon, 
-				CVectorN<>& vGrad_out) const
-{
-	REAL res = 0.0;
-	BEGIN_LOG_SECTION(CObjectiveFunction::Gradient());
-
-	// get epsilon
-	REAL elem_max = 0.0;
-	for (int nAt = 0; nAt < vIn.GetDim(); nAt++)
-	{
-		elem_max = __max(elem_max, fabs(vIn[nAt]));
-	}
-	epsilon = elem_max * epsilon;
-
-	// numerically evaluate the gradiant
-	CVectorN<> vParam = vIn;
-	const REAL fp = (*this)(vParam);
-
-	vGrad_out.SetDim(vParam.GetDim());
-	for (int nAt = 0; nAt < vParam.GetDim(); nAt++)
-	{
-		vParam[nAt] += epsilon;
-
-		const REAL fp_del = (*this)(vParam);
-		vGrad_out[nAt] = (fp_del - fp) / epsilon;
-
-		vParam[nAt] -= epsilon;
-	}
-	LOG_EXPR_EXT(vGrad_out);
-
-	END_LOG_SECTION();	// CObjectiveFunction::Gradient
-
-}	// CObjectiveFunction::Gradient
+//void DynamicCovarianceCostFunction::Gradient(const CVectorN<>& vIn, REAL epsilon, 
+//				CVectorN<>& vGrad_out) const
+//{
+//	REAL res = 0.0;
+//	BEGIN_LOG_SECTION(CObjectiveFunction::Gradient());
+//
+//	// get epsilon
+//	REAL elem_max = 0.0;
+//	for (int nAt = 0; nAt < vIn.GetDim(); nAt++)
+//	{
+//		elem_max = __max(elem_max, fabs(vIn[nAt]));
+//	}
+//	epsilon = elem_max * epsilon;
+//
+//	// numerically evaluate the gradiant
+//	CVectorN<> vParam = vIn;
+//	const REAL fp = (*this)(vParam);
+//
+//	vGrad_out.SetDim(vParam.GetDim());
+//	for (int nAt = 0; nAt < vParam.GetDim(); nAt++)
+//	{
+//		vParam[nAt] += epsilon;
+//
+//		const REAL fp_del = (*this)(vParam);
+//		vGrad_out[nAt] = (fp_del - fp) / epsilon;
+//
+//		vParam[nAt] -= epsilon;
+//	}
+//	LOG_EXPR_EXT(vGrad_out);
+//
+//	END_LOG_SECTION();	// CObjectiveFunction::Gradient
+//
+//}	// CObjectiveFunction::Gradient
 
 //////////////////////////////////////////////////////////////////////////////
 void 
-	CObjectiveFunction::SetAdaptiveVariance(CVectorN<> *pAV, REAL varMin, REAL varMax)
+	DynamicCovarianceCostFunction::SetAdaptiveVariance(CVectorN<> *pAV, REAL varMin, REAL varMax)
 	// sets the OF to use adaptive variance
 {
 	// store pointer to the AV vector

@@ -282,6 +282,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\OptimizeN\ConjGradOptimizer.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Histogram.cpp"
 				>
 			</File>
@@ -291,6 +295,10 @@
 			</File>
 			<File
 				RelativePath=".\KLDivTerm.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\OptimizeN\ObjectiveFunction.cpp"
 				>
 			</File>
 			<File
@@ -352,6 +360,10 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\OptimizeN\include\ConjGradOptimizer.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\Histogram.h"
 				>
 			</File>
@@ -361,6 +373,10 @@
 			</File>
 			<File
 				RelativePath=".\include\KLDivTerm.h"
+				>
+			</File>
+			<File
+				RelativePath="..\OptimizeN\include\ObjectiveFunction.h"
 				>
 			</File>
 			<File

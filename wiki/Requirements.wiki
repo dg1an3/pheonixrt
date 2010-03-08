@@ -15,4 +15,8 @@ Requirements:
   # PrescriptionDefinition
   # PlanSetup
   # PlanOptimization
+    * User shall be able to specify optimization-specific parameters
+    * User shall be able to start optimization and tell that optimization is running
+    * User shall be able to visualize intermediate optimization of plan (see PlanReview requirements)
+    * User shall be able to stop / restart optimization
   # PlanReview

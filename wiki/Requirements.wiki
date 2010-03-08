@@ -12,5 +12,5 @@ Requirements include:
   * Segmentation
   * PrescriptionDefinition
   * PlanSetup
-  * Optimization
+  * PlanOptimization
   * PlanReview

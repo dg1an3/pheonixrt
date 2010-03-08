@@ -1,6 +1,0 @@
-#summary DICOM import requirements
-#labels Phase-Requirements
-
-== Requirements ==
-  * User shall be able to import DICOM CT series
-  * User shall be able to import associated DICOM StructureSet

@@ -3,12 +3,9 @@
 
 = Introduction =
 
-Add your content here.
+The RtOptimizer library contains the code for performing the actual optimization
 
 
 = Details =
 
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+In the process of converting the optimizier to use the vnl optimization base.  Unfortunately the vnl conjugate gradient optimizer has no "hook" to be able to compute the dynamic covariance, so a completely separate DynamicCovarianceOptimizer is being used.  Also a DynamicCovarianceCostFunction implements those parts of the cost function that are specific to the DynamicCovariance technique.

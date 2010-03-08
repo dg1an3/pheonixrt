@@ -7,10 +7,12 @@ Add your content here.
 
 = Details =
 
-Requirements include:
-  * DataImport
-  * Segmentation
-  * PrescriptionDefinition
-  * PlanSetup
-  * PlanOptimization
-  * PlanReview
+Requirements:
+  # DataImport
+    * User shall be able to import DICOM CT series
+    * User shall be able to import associated DICOM StructureSet?
+  # Segmentation
+  # PrescriptionDefinition
+  # PlanSetup
+  # PlanOptimization
+  # PlanReview

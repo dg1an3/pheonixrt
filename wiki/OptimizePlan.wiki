@@ -1,7 +1,0 @@
-#summary Plan Optimization requirements
-#labels Phase-Requirements
-
-== Requirements ==
-  * Start optimization
-  * Visualize optimized dose
-  * Stop / restart optimization

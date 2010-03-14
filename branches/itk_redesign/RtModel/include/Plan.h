@@ -42,7 +42,7 @@ public:
 	DECLARE_SERIAL(CPlan)
 
 	// series accessor
-	DECLARE_ATTRIBUTE_PTR_GI(Series, CSeries);
+	DECLARE_ATTRIBUTE_PTR_GI(Series, dH::Series);
 
 	// histogram accessor / creator
 	CHistogram *GetHistogram(dH::Structure *pSurface, bool bCreate);

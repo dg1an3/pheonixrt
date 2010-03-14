@@ -1,12 +1,12 @@
-// Copyright (C) 2nd Messenger Systems
-// $Id: SeriesDicomImporter.cpp 640 2009-06-13 05:06:50Z dglane001 $
+// SeriesDicomImporter.cpp: implementation of the CSeriesDicomImporter class.
+//
+//////////////////////////////////////////////////////////////////////
+
 #include "stdafx.h"
 #include "SeriesDicomImporter.h"
 
 #include <Series.h>
 #include <Structure.h>
-//#include <Volumep.h>
-#include <Polygon.h>
 
 #include <dcmtk/dcmdata/dcmetinf.h>
 #include <dcmtk/dcmdata/dcdeftag.h>
@@ -32,7 +32,7 @@ if (!(x.good()))	\
 //////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////////
-CSeriesDicomImporter::CSeriesDicomImporter(CSeries *pSeries, CFileDialog *pDlg)
+CSeriesDicomImporter::CSeriesDicomImporter(dH::Series *pSeries, CFileDialog *pDlg)
 : m_pSeries(pSeries),
 	m_pDlg(pDlg),
 	m_posFile(NULL),
@@ -97,6 +97,10 @@ int CSeriesDicomImporter::ProcessNext()
 	}
 	else
 	{
+		// done with import, so update the pipelines
+		m_pSeries->UpdateStructurePipelines();
+
+		// and exit
 		return -1;
 	}
 
@@ -129,9 +133,7 @@ void CSeriesDicomImporter::FormatVolume()
 		// determine slice spacing
 		VolumeReal::SpacingType vSpacing = pItem->m_vSpacing;
 		CDicomImageItem *pItem2 = m_arrImageItems[1];
-		/// TEMP: make isotropic
-		vSpacing[2] = // vSpacing[0];
-			pItem2->m_vOrigin[2] - pItem->m_vOrigin[2];
+		vSpacing[2] = pItem2->m_vOrigin[2] - pItem->m_vOrigin[2];
 		m_pSeries->GetDensity()->SetSpacing(vSpacing); 
 
 		// TODO: set direction
@@ -158,11 +160,12 @@ BOOL convertVoxels(VOXEL_TYPE *pOrigVoxels, int nSize,
 //////////////////////////////////////////////////////////////////////////////
 void CSeriesDicomImporter::ResampleNextDicomImage()
 {
+	// must format first, as this sorts m_arrImageItems
+	FormatVolume();
+
 	// consume the image items, starting at the end of the list
 	DcmDataset *pDataset = m_arrImageItems.back()->m_pFileFormat->getDataset();
 	DcmMetaInfo *pMetaInfo = m_arrImageItems.back()->m_pFileFormat->getMetaInfo();
-
-	FormatVolume();
 
 	// calculate current slice position in the volume
 	int nSlice = (int) m_arrImageItems.size()-1;
@@ -301,7 +304,6 @@ void CSeriesDicomImporter::ImportDicomStructureSet(DcmFileFormat *pFileFormat)
 {
 	DcmDataset *pDataset = pFileFormat->getDataset();
 
-	// CTypedPtrArray< CObArray, CStructure * > arrROIs;
 	std::map<int, dH::Structure::Pointer > mapROIs;
 
 	DcmSequenceOfItems *pSSROISequence = NULL;
@@ -319,8 +321,7 @@ void CSeriesDicomImporter::ImportDicomStructureSet(DcmFileFormat *pFileFormat)
 		dH::Structure::Pointer pStruct = dH::Structure::New();
 		pStruct->SetName(strName.c_str());
 
-		// add to ROI list
-		// arrROIs.SetAtGrow(nROINumber, pStruct);
+		// add to ROI map
 		mapROIs[nROINumber] = pStruct;
 
 		// add structure to series
@@ -335,8 +336,8 @@ void CSeriesDicomImporter::ImportDicomStructureSet(DcmFileFormat *pFileFormat)
 
 		long nRefROINumber = 0;
 		CHK_DCM(pROIContourItem->findAndGetSint32(DCM_ReferencedROINumber, nRefROINumber));
-		dH::Structure *pStruct = mapROIs[nRefROINumber];
-		ASSERT(pStruct != NULL);
+		dH::Structure::Pointer pStruct = mapROIs[nRefROINumber];
+		ASSERT(pStruct.IsNotNull());
 
 		OFString strColor;
 		CHK_DCM(pROIContourItem->findAndGetOFStringArray(DCM_ROIDisplayColor, strColor));
@@ -361,7 +362,7 @@ void CSeriesDicomImporter::ImportDicomStructureSet(DcmFileFormat *pFileFormat)
 				OFString strContourData;
 				CHK_DCM(pContourItem->findAndGetOFStringArray(DCM_ContourData, strContourData));
 
-				CPolygon *pPoly = new CPolygon();
+				dH::ContourType::Pointer pContour = dH::ContourType::New();
 
 				int nStart = 0;
 				int nNext = 0;
@@ -390,10 +391,11 @@ void CSeriesDicomImporter::ImportDicomStructureSet(DcmFileFormat *pFileFormat)
 					}
 					ASSERT(IsApproxEqual(coord_z, slice_z));
 
-					pPoly->AddVertex(MakeVector<2>(coord_x, coord_y)); // (vVert);
+					pContour->AddVertex(MakeContinuousIndex<3>(coord_x, coord_y, coord_z));
 				}
 
-				pStruct->AddContour(pPoly, slice_z);
+
+				pStruct->AddContourPoly(pContour);
 			}
 		}
 	}

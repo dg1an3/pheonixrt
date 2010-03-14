@@ -1,48 +1,47 @@
 // Copyright (C) 2nd Messenger Systems
 // $Id: Series.h 640 2009-06-13 05:06:50Z dglane001 $
-#if !defined(AFX_SERIES_H__731877C4_EE46_11D4_9E36_00B0D0609AB0__INCLUDED_)
-#define AFX_SERIES_H__731877C4_EE46_11D4_9E36_00B0D0609AB0__INCLUDED_
-
 #pragma once
 
 #include <Structure.h>
 
+BeginNamespace(dH)
+
 ///////////////////////////////////////////////////////////////////////////////
-// class CSeries
-// 
-// <description>
-///////////////////////////////////////////////////////////////////////////////
-class CSeries : public CModelObject
+class Series : 
+		public DataObject
 {
 public:
-	CSeries();          
-	virtual ~CSeries();
+	Series();          
+	virtual ~Series();
 
-	DECLARE_SERIAL(CSeries)
-	virtual void Serialize(CArchive& ar);
+	// itk typedefs
+	typedef Series Self;
+	typedef DataObject Superclass;
+	typedef SmartPointer<Self> Pointer;
+	typedef SmartPointer<const Self> ConstPointer;
+
+	// defines itk's New and CreateAnother static functions
+	itkNewMacro(Self);
 
 	// Structures for the series
 	int GetStructureCount() const;
 	dH::Structure *GetStructureAt(int nAt);
-	dH::Structure * GetStructureFromName(const CString& strName);
+	dH::Structure *GetStructureFromName(const CString& strName);
 	void AddStructure(dH::Structure *pStruct);
 
 	// Volume data for the series
-	DECLARE_ATTRIBUTE_SPTR(Density, VolumeReal);
+	DeclareMemberSPtr(Density, VolumeReal);
 
-#ifdef _DEBUG
-	virtual void AssertValid() const;
-	virtual void Dump(CDumpContext& dc) const;
-#endif
+	// called to update structure pipelines for priorities
+	void UpdateStructurePipelines();
+
+	// serialization
+	void SerializeExt(CArchive& ar, int nSchema);
 
 private:
-	//CTypedPtrArray<CObArray, CStructure*> m_arrStructures;
 	// the structure array
 	std::vector< dH::Structure::Pointer > m_arrStructures;
 };
 
+EndNamespace(dH)
 
-//{{AFX_INSERT_LOCATION}	// CSeries}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
-
-#endif // !defined(AFX_SERIES_H__731877C4_EE46_11D4_9E36_00B0D0609AB0__INCLUDED_)

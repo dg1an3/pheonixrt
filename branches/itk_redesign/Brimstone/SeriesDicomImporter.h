@@ -1,26 +1,21 @@
-// Copyright (C) 2nd Messenger Systems
-// $Id: SeriesDicomImporter.h 609 2008-09-14 18:34:53Z dglane001 $
-#if !defined(AFX_SERIESDICOMIMPORTER_H__718F0516_B419_4DF9_BFF5_5A5578C638AD__INCLUDED_)
-#define AFX_SERIESDICOMIMPORTER_H__718F0516_B419_4DF9_BFF5_5A5578C638AD__INCLUDED_
+// SeriesDicomImporter.h: interface for the CSeriesDicomImporter class.
+//
+//////////////////////////////////////////////////////////////////////
+
+#pragma once
 
 #include <dcmtk/dcmdata/dcfilefo.h>
 
-//#include <VectorD.h>
-
 #include <vector>
 
+#include <Series.h>
 
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
-
-class CSeries;
 
 //////////////////////////////////////////////////////////////////////////////
 class CSeriesDicomImporter  
 {
 public:
-	CSeriesDicomImporter(CSeries *pSeries, CFileDialog *pDlg);
+	CSeriesDicomImporter(dH::Series *pSeries, CFileDialog *pDlg);
 	virtual ~CSeriesDicomImporter();
 
 	// processes next file / image
@@ -37,7 +32,7 @@ public:
 
 private:
 	// the series for the importer
-	CSeries *m_pSeries;
+	dH::Series *m_pSeries;
 
 	// the file dialog and position of the file
 	CFileDialog *m_pDlg;
@@ -79,5 +74,3 @@ private:
 	// flag to indicate if the volume is formatted
 	BOOL m_bVolumeFormatted;
 };
-
-#endif // !defined(AFX_SERIESDICOMIMPORTER_H__718F0516_B419_4DF9_BFF5_5A5578C638AD__INCLUDED_)

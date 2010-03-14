@@ -184,7 +184,7 @@ void
 	{
 		m_cbSSelect.ResetContent();
 
-		CSeries *pSeries = GetDocument()->m_pSeries.get();
+		dH::Series *pSeries = GetDocument()->m_pSeries;
 		for (int nStruct = 0; nStruct < pSeries->GetStructureCount(); nStruct++)
 		{
 			dH::Structure *pStruct = pSeries->GetStructureAt(nStruct);
@@ -406,18 +406,18 @@ void CPrescriptionToolbar::OnBnClickedCheckContour()
 {
 	if (m_btnContour.GetCheck())
 	{
-		GetView()->m_wndPlanarView.SetSelectedStructure(GetSelectedStruct());
-		GetView()->m_wndPlanarView.SetSelectedContour(NULL);
-		GetView()->m_wndPlanarView.SetSelectedVertex(NULL);
+		GetView()->m_wndPlanarView.GetContourDrawer()->SetSelectedStructure(GetSelectedStruct());
+		GetView()->m_wndPlanarView.GetContourDrawer()->SetSelectedContour(NULL);
+		// GetView()->m_wndPlanarView.GetContourDrawer()->SetSelectedVertex(NULL);
 
 		// TODO: put Invalidate in SetSelectedStructure
 		GetView()->m_wndPlanarView.Invalidate();
 	}
 	else
 	{
-		GetView()->m_wndPlanarView.SetSelectedStructure(NULL);
-		GetView()->m_wndPlanarView.SetSelectedContour(NULL);
-		GetView()->m_wndPlanarView.SetSelectedVertex(NULL);
+		GetView()->m_wndPlanarView.GetContourDrawer()->SetSelectedStructure(NULL);
+		GetView()->m_wndPlanarView.GetContourDrawer()->SetSelectedContour(NULL);
+		// GetView()->m_wndPlanarView.SetSelectedVertex(NULL);
 
 		GetView()->m_wndPlanarView.Invalidate();
 	}

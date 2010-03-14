@@ -220,7 +220,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\GenImaging\include;..\Graph\include;..\RtOptimizer\include;..\RtModel\include;..\OptimizeN\include;&quot;$(DCMTK_DIR)\dcmimgle\include&quot;;&quot;$(DCMTK_DIR)\dcmdata\include&quot;;&quot;$(DCMTK_DIR)\ofstd\include&quot;;&quot;$(DCMTK_DIR)\config\include&quot;;&quot;$(ITK_DIR)\Code\Algorithms&quot;;&quot;$(ITK_DIR)\Code\BasicFilters&quot;;&quot;$(ITK_DIR)\Code\Common&quot;;&quot;$(ITK_BUILD_DIR)&quot;;&quot;$(ITK_DIR)\Utilities\vxl\vcl&quot;;&quot;$(ITK_BUILD_DIR)\Utilities\vxl\vcl&quot;;&quot;$(ITK_DIR)\Utilities\vxl\core&quot;;&quot;$(ITK_BUILD_DIR)\Utilities\vxl\core&quot;"
+				AdditionalIncludeDirectories="..\GenImaging\include;..\Graph\include;..\RtOptimizer\include;..\RtModel\include;..\OptimizeN\include;&quot;$(DCMTK_DIR)\dcmimgle\include&quot;;&quot;$(DCMTK_DIR)\dcmdata\include&quot;;&quot;$(DCMTK_DIR)\ofstd\include&quot;;&quot;$(DCMTK_DIR)\config\include&quot;;&quot;$(ITK_DIR)\Code\Numerics\Statistics&quot;;&quot;$(ITK_DIR)\Code\Algorithms&quot;;&quot;$(ITK_DIR)\Code\BasicFilters&quot;;&quot;$(ITK_DIR)\Code\Common&quot;;&quot;$(ITK_BUILD_DIR)&quot;;&quot;$(ITK_DIR)\Utilities\vxl\vcl&quot;;&quot;$(ITK_BUILD_DIR)\Utilities\vxl\vcl&quot;;&quot;$(ITK_DIR)\Utilities\vxl\core&quot;;&quot;$(ITK_BUILD_DIR)\Utilities\vxl\core&quot;"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;USE_IPP;SBYTE_DEFINED;USE_RTOPT"
 				MinimalRebuild="false"
 				RuntimeLibrary="2"
@@ -242,7 +242,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="$(DCMTK_BUILD_DIR)\dcmimgle\libsrc\release\dcmimgle.lib $(DCMTK_BUILD_DIR)\dcmdata\libsrc\release\dcmdata.lib $(DCMTK_BUILD_DIR)\ofstd\libsrc\release\ofstd.lib ITKAlgorithms.lib ITKBasicFilters.lib ITKCommon.lib itkvnl_inst.lib itkvnl_algo.lib itkv3p_netlib.lib itkvnl.lib itkvcl.lib itksys.lib ippi.lib ipps.lib ippm.lib ippcore.lib ws2_32.lib netapi32.lib"
+				AdditionalDependencies="$(DCMTK_BUILD_DIR)\dcmimgle\libsrc\release\dcmimgle.lib $(DCMTK_BUILD_DIR)\dcmdata\libsrc\release\dcmdata.lib $(DCMTK_BUILD_DIR)\ofstd\libsrc\release\ofstd.lib ITKStatistics.lib ITKAlgorithms.lib ITKBasicFilters.lib ITKCommon.lib itkvnl_inst.lib itkvnl_algo.lib itkv3p_netlib.lib itkvnl.lib itkvcl.lib itksys.lib ippi.lib ipps.lib ippm.lib ippcore.lib ws2_32.lib netapi32.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="$(ITK_BUILD_DIR)\bin\Release"
 				GenerateDebugInformation="true"

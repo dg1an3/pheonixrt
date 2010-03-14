@@ -1,37 +1,51 @@
-// Copyright (C) 2nd Messenger Systems - U. S. Patent 7,369,645
-// $Id: DataSeries.h 607 2008-09-14 18:32:17Z dglane001 $
+// Copyright (C) 2nd Messenger Systems
+// $Id$
 #pragma once
 
-//#include <VectorD.h>
-#include <MatrixNxM.h>
+#include <itkDataObject.h>
+using namespace itk;
 
-#include <ModelObject.h>
-// #include <Attributes.h>
+BeginNamespace(dH)
 
-class CGraph;
+// forward definition
+class Graph;
 
-class CDataSeries :
-	public CModelObject
+//////////////////////////////////////////////////////////////////////////////
+class DataSeries :
+	public DataObject 
 {
 public:
-	CDataSeries(void);
-	virtual ~CDataSeries(void);
+	DataSeries(void);
+	virtual ~DataSeries(void);
 
-	// the object of the data series
-	DECLARE_ATTRIBUTE_PTR(Object, CObject);
+	// itk typedefs
+	typedef DataSeries Self;
+	typedef DataObject Superclass;
+	typedef SmartPointer<Self> Pointer;
+	typedef SmartPointer<const Self> ConstPointer;
+
+	// defines itk's New and CreateAnother static functions
+	itkNewMacro(Self);
+
+	// the object of the data series (should be DataObject)
+	DeclareMemberSPtr(Object, DataObject);
 
 	// curve attributes
-	DECLARE_ATTRIBUTE_GI(Color, COLORREF);
-	DECLARE_ATTRIBUTE(PenStyle, int);
+	DeclareMember(Color, COLORREF);
+	DeclareMember(PenStyle, int);
+
+	// type of curves displayed as data series
+	typedef PolyLineParametricPath<2> CurveType;
 
 	// accessors for the data series data
-	virtual const CMatrixNxM<>& GetDataMatrix() const;
-	virtual void SetDataMatrix(const CMatrixNxM<>& mData);
-	void AddDataPoint(const itk::Vector<REAL,2>& vDataPt);
+	DeclareMemberSPtr(Curve, CurveType);
+
+	// called to update the curve (if needed)
+	virtual void UpdateCurve() { }
 
 	// flag to indicate whether the data series should have handles
 	//		for interaction
-	DECLARE_ATTRIBUTE(HasHandles, bool);
+	DeclareMember(HasHandles, bool);
 
 	// returns index of handle, if point hits it
 	int GetHandleHit(const CPoint& point, int nSize, CPoint *pOfs = NULL);
@@ -40,16 +54,15 @@ public:
 	//		-1 for decreasing, 
 	//		1 for increasing,
 	//		0 for not monotonic
-	DECLARE_ATTRIBUTE(MonotonicDirection, int);
+	DeclareMember(MonotonicDirection, int);
 
 protected:
-	friend CGraph;
+	friend dH::Graph;
 
 public:
-	// my graph (if part of graph
-	CGraph *m_pGraph;
+	// my graph (if part of graph)
+	dH::Graph *m_pGraph;
 
-	// use a std vector instead of CArray, because CArray is bad
-	mutable CMatrixNxM<> m_mData;	
+};	// class DataSeries
 
-};	// class CDataSeries
+EndNamespace(dH)

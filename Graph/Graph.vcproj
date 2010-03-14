@@ -174,7 +174,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories=".\include;..\GenImaging\include;..\RtOptimizer\include;..\RtModel\include;..\OptimizeN\include;&quot;$(ITK_DIR)\Code\Common&quot;;&quot;$(ITK_BUILD_DIR)&quot;;&quot;$(ITK_DIR)\Utilities\vxl\vcl&quot;;&quot;$(ITK_BUILD_DIR)\Utilities\vxl\vcl&quot;;&quot;$(ITK_DIR)\Utilities\vxl\core&quot;;&quot;$(ITK_BUILD_DIR)\Utilities\vxl\core&quot;"
+				AdditionalIncludeDirectories=".\include;..\GenImaging\include;..\RtOptimizer\include;..\RtModel\include;..\OptimizeN\include;&quot;$(ITK_DIR)\Code\Numerics\Statistics&quot;;&quot;$(ITK_DIR)\Code\Algorithms&quot;;&quot;$(ITK_DIR)\Code\BasicFilters&quot;;&quot;$(ITK_DIR)\Code\Common&quot;;&quot;$(ITK_BUILD_DIR)&quot;;&quot;$(ITK_DIR)\Utilities\vxl\vcl&quot;;&quot;$(ITK_BUILD_DIR)\Utilities\vxl\vcl&quot;;&quot;$(ITK_DIR)\Utilities\vxl\core&quot;;&quot;$(ITK_BUILD_DIR)\Utilities\vxl\core&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;USE_IPP;USE_RTOPT"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="2"
@@ -282,6 +282,14 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\ContourEditTracker.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ContourOverlay.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\DataSeries.cpp"
 				>
 			</File>
@@ -290,11 +298,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DisplayBlendFilter.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Graph.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\HistogramDataSeries.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\IsocurveOverlay.cpp"
 				>
 			</File>
 			<File
@@ -337,6 +353,14 @@
 				RelativePath=".\TargetDVHSeries.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\WindowLevelTracker.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ZoomPanTracker.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -344,7 +368,19 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\include\ContourEditTracker.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\ContourOverlay.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\DataSeries.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\DisplayBlendFilter.h"
 				>
 			</File>
 			<File
@@ -356,11 +392,31 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\IsocurveOverlay.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\PlanarOverlay.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\PlanarTracker.h"
+				>
+			</File>
+			<File
 				RelativePath=".\stdafx.h"
 				>
 			</File>
 			<File
 				RelativePath=".\include\TargetDVHSeries.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\WindowLevelTracker.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\ZoomPanTracker.h"
 				>
 			</File>
 		</Filter>

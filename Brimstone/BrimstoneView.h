@@ -1,15 +1,11 @@
-// Copyright (C) 2nd Messenger Systems - U. S. Patent 7,369,645
-// $Id: BrimstoneView.h 640 2009-06-13 05:06:50Z dglane001 $
-#if !defined(AFX_BRIMSTONEVIEW_H__315F9461_92CF_4D86_B8C6_304D8C253E91__INCLUDED_)
-#define AFX_BRIMSTONEVIEW_H__315F9461_92CF_4D86_B8C6_304D8C253E91__INCLUDED_
+// Copyright (C) 2nd Messenger Systems - U. S. Patent 0,000,000
+// $Id xxxxx xxxxxxxxxxxxxx x xx x    xxxxxxxxxxxxx $
+#pragma once
 
 #include <Graph.h>
-#include "PlanarView.h"	// Added by ClassView
-#include "OptThread.h"
 
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
+#include "PlanarView.h"
+#include "OptThread.h"
 
 namespace dH
 {
@@ -17,11 +13,9 @@ namespace dH
 }
 
 //////////////////////////////////////////////////////////////////////
-// class CBrimstoneView
-//
-// manages the view of the plan data
-//////////////////////////////////////////////////////////////////////
-class CBrimstoneView : public CView
+class CBrimstoneView : 
+		public CView
+	// manages the view of the plan data
 {
 protected: // create from serialization only
 	CBrimstoneView();
@@ -32,20 +26,19 @@ public:
 	CBrimstoneDoc* GetDocument();
 
 	// planar view of images / contours / dose
-	CPlanarView m_wndPlanarView;
+	dH::PlanarView m_wndPlanarView;
 
 	// colormap for the dose display
 	CArray<COLORREF, COLORREF> m_arrColormap;
 
 	// graph to display the histogram
-	CGraph m_graphDVH;
+	dH::Graph m_graphDVH;
 
 	// graph to display iterations
-	CGraph m_graphIterations;
-	CDataSeries m_dsIter;
+	dH::Graph m_graphIterations;
 
 	// stores data series for iteration graph
-	CDataSeries *m_pIterDS[dH::Structure::MAX_SCALES];
+	dH::DataSeries::Pointer m_pIterDS;
 
 	// generates a histogram for the specified structure
 	void AddHistogram(dH::Structure * pStruct);
@@ -111,4 +104,4 @@ inline CBrimstoneDoc* CBrimstoneView::GetDocument()
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 
-#endif // !defined(AFX_BRIMSTONEVIEW_H__315F9461_92CF_4D86_B8C6_304D8C253E91__INCLUDED_)
+// #endif // !defined(AFX_BRIMSTONEVIEW_H__315F9461_92CF_4D86_B8C6_304D8C253E91__INCLUDED_)

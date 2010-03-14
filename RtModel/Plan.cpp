@@ -57,7 +57,7 @@ CPlan::~CPlan()
 
 ///////////////////////////////////////////////////////////////////////////////
 void 
-	CPlan::SetSeries(CSeries *pSeries)
+	CPlan::SetSeries(dH::Series *pSeries)
 {
 	// store the series pointer
 	m_pSeries = pSeries;
@@ -395,7 +395,8 @@ void CPlan::Serialize(CArchive& ar)
 
 	if (nSchema >= 5)
 	{
-		SERIALIZE_VALUE(ar, m_pSeries);
+		m_pSeries->SerializeExt(ar, 0);
+		//SERIALIZE_VALUE(ar, m_pSeries);
 		ASSERT(m_pSeries != NULL);
 
 		m_mapHistograms.Serialize(ar);

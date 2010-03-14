@@ -1,32 +1,54 @@
-// Copyright (C) 2nd Messenger Systems - U. S. Patent 7,369,645
-// $Id: HistogramDataSeries.h 607 2008-09-14 18:32:17Z dglane001 $
+//
+//
 #pragma once
 
-#ifdef USE_RTOPT
-#include <Histogram.h>
-#endif
+#include <itkScalarImageToHistogramGenerator.h>
+using namespace itk;
+
+#include <ScalarImageToWeightedHistogramGenerator.h>
 #include <DataSeries.h>
+#include <Structure.h>
 
-class CHistogram;
+BeginNamespace(dH)
 
-class CHistogramDataSeries :
-	public CDataSeries
+//////////////////////////////////////////////////////////////////////////////
+class HistogramDataSeries :
+	public dH::DataSeries
 {
 public:
-	CHistogramDataSeries(CHistogram *pHisto);
-	virtual ~CHistogramDataSeries(void);
+	HistogramDataSeries();
+	virtual ~HistogramDataSeries(void);
 
-	DECLARE_ATTRIBUTE_PTR(Histogram, CHistogram);
+	// itk typedefs
+	typedef HistogramDataSeries Self;
+	typedef DataSeries Superclass;
+	typedef SmartPointer<Self> Pointer;
+	typedef SmartPointer<const Self> ConstPointer;
 
-	virtual const CMatrixNxM<>& GetDataMatrix() const;
+	// defines itk's New and CreateAnother static functions
+	itkNewMacro(Self);
 
-	void OnHistogramChanged(CObservableEvent *, void *);
+	// the dose matrix for which histogram is needed
+	DeclareMemberSPtrGet(DoseMatrix, VolumeReal);
+	void SetDoseMatrix(VolumeReal *pDoseMatrix);
+
+	// the structure for which histogram is needed
+	DeclareMemberSPtrGet(Structure, dH::Structure);
+	void SetStructure(dH::Structure *pStructure);
+
+	// helper typedefs for the embedded objects
+	typedef dH::ScalarImageToWeightedHistogramGenerator HistogramGeneratorType;
+	typedef HistogramGeneratorType::HistogramType HistogramType;
+
+	// the contained histogram generator
+	DeclareMemberSPtr(HistogramGenerator, HistogramGeneratorType);
+
+	// over-ride to update histo curve
+	virtual void UpdateCurve();
 
 private:
-//	CHistogram *m_pHisto;
-// public:
-//	CHistogram * GetHistogram(void);
-
-	mutable bool m_bRecalcCurve;
+	// pointer the structure region
+	VolumeReal::ConstPointer m_pConformRegion;
 };
 
+EndNamespace(dH)

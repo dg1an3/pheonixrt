@@ -49,7 +49,7 @@ END_MESSAGE_MAP()
 CBrimstoneView::CBrimstoneView()
 	: m_pOptThread(NULL)
 	, m_bOptimizerRun(false)
-	// , m_pIterDS(NULL)
+	, m_pIterDS(NULL)
 {
 	m_pOptThread = static_cast<COptThread*>(
 		AfxBeginThread(RUNTIME_CLASS(COptThread), 
@@ -82,16 +82,19 @@ void
 	CBrimstoneView::AddHistogram(dH::Structure * pStruct)
 	// generates a histogram for the specified structure
 {
-	CHistogram *pHisto = GetDocument()->m_pPlan->GetHistogram(pStruct, true);
-	ASSERT(pHisto != NULL);
+	VolumeReal *pDoseMatrix = GetDocument()->m_pPlan->GetDoseMatrix();
+	if (pDoseMatrix->GetBufferedRegion().GetNumberOfPixels() == 0)
+		return;
 
-	CHistogramDataSeries *pSeries = new CHistogramDataSeries(pHisto);
-	pSeries->m_pGraph = &m_graphDVH;
-	pSeries->SetColor(pStruct->GetColor());
+	dH::HistogramDataSeries::Pointer pHisto = dH::HistogramDataSeries::New();
+	pHisto->SetStructure(pStruct);
+	pHisto->SetDoseMatrix(pDoseMatrix);
 
-	m_graphDVH.AddDataSeries(pSeries);
+//	pSeries->m_pGraph = &m_graphDVH;
+
+	m_graphDVH.AddDataSeries(pHisto);
 	m_graphDVH.AutoScale();
-	m_graphDVH.SetAxesMin(MakeVector<2>(0.0f, 0.0f));
+	m_graphDVH.SetAxesMin(MakeContinuousIndex<2>(0.0f, 0.0f));
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -99,19 +102,19 @@ void
 	CBrimstoneView::RemoveHistogram(dH::Structure * pStruct)
 	// removes histogram for designated structure
 {
-	CHistogram *pHisto = GetDocument()->m_pPlan->GetHistogram(pStruct, false);
-	ASSERT(pHisto != NULL);
+	// CHistogram *pHisto = NULL; // GetDocument()->GetPlan()->GetHistogram(pStruct, false);
+	// ASSERT(pHisto != NULL);
 
 	for (int nAt = 0; nAt < m_graphDVH.GetDataSeriesCount(); nAt++)
 	{
-		CHistogramDataSeries *pSeries = 
-			static_cast<CHistogramDataSeries *>(m_graphDVH.GetDataSeriesAt(nAt));
-		if (pSeries->GetHistogram() == pHisto)
-		{
-			m_graphDVH.RemoveDataSeries(nAt);
-			m_graphDVH.AutoScale();
-			m_graphDVH.SetAxesMin(MakeVector<2>(0.0f, 0.0f));
-		}
+		dH::HistogramDataSeries *pSeries = 
+			static_cast<dH::HistogramDataSeries *>(m_graphDVH.GetDataSeriesAt(nAt));
+		//if (pSeries->GetHistogram() == pHisto)
+		//{
+		//	m_graphDVH.RemoveDataSeries(nAt);
+		//	m_graphDVH.AutoScale();
+		//	m_graphDVH.SetAxesMin(MakeVector<2>(0.0f, 0.0f));
+		//}
 	}
 }
 
@@ -186,46 +189,44 @@ int
 	// load the colormap for dose display
 	CDib colormap;
 	BOOL bResult = colormap.Load(GetModuleHandle(NULL), IDB_RAINBOW);	
-	CSize size = colormap.GetSize();
-	m_arrColormap.SetSize(/* size.cx */ size.cy);
+	m_wndPlanarView.GetBlender()->SetPseudoColorTableFromDib(colormap); 
 
-	CArray<UCHAR, UCHAR&> arrRaw;
-	arrRaw.SetSize(size.cx * size.cy * 3);
-	colormap.GetBitmapBits(size.cx * size.cy * 3, arrRaw.GetData());
-
-	int nAtRaw = 0;
-	for (int nAt = 0; nAt < m_arrColormap.GetSize(); nAt++)
-	{ 
-		m_arrColormap[nAt] = RGB(arrRaw[nAtRaw+2], arrRaw[nAtRaw+1], arrRaw[nAtRaw]);
-		nAtRaw += (3 * size.cx);
-	}
-
-	m_wndPlanarView.SetLUT(m_arrColormap, 1); 
-
-	m_wndPlanarView.SetWindowLevel((REAL) 1.0 / 0.8, 0.4, 1);
+	m_wndPlanarView.GetIsocurveDrawer()->SetIsocurveColorTable(
+		m_wndPlanarView.GetBlender()->GetPseudoColorTable());
 
 	// create the graph window
 	m_graphDVH.Create(NULL, NULL, WS_BORDER | WS_VISIBLE | WS_CHILD | WS_CLIPSIBLINGS, 
 		CRect(0, 200, 200, 400), this, /* nID */ 113);
 
-	m_graphDVH.SetLegendLUT(m_arrColormap, 
-		m_wndPlanarView.m_window[1], m_wndPlanarView.m_level[1]);
+	// colormap for the dose display
+	// CArray<COLORREF, COLORREF> m_arrColormap;
+
+	//CSize size = colormap.GetSize();
+	//m_arrColormap.SetSize(size.cy);
+
+	//CArray<UCHAR, UCHAR&> arrRaw;
+	//arrRaw.SetSize(size.cx * size.cy * 3);
+	//colormap.GetBitmapBits(size.cx * size.cy * 3, arrRaw.GetData());
+
+	//itk::ColorTable<unsigned char>::Pointer pColormap = itk::ColorTable<unsigned char>::New();
+	//pColormap->UseGrayColors(size.cy);
+
+	//int nAtRaw = 0;
+	//for (int nAt = 0; nAt < m_arrColormap.GetSize(); nAt++)
+	//{ 
+	//	pColormap->SetColor(nAt, arrRaw[nAtRaw+2], arrRaw[nAtRaw+1], arrRaw[nAtRaw], "c");
+	//	nAtRaw += (3 * size.cx);
+	//}
+
+//	m_graphDVH.SetLegendLUT(m_arrColormap, 
+//		m_wndPlanarView.m_blender->GetWindow(1), m_wndPlanarView.m_blender->GetLevel(1));
 
 	// create the graph window
 	m_graphIterations.Create(NULL, NULL, WS_BORDER | WS_VISIBLE | WS_CHILD | WS_CLIPSIBLINGS, 
 		CRect(0, 200, 200, 400), this, /* nID */ 114);
 
-	for (int nD = 0; nD < dH::Structure::MAX_SCALES; nD++)
-		m_pIterDS[nD] = new CDataSeries();
-	m_pIterDS[0]->SetColor(RGB(255, 0, 0));
-	m_graphIterations.AddDataSeries(m_pIterDS[0]);
-	m_pIterDS[1]->SetColor(RGB(0, 255, 0));
-	m_graphIterations.AddDataSeries(m_pIterDS[1]);
-	m_pIterDS[2]->SetColor(RGB(0, 0, 255));
-	m_graphIterations.AddDataSeries(m_pIterDS[2]);
-	m_pIterDS[3]->SetColor(RGB(255, 0, 255));
-	m_graphIterations.AddDataSeries(m_pIterDS[3]);
-
+	// m_pIterDS = dH::DataSeries::New();
+	// m_graphIterations.AddDataSeries(m_pIterDS);
 
 	return 0;
 }
@@ -248,27 +249,27 @@ void
 	m_pOptThread->SetPlanOpt(GetDocument()->m_pOptimizer.get());
 #endif
 
-	if (GetDocument()->m_pSeries.get())
+	if (GetDocument()->m_pSeries)
 	{
-		m_wndPlanarView.SetSeries(GetDocument()->m_pSeries.get());
-		//m_wndPlanarView.SetVolume(GetDocument()->m_pSeries->GetDensity(), 0);
-		//m_wndPlanarView.m_pSeries = GetDocument()->m_pSeries.get();
-
+		m_wndPlanarView.SetSeries(GetDocument()->m_pSeries);
 	}
-	if (GetDocument()->m_pPlan.get())
+
+	// set the initial view center based on series volume
+	m_wndPlanarView.InitZoomCenter();
+
+	CPlan *pPlan = GetDocument()->m_pPlan.get();
+	if (pPlan)
 	{
-		m_wndPlanarView.SetVolume(GetDocument()->m_pPlan->GetDoseMatrix(), 1);
+		m_wndPlanarView.SetVolume(pPlan->GetDoseMatrix(), 1);
+		if (pPlan->GetBeamCount() > 0)		
+		{
+			Vector<REAL> vIsocenter = pPlan->GetBeamAt(0)->GetIsocenter();
+			Vector<REAL> vCenter = m_wndPlanarView.GetCenter();
+			vCenter[2] = vIsocenter[2];
+			m_wndPlanarView.SetCenter(vCenter);
+		}
 	}
 	m_wndPlanarView.Invalidate(TRUE);
-
-	// set the initial view center
-	m_wndPlanarView.InitZoomCenter();
-	if (GetDocument()->m_pPlan.get()
-		&& GetDocument()->m_pPlan->GetBeamCount() > 0)
-	{
-		Vector<REAL> vIsocenter = GetDocument()->m_pPlan->GetBeamAt(0)->GetIsocenter();
-		m_wndPlanarView.SetCenter(vIsocenter);
-	}
 
 	// delete histograms
 	m_graphDVH.RemoveAllDataSeries();
@@ -316,8 +317,8 @@ void
 
 		// clear iteration data matrix
 		CMatrixNxM<> mEmpty;
-		for (int nL = 0; nL < dH::Structure::MAX_SCALES; nL++)
-			m_pIterDS[nL]->SetDataMatrix(mEmpty);
+		//for (int nL = 0; nL < dH::Structure::MAX_SCALES; nL++)
+			//m_pIterDS->[nL]->SetDataMatrix(mEmpty);
 
 		m_pOptThread->PostThreadMessage(WM_OPTIMIZER_START, 0, 0);
 		m_bOptimizerRun = true;
@@ -359,7 +360,7 @@ LRESULT
 
 		if (pOID->m_ofvalue > 0.1)
 		{
-			m_pIterDS[pOID->m_nLevel]->AddDataPoint(MakeVector<2>(m_nTotalIter, -log10(pOID->m_ofvalue - 0.1)));
+			//m_pIterDS->AddDataPoint(MakeVector<2>(m_nTotalIter, -log10(pOID->m_ofvalue - 0.1)));
 		}
 
 		const int nUpdateEvery = 1;

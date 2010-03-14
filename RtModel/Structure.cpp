@@ -2,12 +2,6 @@
 // $Id: Structure.cpp 640 2009-06-13 05:06:50Z dglane001 $
 #include "stdafx.h"
 
-#include <itkImageRegionConstIterator.h>
-#include <itkImageRegionIterator.h>
-#include <itkScalarImageToListAdaptor.h>
-#include <itkMeanCalculator.h>
-#include <itkResampleImageFilter.h>
-
 #include <Structure.h>
 #include <Series.h>
 
@@ -19,10 +13,10 @@ Structure::Structure()
 	, m_Visible(true)
 	, m_Type(eNONE)
 	, m_Priority(1)
-	, m_bRecalcRegion(true)
 	// constructs a structure
 {
-	m_pRegion0 = VolumeReal::New();
+	m_pContoursToRegion = dH::ContoursToRegionFilter::New();
+	m_pMultiMaskNegatedFilter = dH::MultiMaskNegatedImageFilter::New();
 	m_pPyramid = PyramidType::New(); 
 
 }	// Structure::Structure
@@ -31,275 +25,35 @@ Structure::Structure()
 Structure::~Structure()
 	// destroys structure
 {
-	for (int nAt = 0; nAt < m_arrContours.GetSize(); nAt++)
-	{
-		delete m_arrContours[nAt];
-	}
-
-}	// Structure::~Structure
+	// contours-to-region filter (also container for contours)
+	m_pContoursToRegion = NULL;
+	m_pMultiMaskNegatedFilter = NULL;
+	m_pPyramid = NULL; 
+	m_arrResamplers.clear();
+}	
 
 ///////////////////////////////////////////////////////////////////////////////
 int 
 	Structure::GetContourCount() const
 	// returns the number of contours in the mesh
 {
-	return (int) m_arrContours.GetSize();
-
-}	// Structure::GetContourCount
+	return m_pContoursToRegion->GetNumberOfInputs();
+}	
 
 ///////////////////////////////////////////////////////////////////////////////
-CPolygon *
-	Structure::GetContour(int nIndex)
+dH::ContourType *
+	Structure::GetContourPoly(int nAt)
 	// returns the contour at the given index
 {
-	return (CPolygon *) m_arrContours[nIndex];
-
-}	// Structure::GetContour
-
-///////////////////////////////////////////////////////////////////////////////
-REAL 
-	Structure::GetContourRefDist(int nIndex) const
-	// returns the reference distance of the indicated contour
-{
-	return m_arrRefDist[nIndex];
-
-}	// Structure::GetContourRefDist
+	return const_cast<dH::ContourType*>(m_pContoursToRegion->GetInput(nAt));
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 void 
-	Structure::AddContour(CPolygon *pPoly, REAL refDist)
-	// adds a new contour to the structure
+	Structure::AddContourPoly(dH::ContourType *pContour)
 {
-	m_arrContours.Add(pPoly);
-	m_arrRefDist.Add(refDist);
-
-}	// Structure::AddContour
-
-
-///////////////////////////////////////////////////////////////////////////////
-const VolumeReal * 
-	Structure::GetRegion(int nScale)
-	// forms a new region and returns at requested scale
-{
-	if (nScale >= MAX_SCALES)
-	{
-		::AfxMessageBox(_T("Too big"));
-		nScale = MAX_SCALES-1;
-	}
-
-	if (m_bRecalcRegion)
-	{
-		CalcRegion();
-	}
-
-	if (nScale == 0)
-	{
-		return m_pPyramid->GetInput();
-	}
-
-	// return m_pPyramid->GetOutput(nScale-1);
-	return m_pPyramid->GetOutput(MAX_SCALES-1 - nScale);
-
-}	// Structure::GetRegion
-
-///////////////////////////////////////////////////////////////////////////////
-void
-	Structure::CalcRegion()
-	// forms the base level region
-{
-	// set size of region
-	ConformTo<VOXEL_REAL,3>(GetSeries()->GetDensity(), m_pRegion0);
-	ContoursToRegion(m_pRegion0);
-
-	// now exclude
-	for (int nAt = 0; nAt < GetSeries()->GetStructureCount(); nAt++)
-	{
-		Structure *pOtherStruct = GetSeries()->GetStructureAt(nAt);
-		if (GetPriority() > pOtherStruct->GetPriority())
-		{
-			const VolumeReal *pExclRegion = pOtherStruct->GetRegion(0);
-			ConstVolumeRealIterator iterExcl(pExclRegion, pExclRegion->GetBufferedRegion());
-			VolumeRealIterator iter(m_pRegion0, m_pRegion0->GetBufferedRegion());
-			for ( iter.GoToBegin(), iterExcl.GoToBegin(); !iterExcl.IsAtEnd();
-				++iter, ++iterExcl)
-			{
-				if (iterExcl.Get() > 0.0)
-					iter.Set(0.0);
-			}
-		}
-	}
-
-	// set the input to the pyramid and update
-	m_pPyramid->SetInput(m_pRegion0);
-	m_pPyramid->SetNumberOfLevels(MAX_SCALES);
-	m_pPyramid->Update();
-
-	// check the calculated levels
-	for (int nAt = 0; nAt < MAX_SCALES; nAt++)
-	{
-		VolumeReal *pMask;
-		if (nAt == 0)
-			pMask = m_pRegion0;
-		else
-			pMask = m_pPyramid->GetOutput(MAX_SCALES-1 - nAt);
-		TRACE("Level %i spacing = %lf, %lf, %lf\n", nAt, 
-			pMask->GetSpacing()[0], pMask->GetSpacing()[1], pMask->GetSpacing()[2]);
-
-		REAL maxVoxel = -1e+6;
-		for (int nAt = 0; nAt < pMask->GetBufferedRegion().GetSize()[2]; nAt++)
-		{
-			REAL sliceMax = GetSliceMax(pMask, nAt);
-			TRACE("Slice %i max %lf\n", nAt, sliceMax);
-			maxVoxel = __max(sliceMax, maxVoxel);
-		}
-
-		// now adjust for the max (i.e. normalize to max 1)
-		typedef itk::ImageRegionConstIterator< VolumeReal > ConstIteratorType;
-		typedef itk::ImageRegionIterator< VolumeReal > IteratorType;
-
-		VolumeReal::RegionType inputRegion;
-		VolumeReal::RegionType::IndexType inputStart = pMask->GetBufferedRegion().GetIndex();
-		VolumeReal::RegionType::SizeType size = pMask->GetBufferedRegion().GetSize();
-
-		inputRegion.SetSize( size );
-		inputRegion.SetIndex( inputStart );
-
-		IteratorType voxelIt( pMask, inputRegion );
-		for ( voxelIt.GoToBegin(); !voxelIt.IsAtEnd(); ++voxelIt)
-		{
-			/// TODO: figure out if this works (normalizing by the max voxel)
-			/// voxelIt.Set(voxelIt.Get() / maxVoxel);
-		}
-
-		//typedef itk::Statistics::ScalarImageToListAdaptor< VolumeReal > VolumeRealSample;
-		//VolumeRealSample::Pointer sample = VolumeRealSample::New();
-		//sample->SetImage(pMask);
-
-		//typedef itk::Statistics::MeanCalculator< VolumeRealSample > VolumeRealMean;
-		//VolumeRealMean::Pointer mean = VolumeRealMean::New();
-		//mean->SetInputSample(sample);
-		//mean->Update();
-		//VolumeRealMean::OutputType *out = mean->GetOutput();
-
-	}
-	m_bRecalcRegion = false;
-
-}	// Structure::CalcRegion
-
-///////////////////////////////////////////////////////////////////////////////
-VolumeReal * 
-		Structure::GetConformRegion(itk::ImageBase<3> *pVolume)
-		// forms / returns a resampled region for a given basis
-		//	TODO: change this to only return the nearest conformant region 
-		//		(so that caller is solely responsible for maintaining the resampled)
-{
-	VolumeReal::Pointer pConformRegion;
-
-	// find if there is already a region
-	for (int nAt = 0; nAt < (int) m_arrConformRegions.size(); nAt++)
-	{
-
-		VolumeReal * pTestConformRegion = m_arrConformRegions[nAt];
-		if (IsApproxEqual<3>(pTestConformRegion->GetOrigin(), pVolume->GetOrigin())
-				&& IsApproxEqual<3>(pTestConformRegion->GetSpacing(), pVolume->GetSpacing())
-				&& pTestConformRegion->GetBufferedRegion() == pVolume->GetBufferedRegion())
-		{
-			pConformRegion = pTestConformRegion;
-		}
-	}
-
-// #ifdef NEVER
-	if (pConformRegion.IsNull())
-	{
-		// else form the resampled region
-		pConformRegion = VolumeReal::New(); 
-
-		// and add to cache map
-		m_arrConformRegions.push_back(pConformRegion); 
-	}
-
-	ConformTo<VOXEL_REAL,3>(pVolume, pConformRegion);
-	pConformRegion->FillBuffer(0.0);
-// #endif
-
-	// search for closest level in structure's pyramid
-	int nLevel = -1;
-	itk::Vector<REAL> vDosePixelSpacing = /*pConformRegion*/pVolume->GetSpacing();
-	itk::Vector<REAL> vRegionPixelSpacing;
-	do
-	{
-		nLevel++;
-		vRegionPixelSpacing = GetRegion(nLevel)->GetSpacing();
-	} while (
-		(vRegionPixelSpacing[0] < vDosePixelSpacing[0] * 0.9/*- 1e-3*/
-		|| vRegionPixelSpacing[1]  < vDosePixelSpacing[1] * 0.9/*- 1e-3*/)
-		&& nLevel < MAX_SCALES);
-		//vRegionPixelSpacing[0] /** 2.0 <*/ > vDosePixelSpacing[0]
-		//|| vRegionPixelSpacing[1] /** 2.0 <*/ > vDosePixelSpacing[1]);
-	
-	CString strMsg;
-	strMsg.Format(_T("DoseSpacing = %lf, %lf, %lf\nLevel Spacing = %lf, %lf, %lf"),
-		vDosePixelSpacing[0], vDosePixelSpacing[1], vDosePixelSpacing[2],
-		vRegionPixelSpacing[0], vRegionPixelSpacing[1], vRegionPixelSpacing[2]);
-	//::AfxMessageBox(strMsg);
-
-#ifdef NEVER
-
-	// now resample to appropriate basis
-	::Resample3D(GetRegion(nLevel), pConformRegion, TRUE);
-
-#else
-	itk::ResampleImageFilter<VolumeReal, VolumeReal>::Pointer resampler = 
-		itk::ResampleImageFilter<VolumeReal, VolumeReal>::New();
-	resampler->SetInput(GetRegion(nLevel));
-
-	typedef itk::AffineTransform<REAL, 3> TransformType;
-	TransformType::Pointer transform = TransformType::New();
-	transform->SetIdentity();
-	resampler->SetTransform(transform);
-
-	typedef itk::LinearInterpolateImageFunction<VolumeReal, REAL> InterpolatorType;
-	InterpolatorType::Pointer interpolator = InterpolatorType::New();
-	resampler->SetInterpolator( interpolator );
-
-	VolumeReal::Pointer pPointToVolume = static_cast<VolumeReal*>(pVolume);
-	resampler->SetOutputParametersFromImage(pPointToVolume);
-	resampler->Update();
-	CopyImage<VOXEL_REAL, 3>(resampler->GetOutput(), pConformRegion);
-	// and add to cache map
-	m_arrConformRegions.push_back(pConformRegion); 
-#endif
-
-	return pConformRegion;
-
-}	// Structure::GetConformRegion
-
-
-///////////////////////////////////////////////////////////////////////////////
-void 
-	Structure::ContoursToRegion(VolumeReal *pRegion)
-		// converts the contours to a region
-{
-	// clear region before drawing any contours
-	pRegion->FillBuffer(0.0); 
-
-	for (int nSlice = 0; nSlice < pRegion->GetBufferedRegion().GetSize()[2]; nSlice++)
-	{
-		REAL slicePos = pRegion->GetOrigin()[2] + pRegion->GetSpacing()[2] * nSlice;
-		CArray<CPolygon *, CPolygon *> arrContours;
-		for (int nAt = 0; nAt < GetContourCount(); nAt++)
-		{
-			REAL zPos = GetContourRefDist(nAt);
-			if (IsApproxEqual(zPos, slicePos, pRegion->GetSpacing()[2] / 2.0))
-			{
-				arrContours.Add(GetContour(nAt));
-			}
-		}
-
-		CreateRegion(arrContours, pRegion, nSlice);
-	}
-
-}	// Structure::ContoursToRegion
+	m_pContoursToRegion->AddContour(pContour);
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -308,11 +62,92 @@ void
 {
 	m_Priority = nPriority;
 
-	// set flags to recalc region
+	// need to update all structure pipelines for new priority
+	GetSeries()->UpdateStructurePipelines();
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+const VolumeReal * 
+	Structure::GetRegion(int nScale)
+	// forms a new region and returns at requested scale
+{
+	if (nScale == 0)
+	{
+		return m_pPyramid->GetInput();
+	}
+
+	return m_pPyramid->GetOutput(MAX_SCALES-nScale-1);
+
+}	// Structure::GetRegion
+
+///////////////////////////////////////////////////////////////////////////////
+VolumeReal *
+		Structure::GetConformRegion(itk::ImageBase<3> *pVolume)
+		// forms / returns a resampled region for a given basis
+{
+	m_pPyramid->UpdateLargestPossibleRegion();
+
+	// find if there is already a region
+	for (int nAt = 0; nAt < (int) m_arrResamplers.size(); nAt++)
+	{
+		VolumeReal::Pointer pConformRegion = m_arrResamplers[nAt]->GetOutput();
+		if (IsApproxEqual<3>(pConformRegion->GetOrigin(), pVolume->GetOrigin())
+				&& IsApproxEqual<3>(pConformRegion->GetSpacing(), pVolume->GetSpacing())
+				&& pConformRegion->GetBufferedRegion() == pVolume->GetBufferedRegion())
+		{
+			return pConformRegion;
+		}
+	}
+
+	// create a new resampler
+	ResamplerType::Pointer pResampler = ResamplerType::New();
+	pResampler->SetOutputParametersFromImage(pVolume);
+	m_arrResamplers.push_back(pResampler);
+
+	// search for closest level in structure's pyramid
+	VolumeReal::SpacingType outSpacing = pVolume->GetSpacing();
+	for (int nLevel = 0; nLevel < MAX_SCALES; nLevel++)
+	{
+		VolumeReal::SpacingType inSpacing = GetRegion(nLevel)->GetSpacing();
+		if (inSpacing[0] >= outSpacing[0] * 0.9
+			&& inSpacing[1] >= outSpacing[1] * 0.9)
+		{
+			pResampler->SetInput(GetRegion(nLevel));
+			break;
+		}
+	}
+	ASSERT(pResampler->GetInput() != NULL);
+	pResampler->UpdateLargestPossibleRegion();
+
+	return pResampler->GetOutput();
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+void 
+	Structure::UpdatePipeline()
+{
+	if (GetSeries()->GetDensity())
+	{
+		// set up the output geometry for ContoursToRegionFilter
+		m_pContoursToRegion->SetOutputParametersFromImage(GetSeries()->GetDensity());
+	}
+
+	// set up mask filter input
+	m_pMultiMaskNegatedFilter->SetInput(0, m_pContoursToRegion->GetOutput());
+
+	// set up mask filter exclude maps
 	for (int nAt = 0; nAt < GetSeries()->GetStructureCount(); nAt++)
 	{
-		GetSeries()->GetStructureAt(nAt)->m_bRecalcRegion = true;
+		Structure *pOtherStruct = GetSeries()->GetStructureAt(nAt);
+		m_pMultiMaskNegatedFilter->SetInput(nAt+1, pOtherStruct->GetRegion(0));
+		m_pMultiMaskNegatedFilter->SetMaskEnabled(nAt+1, pOtherStruct->GetPriority() < GetPriority());
 	}
+
+	// set up the pyramid
+	m_pPyramid->SetInput(m_pContoursToRegion->GetOutput());
+	m_pPyramid->SetNumberOfLevels(MAX_SCALES);
 }
 
 
@@ -320,72 +155,44 @@ void
 void 
 	Structure::SerializeExt(CArchive& ar, int nSchema)
 {
-	// schema for the plan object
-	// UINT nSchema = ar.IsLoading() ? ar.GetObjectSchema() : STRUCTURE_SCHEMA;
+	// schema serialization
+	nSchema = 1;
+	SerializeValue(ar, nSchema);
 
-	// CModelObject::Serialize(ar);
+	SerializeValue(ar, m_Name);
+
+	SerializeValue(ar, m_Color);
+
+	int nIntType = (int) m_Type;
+	SerializeValue(ar, nIntType);
+	if (ar.IsLoading())
+		m_Type = (StructType) nIntType;
+
+	SerializeValue(ar, m_Visible);
+
 	if (ar.IsLoading())
 	{
-		ar >> m_Name;	
-	}
-	else
+		// delete existing contours by re-creating filter
+		m_pContoursToRegion = dH::ContoursToRegionFilter::New();
+
+		int nContourCount = 0;
+		SerializeValue(ar, nContourCount);
+		for (int nAt = 0; nAt < nContourCount; nAt++)
+		{
+			ContourType::Pointer pContour = ContourType::New();
+			SerializePolyLine<3>(ar, pContour);
+			AddContourPoly(pContour);
+		}
+	}	
+	else if (ar.IsStoring())
 	{
-		ar << m_Name;
-	}
-
-	//if (ar.IsLoading())
-	//{
-	//	ar >> m_pSeries;	
-	//}
-	//else
-	//{
-	//	ar << m_pSeries;
-	//}
-
-	m_arrContours.Serialize(ar);
-	m_arrRefDist.Serialize(ar);
-
-	if (nSchema >= 2)
-	{
-		if (ar.IsLoading())
+		int nContourCount = GetContourCount();
+		SerializeValue(ar, nContourCount);
+		for (int nAt = 0; nAt < nContourCount; nAt++)
 		{
-			ar >> m_Color;	
-		}
-		else
-		{
-			ar << m_Color;
+			SerializePolyLine<3>(ar, GetContourPoly(nAt));
 		}
 	}
-
-	if (nSchema >= 3)
-	{
-		if (ar.IsLoading())
-		{
-			int nIntType;
-			ar >> nIntType;
-			m_Type = (StructType) nIntType;
-		}
-		else
-		{
-			ar << (int) m_Type;
-		}
-	}
-
-	if (nSchema >= 4)
-	{
-		if (ar.IsLoading())
-		{
-			ar >> m_Visible;
-		}
-		else
-		{
-			ar << m_Visible;
-		}
-	}
-
-	if (ar.IsLoading())
-		m_bRecalcRegion = true;
-
-}	// Structure::Serialize
+}
 
 EndNamespace(dH)

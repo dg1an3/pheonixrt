@@ -52,9 +52,9 @@ CBrimstoneDoc::~CBrimstoneDoc()
 void CBrimstoneDoc::DeleteContents() 
 {
 	// create series * plan
-	m_pSeries.reset(new CSeries());
+	m_pSeries = dH::Series::New();
 	m_pPlan.reset(new CPlan());
-	m_pPlan->SetSeries(m_pSeries.get());
+	m_pPlan->SetSeries(m_pSeries);
 
 #ifdef USE_RTOPT
 	m_pOptimizer.reset(new dH::PlanOptimizer(m_pPlan.get()));
@@ -69,10 +69,11 @@ void CBrimstoneDoc::DeleteContents()
 /////////////////////////////////////////////////////////////////////////////
 void CBrimstoneDoc::Serialize(CArchive& ar)
 {
+#ifdef ALLOW_WORKSPACE_SERIALIZE
 	CObArray arrWorkspace;
 	if (ar.IsStoring())
 	{
-		arrWorkspace.Add(m_pSeries.get());
+		arrWorkspace.Add(m_pSeries);
 		arrWorkspace.Add(m_pPlan.get());
 	}
 
@@ -146,6 +147,7 @@ void CBrimstoneDoc::Serialize(CArchive& ar)
 		m_pOptimizer.reset(new dH::PlanOptimizer(m_pPlan.get()));
 #endif
 	}
+#endif
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -225,7 +227,7 @@ void CBrimstoneDoc::OnFileImportDcm()
 		//SendInitialUpdate();
 
 		// construct the importer
-		CSeriesDicomImporter dcmImp(m_pSeries.get(), &dlg);
+		CSeriesDicomImporter dcmImp(m_pSeries, &dlg);
 
 		// process files
 		int nCount = 0;

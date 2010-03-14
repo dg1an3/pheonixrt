@@ -1,41 +1,32 @@
-// Copyright (C) 2nd Messenger Systems - U. S. Patent 7,369,645
-// $Id: Graph.h 607 2008-09-14 18:32:17Z dglane001 $
-#if !defined(AFX_GRAPH_H__37CA0912_5524_11D5_ABBE_00B0D0AB90D6__INCLUDED_)
-#define AFX_GRAPH_H__37CA0912_5524_11D5_ABBE_00B0D0AB90D6__INCLUDED_
-
-#if _MSC_VER > 1000
+// Copyright (C) 2008 DGLane
+// $Id$
 #pragma once
-#endif // _MSC_VER > 1000
-
-//#include <VectorD.h>
-#include <MatrixNxM.h>
-
-#include <ModelObject.h>
-
-// #include <Histogram.h>
 
 #include <Dib.h>
 
+#include <itkColorTable.h>
+using namespace itk;
+
 #include <DataSeries.h>
-#include "atltypes.h"
+
+namespace dH {
 
 /////////////////////////////////////////////////////////////////////////////
-// CGraph window
-
-class CGraph : public CWnd
+class Graph : 
+		public CWnd
 {
 // Construction
 public:
-	CGraph();
-	virtual ~CGraph();
+	Graph();
+	virtual ~Graph();
 
 // Attributes
 public:
 
 	// accessors for data series
 	int GetDataSeriesCount();
-	CDataSeries *GetDataSeriesAt(int nAt);
-	void AddDataSeries(CDataSeries *pSeries);
+	dH::DataSeries *GetDataSeriesAt(int nAt);
+	void AddDataSeries(dH::DataSeries *pSeries);
 	void RemoveDataSeries(int nAt, bool bDelete = false);
 	void RemoveAllDataSeries(bool bDelete = false);
 
@@ -46,20 +37,28 @@ public:
 	void SetMargins(int nLeft, int nTop, int nRight, int nBottom);
 
 	// sets the axes ranges and tick marks
-	typedef itk::Vector<REAL,2> GraphCoord;
+	typedef dH::DataSeries::CurveType::VertexType GraphCoord;
 
-	DECLARE_ATTRIBUTE(AxesMin, GraphCoord);
-	DECLARE_ATTRIBUTE(AxesMax, GraphCoord);
+	// axes tick marks
 
-	DECLARE_ATTRIBUTE(AxesMajor, GraphCoord);
-	DECLARE_ATTRIBUTE(AxesMinor, GraphCoord);
+	DeclareMember(AxesMin, GraphCoord);
+	DeclareMember(AxesMax, GraphCoord);
+
+	DeclareMember(AxesMajor, GraphCoord);
+	DeclareMember(AxesMinor, GraphCoord);
 
 	// computes the min and max values for the graph
 	void AutoScale();
-	DECLARE_ATTRIBUTE(TruncateZeroTail, bool);
+
+	// sets tick marks for min / max
+	void ScaleTickMarks();
+
+	// flag to indicate that zero tail be "chopped off"
+	DeclareMember(TruncateZeroTail, bool);
 
 	// sets up the legend (legend only displayed after this is called)
-	void SetLegendLUT(CArray<COLORREF, COLORREF>&  arrLUT, REAL window, REAL level);
+	void SetLegendColormap(ColorTable<unsigned char> *pColormap, 
+				REAL window, REAL level);
 
 // Overrides
 	// ClassWizard generated virtual function overrides
@@ -85,39 +84,39 @@ public:
 	// draw major ticks and grids
 	void DrawMajorAxes(CDC * pDC, const CRect& rect);
 
+	// draw one series (or all?)
 	void DrawSeries(CDC * pDC, const CRect& rect);
 
+	// draw the legend
 	void DrawLegend(CDC * pDC, const CRect& rect);
 
 	// converts to coordinates on the plot
 	CPoint ToPlotCoord(const GraphCoord& vCoord);
 	GraphCoord FromPlotCoord(const CPoint& vCoord);
 
-	// called when one of my data series changes
-	void OnDataSeriesChanged(CObservableEvent * pOE, void * pParam);
-
 private:
 	// the array of data series
-	CTypedPtrArray<CObArray, CDataSeries*> m_arrDataSeries;
+	std::vector< dH::DataSeries::Pointer > m_arrDataSeries;
 
 	// graph plot area
 	int m_arrMargins[4];
 
 	// dragging logic
-	CDataSeries *m_pDragSeries;
+	dH::DataSeries *m_pDragSeries;
 	int m_nDragPoint;
 	CPoint m_ptDragOffset;
 	BOOL m_bDragging;
 
 	// legend variables
-	CArray<COLORREF, COLORREF> m_arrLegendLUT;
+	ColorTable<unsigned char>::Pointer m_pLegendColormap;
 	REAL m_window;
 	REAL m_level;
 	bool m_bShowLegend;
 
 	// graph buffer
 	CDib m_dib;
-
+public:
+	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -125,4 +124,4 @@ private:
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 
-#endif // !defined(AFX_GRAPH_H__37CA0912_5524_11D5_ABBE_00B0D0AB90D6__INCLUDED_)
+}

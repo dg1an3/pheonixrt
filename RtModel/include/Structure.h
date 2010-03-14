@@ -2,18 +2,17 @@
 // $Id: Structure.h 640 2009-06-13 05:06:50Z dglane001 $
 #pragma once
 
-#include <ModelObject.h>
-
-#include <Polygon.h>
 #include <ItkUtils.h>
 using namespace itk;
 
 #include <itkMultiResolutionPyramidImageFilter.h> 
-
-// forward definition of Series class
-class CSeries;
+#include <ContoursToRegionFilter.h>
+#include <MultiMaskNegatedImageFilter.h>
+// #include <InPlaneResampleImageFilter.h>
 
 BeginNamespace(dH)
+
+class Series;
 
 //////////////////////////////////////////////////////////////////////
 class Structure : public DataObject
@@ -38,12 +37,13 @@ public:
 	// name of the structure
 	DeclareMember(Name, CString);
 
+	// series accessor
+	DeclareMemberPtr(Series, dH::Series);
+
 	// contour accessors
 	int GetContourCount() const;
-	CPolygon *GetContour(int nAt);
-	REAL GetContourRefDist(int nIndex) const;
-
-	void AddContour(CPolygon *pPoly, REAL refDist);
+	dH::ContourType *GetContourPoly(int nAt);
+	void AddContourPoly(dH::ContourType *pContour);
 
 	// constant for maximum scales
 	static const int MAX_SCALES = 5;
@@ -74,36 +74,27 @@ public:
 	// accessor for display color
 	DeclareMember(Color, COLORREF);
 
-	// series accessor
-	DeclareMemberPtr(Series, CSeries);
-
 //protected:
 
-	// region calc for base scale
-	void CalcRegion();
+	// called to update inputs to the mask filter 
+	//	(if priorities change, or if structures are added / removed)
+	void UpdatePipeline();
 
-	// helper - converts contours to a region
-	void ContoursToRegion(VolumeReal *pRegion);
 
 private:
-	// contours for the structure
-	CTypedPtrArray<CObArray, CPolygon*> m_arrContours;
+	// contours-to-region filter (also container for contours)
+	dH::ContoursToRegionFilter::Pointer m_pContoursToRegion;
 
-	// reference distances for the contours
-	CArray<REAL, REAL> m_arrRefDist;
-
-	// region (binary volume) representation (for base layer)
-	VolumeReal::Pointer m_pRegion0;
+	// negated mask filter (for exclusion operation)
+	dH::MultiMaskNegatedImageFilter::Pointer m_pMultiMaskNegatedFilter;
 
 	// pyramid for the regions
-	typedef MultiResolutionPyramidImageFilter<VolumeReal, VolumeReal> PyramidType;
+	typedef itk::MultiResolutionPyramidImageFilter<VolumeReal, VolumeReal> PyramidType;
 	PyramidType::Pointer m_pPyramid;
 
-	// flag to indicate region recalc is needed
-	bool m_bRecalcRegion;
-
 	// stores cache of resampled regions
-	std::vector< VolumeReal::Pointer > m_arrConformRegions;
+	typedef itk::ResampleImageFilter<VolumeReal, VolumeReal> ResamplerType;
+	std::vector< ResamplerType::Pointer > m_arrResamplers;
 
 };	// class Structure
 

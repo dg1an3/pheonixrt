@@ -1,5 +1,5 @@
-// Copyright (C) 2nd Messenger Systems
-// $Id: Beam.cpp 640 2009-06-13 05:06:50Z dglane001 $
+// Copyright (C) 1999-2008 DG Lane
+// $Id: Beam.cpp,v 1.28 2007-12-10 02:57:30 Derek Lane Exp $
 #include "stdafx.h"
 
 #include <itkEuler3DTransform.h>
@@ -8,409 +8,166 @@
 #include <Beam.h>
 #include <Plan.h>
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
+namespace dH {
 
 ///////////////////////////////////////////////////////////////////////////////
-CBeam::CBeam()
-	// constructs a new CBeam object
+Beam::Beam()
+	// constructs a new dH::Beam object
 	: m_pPlan(NULL)
-		, m_collimAngle(0.0)
-		, m_gantryAngle(PI)
-		, m_couchAngle(0.0)
-		, m_bRecalcDose(TRUE)
-		, m_bRecalcBeamlets(true)
+		, m_CollimAngle(0.0)
+		, m_GantryAngle(PI)
+		, m_CouchAngle(0.0)
 {
-	m_vBeamletWeights = IntensityMap::New();
-	m_dose = VolumeReal::New();
-	m_doseAccumBuffer = VolumeReal::New();
+	// set up intensity map
+	SetIntensityMap(dH::IntensityMapType::New());
 
-}	// CBeam::CBeam
+	// set up accumulator for calculating beam dose from beamlets + weights
+	SetAccumulator(dH::IntensityMapAccumulateImageFilter::New());
+	GetAccumulator()->SetInput(GetIntensityMap());
+	SetDoseMatrix(GetAccumulator()->GetOutput()); 
 
-//////////////////////////////////////////////////////////////////////
-CBeam::~CBeam()
-	// destroys the CBeam object
-{
-	// delete the blocks
-	for (int nAt = 0; nAt < m_arrBlocks.GetSize(); nAt++)
-	{
-		delete m_arrBlocks[nAt];
-	}
+	// store reference to the beamlet group (= accumulator basis group)
+	SetBeamletGroup(GetAccumulator()->GetBasisGroup());
 
-}	// CBeam::~CBeam
+	// the dose resampler transforms the dose back to the plan's geometry
+	SetDoseResampler(dH::InPlaneResampleImageFilter::New());
+	GetDoseResampler()->SetInput(GetDoseMatrix());
 
-//////////////////////////////////////////////////////////////////////
-double CBeam::GetGantryAngle() const
-{
-	return m_gantryAngle;
-
-}	// CBeam::GetGantryAngle
-
-//////////////////////////////////////////////////////////////////////
-void 
-	CBeam::SetGantryAngle(double gantryAngle)
-	// sets the gantry angle value
-	/// TODO: fix this
-{
-	m_gantryAngle = gantryAngle;
-
-	// make sure the plan's dose matrix is initialized
-	GetPlan()->SetDoseResolution(GetPlan()->GetDoseResolution());
-
-	// now set up the rotated dose matrix
-	ConformTo<VOXEL_REAL,3>(GetPlan()->m_pDose, m_dose);
-
-	itk::Euler3DTransform<REAL>::Pointer rotXform = itk::Euler3DTransform<REAL>::New();
-	rotXform->SetRotation(0.0, 0.0, gantryAngle);
-	
-	// set the center of rotation
-	itk::Vector<REAL, 3> vCenter_vxl;
-	vCenter_vxl[0] = m_dose->GetBufferedRegion().GetSize()[0]/2;
-	vCenter_vxl[1] = m_dose->GetBufferedRegion().GetSize()[1]/2;
-	vCenter_vxl[2] = m_dose->GetBufferedRegion().GetSize()[2]/2;
-
-	itk::Matrix<REAL, 4, 4> mDoseBasis;
-	CalcBasis<3>(m_dose, mDoseBasis);
-	itk::Vector<REAL, 3> vCenter;
-	MultHG(mDoseBasis, vCenter_vxl, vCenter);
-	rotXform->SetCenter(MakePoint<3>(vCenter));
-
-	itk::Matrix<REAL, 3, 3> mRot = 
-		rotXform->GetMatrix() * m_dose->GetDirection();
-	m_dose->SetDirection(mRot);
-
-	itk::Point<REAL, 3> vOrigin = rotXform->TransformPoint(m_dose->GetOrigin());
-	m_dose->SetOrigin(vOrigin);
-	
-	/// TODO: this should be done using the dose calc region
-
-#ifdef USING_MATRIXHG
-	CMatrixD<4> mDoseBasis = m_dose.GetMatrixHG();
-
-	// rotate basis to beam orientation
-	CMatrixD<2> mRotateBasis2D = CreateRotate(gantryAngle);
-
-	CMatrixD<4> mRotateBasisHG;
-	mRotateBasisHG[0][0] = mRotateBasis2D[0][0];
-	mRotateBasisHG[0][1] = mRotateBasis2D[0][1];
-	mRotateBasisHG[1][0] = mRotateBasis2D[1][0];
-	mRotateBasisHG[1][1] = mRotateBasis2D[1][1];
-
-	// rotate about center of volume
-	CMatrixD<4> mBeamBasis = mRotateBasisHG * mDoseBasis;
-
-	m_dose.SetMatrixHG(mBeamBasis);
-	TRACE_MATRIX("CBeam::m_dose Basis", mBeamBasis);
-#endif
-
-	// finally change event
-	GetChangeEvent().Fire();
-
-}	// CBeam::SetGantryAngle
-
-//////////////////////////////////////////////////////////////////////
-double 
-	CBeam::GetCouchAngle() const
-	// returns the couch angle value
-{
-	return m_couchAngle;
-
-}	// CBeam::GetCouchAngle
-
-//////////////////////////////////////////////////////////////////////
-void 
-	CBeam::SetCouchAngle(double couchAngle)
-	// sets the couch angle value
-{
-	m_couchAngle = couchAngle;
-	GetChangeEvent().Fire();
-
-}	// CBeam::SetCouchAngle
-
-///////////////////////////////////////////////////////////////////////////////
-int 
-	CBeam::GetBeamletCount()
-{
-	return (int) m_arrBeamlets.size(); 
-
-}	// CBeam::GetBeamletCount
-
-/////////////////////////////////////////////////////////////////////////////// 
-VolumeReal * 
-	CBeam::GetBeamlet(int nShift)
-{
-	int nBeamletAt = nShift + GetBeamletCount() / 2;
-	if (nBeamletAt >= 0 
-		&& nBeamletAt < m_arrBeamlets.size())
-	{
-		return m_arrBeamlets[nBeamletAt];
-	}
-
-	return NULL;
-
-}	// CBeam::GetBeamlet
-
-///////////////////////////////////////////////////////////////////////////////
-CBeam::IntensityMap * 
-	CBeam::GetIntensityMap() const
-{
-	return m_vBeamletWeights;
-
-}	// CBeam::GetIntensityMap
-
-///////////////////////////////////////////////////////////////////////////////
-void 
-	CBeam::SetIntensityMap(const CVectorN<>& vWeights)
-{
-	m_vBeamletWeights->SetRegions(MakeSize(vWeights.GetDim()));
-	m_vBeamletWeights->Allocate();
-	for (int nAt = 0; nAt < vWeights.GetDim(); nAt++)
-		m_vBeamletWeights->GetBufferPointer()[nAt] = vWeights[nAt];
-
-	// flag dose recalc
-	m_bRecalcDose = TRUE;
-
-	// fire change
-	GetChangeEvent().Fire();
-
-}	// CBeam::SetIntensityMap
-
-///////////////////////////////////////////////////////////////////////////////
-void 
-	CBeam::OnIntensityMapChanged() 
-{
-	// must be odd-sized
-	ASSERT(m_vBeamletWeights->GetBufferedRegion().GetSize()[0] % 2 == 1);
-
-	// set up the number of beamelts
-	if (m_vBeamletWeights->GetBufferedRegion().GetSize()[0] != m_arrBeamlets.size())
-	{
-		m_arrBeamlets.clear();
-		for (int nAt = 0; nAt < m_vBeamletWeights->GetBufferedRegion().GetSize()[0]; nAt++)
-			m_arrBeamlets.push_back(VolumeReal::New());
-	}
-
-	// flag dose recalc
-	m_bRecalcDose = TRUE;
-
-	// fire change
-	GetChangeEvent().Fire();
+	// initialize the intensity map
+	UpdateIntensityMapGeometry(4.0, MakeSize(9, 1));
 }
 
 //////////////////////////////////////////////////////////////////////
-VolumeReal *
-	CBeam::GetDoseMatrix()
-	// the computed dose for this beam (NULL if no dose exists)
+Beam::~Beam()
+	// destroys the dH::Beam object
 {
-	if (m_bRecalcDose 
-		 && m_vBeamletWeights->GetBufferedRegion().GetSize()[0] == m_arrBeamlets.size())
-		 // && m_vBeamletWeights.GetDim() == m_arrBeamlets.size())
-	{ 
-		// set dose matrix size
-		ConformTo<VOXEL_REAL,3>(m_arrBeamlets[0], m_dose);
-
-		// clear voxels for accumulation
-		m_dose->FillBuffer(0.0);
-
-		for (int nAt = 0; nAt < m_arrBeamlets.size(); nAt++)
-		{
-			VolumeReal *pBeamlet = m_arrBeamlets[nAt];
-			ConformTo<VOXEL_REAL,3>(m_dose, m_doseAccumBuffer);
-			Accumulate3D<VOXEL_REAL>(pBeamlet, m_vBeamletWeights->GetBufferPointer()[nAt], m_dose, 
-				m_doseAccumBuffer); 
-		}
-
-		m_bRecalcDose = FALSE;
-	}  
-
-	return m_dose;
-
-}	// CBeam::GetDoseMatrix
-
-//////////////////////////////////////////////////////////////////////
-// CBeam serialization
-// 
-// supports serialization of beam and subordinate objects
-//////////////////////////////////////////////////////////////////////
-#define BEAM_SCHEMA 6
-	// Schema 1: geometry description, blocks
-	// Schema 2: + dose matrix
-	// Schema 3: + call to CModelObject base class serialization
-	// Schema 4: + weight
-	// Schema 5: + beamlets
-	// Schema 6: + subbeamlets & beamlets
-
-IMPLEMENT_SERIAL(CBeam, CModelObject, VERSIONABLE_SCHEMA | BEAM_SCHEMA)
+	SetPlan(NULL);
+	SetAccumulator(NULL);
+	SetBeamletGroup(NULL);
+	SetIntensityMap(NULL);
+	SetDoseMatrix(NULL);
+	SetDoseResampler(NULL);
+}
 
 //////////////////////////////////////////////////////////////////////
 void 
-	CBeam::Serialize(CArchive &ar)
+	Beam::SetGantryAngle(const REAL& gantryAngle)
+	// sets the gantry angle value
+{
+	m_GantryAngle = gantryAngle;
+	UpdateDoseBeamletGeometry();
+}	
+
+///////////////////////////////////////////////////////////////////////////////
+int 
+	Beam::GetBeamletCount()
+{
+	return GetBeamletGroup()->GetPixelContainer()->Size();
+}	
+
+///////////////////////////////////////////////////////////////////////////////
+void 
+	Beam::UpdateIntensityMapGeometry(REAL spacing, dH::IntensityMapType::SizeType size)
+{
+	if (size[0] % 2 != 1)
+		throw new std::exception("Odd-numbered intensity map only supported");
+
+	// set initial index for -n..n
+	dH::IntensityMapType::IndexType index = {{ -(long) (size[0] - 1) / 2, 
+																						 -(long) (size[1] - 1) / 2 }};
+	GetIntensityMap()->SetRegions(dH::IntensityMapType::RegionType(index, size));
+	GetIntensityMap()->Allocate();
+
+	// set up spacing
+	GetIntensityMap()->SetSpacing(dH::IntensityMapType::SpacingType(spacing));
+
+	// make sure basis group conforms to intensity map
+	//		NOTE: this will remove any existing beamlets, so be careful
+	GetAccumulator()->InitBasisGroupGeometry();
+}
+
+//////////////////////////////////////////////////////////////////////////////
+void 
+	Beam::UpdateDoseBeamletGeometry()
+	// set up the dose matrix from gantry angle and series volume
+{
+	// can't update until we have a plan
+	if (!GetPlan())
+		return;
+
+	// now set up the rotated dose matrix
+	ConformTo<VoxelReal,3>(GetPlan()->GetDoseMatrix(), GetDoseMatrix());
+
+	Euler3DTransform<REAL>::Pointer rotXform = Euler3DTransform<REAL>::New();
+	rotXform->SetRotation(0.0, 0.0, GetGantryAngle());
+	
+	// set the center of rotation
+	VolumeReal::SizeType size = GetDoseMatrix()->GetBufferedRegion().GetSize();
+	itk::ContinuousIndex<REAL,3> vCenterIndex = 
+		MakeContinuousIndex<3>(size[0]/2, size[1]/2, size[2]/2);
+
+	itk::Point<Real> vCenter;
+	GetDoseMatrix()->TransformContinuousIndexToPhysicalPoint(vCenterIndex, vCenter);
+	rotXform->SetCenter(vCenter);
+
+	// calculate new dose matrix direction matrix
+	itk::Matrix<Real> mRot = 
+		rotXform->GetMatrix() * GetDoseMatrix()->GetDirection();
+	GetDoseMatrix()->SetDirection(mRot);
+
+	// set new dose matrix origin point
+	itk::Point<Real> vOrigin = rotXform->TransformPoint(GetDoseMatrix()->GetOrigin());
+	GetDoseMatrix()->SetOrigin(vOrigin);
+
+	// set up the dose resampler
+	GetDoseResampler()->SetOutputParametersFromImage(GetPlan()->GetDoseMatrix());
+}
+
+//////////////////////////////////////////////////////////////////////
+void 
+	Beam::SerializeExt(CArchive &ar, int nSchema)
 	// loads/saves beam to archive
 {
-	// store the schema for the beam object
-	UINT nSchema = ar.IsLoading() ? ar.GetObjectSchema() : BEAM_SCHEMA;
+	// schema serialization
+	nSchema = 1;
+	SerializeValue(ar, nSchema);
 
-	// call base class for schema >= 3
-	if (nSchema >= 3)
-	{
-		CModelObject::Serialize(ar);
-	}
-	else
-	{
-		SERIALIZE_VALUE(ar, m_strName);
-	}
+	// serialize the object's name
+	SerializeValue(ar, m_Name);
 
-	// serialize the machine description
-	// m_Machine.Serialize(ar);
+	// serialize basic geom values
+	SerializeValue(ar, m_CollimAngle);
+	SerializeValue(ar, m_GantryAngle);
+	SerializeValue(ar, m_CouchAngle);
 
-	///////////////////////////////////////////////////////
+	SerializeValue(ar, m_Isocenter);
 
-	// machine identification
-	/// TODO: get rid of these (except SAD)
-	CString m_strManufacturer;
-	CString m_strModel;
-	CString m_strSerialNumber;
+	// serialize the intensity map
+	SerializeImage<VoxelReal>(ar, GetIntensityMap());
 
-	SERIALIZE_VALUE(ar, m_strManufacturer);
-	SERIALIZE_VALUE(ar, m_strModel);
-	SERIALIZE_VALUE(ar, m_strSerialNumber);
-
-	// machine geometry description
-	double m_SAD = 0.0;	// source-axis distance
-	double m_SCD = 0.0;	// source-collimator distance
-	double m_SID = 0.0;	// source-image distance
-
-	SERIALIZE_VALUE(ar, m_SAD);
-	SERIALIZE_VALUE(ar, m_SCD);
-	SERIALIZE_VALUE(ar, m_SID);
-
-	///////////////////////////////////////////////////////
-
-
-	// serialize angles
-	/// TODO: get rid of collim angle
-	SERIALIZE_VALUE(ar, m_collimAngle);
-	SERIALIZE_VALUE(ar, m_gantryAngle);
-	SERIALIZE_VALUE(ar, m_couchAngle);
-
-	// TODO: is this really necessary?
+	// if loading, update the basis group geometry from the intensity map 
+	//		(this will clear out any existing beamlets)
 	if (ar.IsLoading())
 	{
-		m_collimAngle = 0.0;
-		m_gantryAngle = 0.0;
-		m_couchAngle = 0.0;
+		GetAccumulator()->InitBasisGroupGeometry();
 	}
+	dH::BasisGroupType::Pointer pBasisGroup = GetBeamletGroup();
 
-	// serialize table parameters
-	/// TODO: get rid of table offset
-	SERIALIZE_VALUE(ar, m_vTableOffset);
-
-	// serialize the collimator jaw settings
-	SERIALIZE_VALUE(ar, m_vCollimMin);
-	SERIALIZE_VALUE(ar, m_vCollimMax);
-
-	// serialize the block(s) -- first prepare the array
-	/// TODO: get rid of blocks
-	if (ar.IsLoading())
+	ImageRegionIterator<dH::BasisGroupType> iter(pBasisGroup, pBasisGroup->GetBufferedRegion());
+	for (; !iter.IsAtEnd(); ++iter)
 	{
-		// delete any existing structures
-		for (int nAt = 0; nAt < m_arrBlocks.GetSize(); nAt++)
-		{
-			delete m_arrBlocks[nAt];
-		}
-		m_arrBlocks.SetSize(0);
-
-		DWORD nCount = (DWORD) ar.ReadCount();
-		for (int nAt = 0; nAt < (int) nCount; nAt++)
-		{
-			// and add it to the array
-			m_arrBlocks.Add(new CPolygon());
-		}
-	}
-	else
-	{
-		ar.WriteCount(m_arrBlocks.GetSize());
-	}
-
-	// now serialize the blocks
-	for (int nAt = 0; nAt < m_arrBlocks.GetSize(); nAt++)
-	{
-		m_arrBlocks[nAt]->Serialize(ar);
-	}
-
-	// check the beam object's schema; only serialize the dose if 
-	//		we are storing or if we are loading with schema >= 2
-	if (nSchema >= 2)
-	{
-		// WAS m_bDoseValid flag (deprecated)
-		BOOL bDoseValid = TRUE;
-		SERIALIZE_VALUE(ar, bDoseValid);
-
-		// serialize the dose matrix
-		SerializeVolume<VOXEL_REAL>(ar, m_dose);
-	}
-
-	// serialize the beam weight
-	if (nSchema >= 4)
-	{
-		double m_weight = 1.0;
-		SERIALIZE_VALUE(ar, m_weight);
-	}
-
-	// serialize the beamlets
-	int nBeamlets0 = 0;
-	if (nSchema >= 5)
-	{
-		int nLevels = dH::Structure::MAX_SCALES;
-		SERIALIZE_VALUE(ar, nLevels);
-		ASSERT(nLevels <= dH::Structure::MAX_SCALES);
-
-		/// TODO: get rid of this beamlet serialization (the one below does the trick)
-		for (int nAtLevel = 0; nAtLevel < nLevels; nAtLevel++)
-		{
-			int nBeamlets = 0; 
-			SERIALIZE_VALUE(ar, nBeamlets);
-			if (nAtLevel == 0) nBeamlets0 = nBeamlets;
-
-
-			for (int nAtBeamlet = 0; nAtBeamlet < nBeamlets; nAtBeamlet++)
-			{
-				// dummny volume for serialization of (deprecated) sub beamlets)
-				VolumeReal::Pointer ptr = VolumeReal::New();
-				SerializeVolume<VOXEL_REAL>(ar, ptr);
-			}
-		}
-		
-		// serialize the weights as well
-		CVectorN<> vBeamletWeights;
-		if (ar.IsStoring())
-		{
-			vBeamletWeights.SetDim(m_vBeamletWeights->GetBufferedRegion().GetSize()[0]);
-			for (int nAt = 0; nAt < vBeamletWeights.GetDim(); nAt++)
-				vBeamletWeights[nAt] = m_vBeamletWeights->GetBufferPointer()[nAt];
-		}
-		SERIALIZE_VALUE(ar, vBeamletWeights);
 		if (ar.IsLoading())
 		{
-			SetIntensityMap(vBeamletWeights);
+			// VolumeReal::Pointer pBeamlet = VolumeReal::New();
+			SerializeVolume<VoxelReal>(ar, iter.Value()/*pBeamlet*/);
+			// iter.Set(pBeamlet);
+			// pBeamlet->Register();		// always need to register pointers to basis volumes in the basis group
 		}
-	}
-
-	// serialize the beamlets + subbeamlets
-	if (nSchema >= 6)
-	{
-		for (int nAtBeamlet = 0; nAtBeamlet < nBeamlets0; nAtBeamlet++)
+		else if (ar.IsStoring())
 		{
-			if (ar.IsLoading())
-			{
-				m_arrBeamlets.push_back(VolumeReal::New());
-			}
-			SerializeVolume<VOXEL_REAL>(ar, m_arrBeamlets[nAtBeamlet]);
+			SerializeVolume<VoxelReal>(ar, iter.Get());
 		}
 	}
+}
 
-	// set the flag to trigger recalc of beamlets
-	m_bRecalcBeamlets = true;
-
-}	// CBeam::Serialize
+}

@@ -1,87 +1,88 @@
-// Copyright (C) 2nd Messenger Systems
-// $Id: BeamDoseCalc.h 600 2008-09-14 16:46:15Z dglane001 $
+// Copyright (C) 2008 DGLane
+// $Id$
 #pragma once
+
+#include <itkUnaryFunctorImageFilter.h>
+using namespace itk;
 
 #include <ItkUtils.h>
 
-using namespace itk;
+#include <InPlaneResampleImageFilter.h>
 
-class CEnergyDepKernel;
-class CBeam;
+#include <Beam.h>
+#include <EnergyDepKernel.h>
+
+namespace dH {
 
 //////////////////////////////////////////////////////////////////////////////////
-class CBeamDoseCalc  
+class BeamDoseCalc : public ProcessObject
 {
 public:
 	// constructor / destructor
-	CBeamDoseCalc(CBeam *pBeam, CEnergyDepKernel *pKernel); 
-	virtual ~CBeamDoseCalc();
+	BeamDoseCalc(); 
+	virtual ~BeamDoseCalc();
 
-	// triggers calculation of beam's pencil beams
-	void InitCalcBeamlets();
-	void CalcBeamlet(int nBeamlet);
+	// itk typedefs
+	typedef BeamDoseCalc Self;
+	typedef ProcessObject Superclass;
+	typedef SmartPointer<Self> Pointer;
+	typedef SmartPointer<const Self> ConstPointer;
 
-	// sets the rectangular region for the current beamlet, in IEC beam coordinates on
-	//		the isocentric plane
-	void SetBeamletMinMax(const Vector<REAL,2>& vMin_in,
-					const Vector<REAL,2>& vMax_in);
+	// defines itk's New and CreateAnother static functions
+	itkNewMacro(Self);
 
-	// vMin, vMax in physical coords at isocentric plane
-	void CalcTerma();
-
-	// performs single ray-trace calculation of terma
-	void TraceRayTerma(Vector<REAL> vRay, const REAL fluence0);
-
-
-	// helper functions for TERMA ray trace
-	REAL GetPhysicalLength(const Vector<REAL>& vDir);
-	REAL TrilinearInterpDensity(const Vector<REAL>& vPos, 
-														const VolumeReal::IndexType& nNdx, 
-														REAL (&weights)[3][3]);
-	void UpdateTermaNeighborhood(const VolumeReal::IndexType& nNdx, 
-														REAL (&weights)[3][3],  REAL value);
-
-	//// top-level spherical convolution
-	//void CalcSphereConvolve();
-
-	//// spherical convolution ray trace (at a single point)
-	//void CalcSphereTrace(const VolumeReal::IndexType& nNdx);
-
-private:
 	// my beam
-	CBeam *m_pBeam;
+	DeclareMemberSPtrGet(Beam, dH::Beam);
+	void SetBeam(dH::Beam *pBeam);
 
 	// reference to the source
-	CEnergyDepKernel *m_pKernel;
+	DeclareMemberSPtr(Kernel, EnergyDepKernel);
 
-	// Mass Density Dist variables
-	VolumeReal::Pointer m_densityRep;
+	// triggers calculation of beam's pencil beams
+	bool CalcNextBeamlet(dH::BasisGroupType::IndexType& currentIndex);
 
-	// vSource -- source position, in voxel coordinates
-	Vector<REAL> m_vSource_vxl;
-	Vector<REAL> m_vIsocenter_vxl;
+	///////////////////////////////////////////////////////////////////////////////
+	class HoundsfieldToMassDensityTransform
+	{
+	public:
+		HoundsfieldToMassDensityTransform() {	}
 
-	// current beamlet min / max rectangle (in voxel coordinates)
-	Vector<REAL> m_vMin_vxl;
-	Vector<REAL> m_vMax_vxl;
+		// computes the mass density for a given HU pixel value
+		inline VoxelReal operator()( const VoxelReal& x )
+		{
+			const VoxelReal AirHoundsfield = -1024.0;
+			const VoxelReal AirDensity = 0.0;
 
+			const VoxelReal WaterHoundsfield = 0.0;
+			const VoxelReal WaterDensity = 1.0;
 
-	// TERMA calc variables
+			const VoxelReal BoneHoundsfield = 1024.0;
+			const VoxelReal BoneDensity = 1.5;
 
-	// minimum number of rays to use per voxel (on top boundary)
-	REAL m_raysPerVoxel;
+			if (x < WaterHoundsfield)
+			{
+				VoxelReal fraction = (x - AirHoundsfield) / (WaterHoundsfield - AirHoundsfield);
+				return AirDensity + (WaterDensity - AirDensity) * fraction;
+			}
+			else if (x < BoneHoundsfield)
+			{
+				VoxelReal fraction = (x - WaterHoundsfield) / (BoneHoundsfield - WaterHoundsfield);
+				return WaterDensity + (BoneDensity - WaterDensity) * fraction;
+			}
 
-	// initialize surface integral of fluence 
-	REAL m_fluenceSurfIntegral;
+			return BoneDensity;
+		}
+	}; 
 
-	// returns computed terma
-	VolumeReal::Pointer m_pTerma;
+	typedef UnaryFunctorImageFilter<VolumeReal,VolumeReal,
+			HoundsfieldToMassDensityTransform> HoundsfieldToMassDensityFilter;
 
+	// helper to get formatted mass density volume
+	DeclareMemberSPtr(HoundsfieldToMassDensityFilter, HoundsfieldToMassDensityFilter);
 
-	// SphereConvolve variables
-
-	// computed energy
-	VolumeReal::Pointer m_pEnergy;
+	// density resampler
+	DeclareMemberSPtr(DensityResampler, dH::InPlaneResampleImageFilter);
 
 };	// class CBeamDoseCalc
 
+}

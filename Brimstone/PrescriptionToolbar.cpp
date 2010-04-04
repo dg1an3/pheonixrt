@@ -61,7 +61,7 @@ dH::VOITerm *
 	// set prescription info
 	if (NULL != GetDocument())
 	{
-		dH::VOITerm *pVOIT = GetDocument()->m_pOptimizer->GetPrescription(0)
+		dH::VOITerm *pVOIT = GetDocument()->GetOptimizer()->GetPrescription(0)
 			->GetStructureTerm(GetSelectedStruct());
 		return pVOIT;
 	}
@@ -131,8 +131,8 @@ void
 	m_btnVisible.SetCheck(pStruct->GetVisible() ? 1 : 0);
 
 	// set histogram check
-	CHistogram *pHisto = GetDocument()->m_pPlan->GetHistogram(pStruct, false);
-	m_btnHistogram.SetCheck(NULL != pHisto ? 1 : 0);
+	//CHistogram *pHisto = GetDocument()->GetPlan()->GetHistogram(pStruct, false);
+	//m_btnHistogram.SetCheck(NULL != pHisto ? 1 : 0);
 
 #ifdef USE_RTOPT
 	// set prescription info
@@ -184,7 +184,7 @@ void
 	{
 		m_cbSSelect.ResetContent();
 
-		dH::Series *pSeries = GetDocument()->m_pSeries;
+		dH::Series *pSeries = GetDocument()->GetSeries();
 		for (int nStruct = 0; nStruct < pSeries->GetStructureCount(); nStruct++)
 		{
 			dH::Structure *pStruct = pSeries->GetStructureAt(nStruct);
@@ -249,7 +249,7 @@ void
 
 #ifdef USE_RTOPT
 	// update include flags to reflect changed types
-	GetDocument()->m_pOptimizer->GetPrescription(0)->SetElementInclude();
+	GetDocument()->GetOptimizer()->GetPrescription(0)->SetElementInclude();
 
 	// set visibility / histogram options
 	if (dH::Structure::eNONE != pStruct->GetType())

@@ -27,11 +27,11 @@ class Prescription : public DynamicCovarianceCostFunction /* CObjectiveFunction 
 {
 public:
 	// constructors / destructors
-	Prescription(CPlan *pPlan = NULL/*, int nLevel = 0*/);
+	Prescription(dH::Plan *pPlan = NULL/*, int nLevel = 0*/);
 	virtual ~Prescription();
 
 	// my plan
-	DECLARE_ATTRIBUTE_PTR(Plan, CPlan);
+	DECLARE_ATTRIBUTE_PTR(Plan, dH::Plan);
 
 	// for 2D operation, determines slice to use
 	DECLARE_ATTRIBUTE(Slice, int);

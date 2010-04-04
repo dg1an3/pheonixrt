@@ -42,7 +42,7 @@ const REAL DEFAULT_TOLERANCE	= 1e-3;
 
 
 ///////////////////////////////////////////////////////////////////////////////
-PlanOptimizer::PlanOptimizer(CPlan *pPlan)
+PlanOptimizer::PlanOptimizer(dH::Plan *pPlan)
 	: m_pPlan(pPlan)
 {
 	SetupPrescription();
@@ -189,7 +189,7 @@ void
 	//	GetPlan()->GetBeamAt(0)->GetBeamletCount());
 	for (int nAtBeam = 0; nAtBeam < GetPlan()->GetBeamCount(); nAtBeam++)
 	{
-		CBeam::IntensityMap *pIM = GetPlan()->GetBeamAt(nAtBeam)->GetIntensityMap();
+		dH::IntensityMapType *pIM = GetPlan()->GetBeamAt(nAtBeam)->GetIntensityMap();
 		IntensityMapToStateVector(0, nAtBeam, pIM, vState);
 		//for (int nAt = 0; nAt < pIM->GetBufferedRegion().GetSize()[0]; nAt++)
 		//	mBeamletWeights[nAtBeam][nAt] = pIM->GetBufferPointer()[nAt];
@@ -209,12 +209,12 @@ void
 	{
 		StateVectorToIntensityMap(0, nAtBeam, vState, 
 			GetPlan()->GetBeamAt(nAtBeam)->GetIntensityMap());
-		GetPlan()->GetBeamAt(nAtBeam)->OnIntensityMapChanged();
+//		GetPlan()->GetBeamAt(nAtBeam)->OnIntensityMapChanged();
 		//GetPlan()->GetBeamAt(nAtBeam)->SetIntensityMap(mBeamletWeights[nAtBeam]);
 	}
 
 	// now iterate through histograms, updating
-	GetPlan()->UpdateAllHisto();
+//	GetPlan()->UpdateAllHisto();
 
 }	// PlanOptimizer::SetStateVectorToPlan
 
@@ -231,16 +231,16 @@ void
 	//CMatrixNxM<> mFiltBeamletWeights(mBeamletWeights.GetCols(),	
 	//	GetPyramid()->GetPlan(nScale-1)->GetBeamAt(0)->GetBeamletCount());
 
-	CBeam::IntensityMap::Pointer intMapIn = CBeam::IntensityMap::New();
-	ConformTo<VOXEL_REAL, 1>(GetPyramid()->GetPlan(nScale)->GetBeamAt(0)->GetIntensityMap(), intMapIn);
+	dH::IntensityMapType::Pointer intMapIn = dH::IntensityMapType::New();
+	ConformTo<VOXEL_REAL, 2>(GetPyramid()->GetPlan(nScale)->GetBeamAt(0)->GetIntensityMap(), intMapIn);
 	//intMapIn->CopyInformation(GetPyramid()->GetPlan(nScale)->GetBeamAt(0)->GetIntensityMap());
 	//intMapIn->SetBufferedRegion( GetPyramid()->GetPlan(nScale)->GetBeamAt(0)->GetIntensityMap()->GetBufferedRegion() );
 	//intMapIn->SetRegions(GetPyramid()->GetPlan(nScale)->GetBeamAt(0)->GetIntensityMap()->GetB);
 	//intMapIn->SetRegions(MakeSize(GetPyramid()->GetPlan(nScale)->GetBeamAt(0)->GetBeamletCount()));
 	//intMapIn->Allocate();
 
-	CBeam::IntensityMap::Pointer intMapOut = CBeam::IntensityMap::New();
-	ConformTo<VOXEL_REAL, 1>(GetPyramid()->GetPlan(nScale-1)->GetBeamAt(0)->GetIntensityMap(), intMapOut);
+	dH::IntensityMapType::Pointer intMapOut = dH::IntensityMapType::New();
+	ConformTo<VOXEL_REAL, 2>(GetPyramid()->GetPlan(nScale-1)->GetBeamAt(0)->GetIntensityMap(), intMapOut);
 	//intMapOut->CopyInformation(GetPyramid()->GetPlan(nScale-1)->GetBeamAt(0)->GetIntensityMap());
 	//intMapOut->SetRegions(MakeSize(GetPyramid()->GetPlan(nScale-1)->GetBeamAt(0)->GetBeamletCount()));
 	//intMapOut->Allocate();
@@ -338,9 +338,9 @@ void
 void 
 	PlanOptimizer::StateVectorToIntensityMap(int nScale, int nBeam,
 		const CVectorN<>& vState, 
-		CBeam::IntensityMap *pIntensityMap) // CMatrixNxM<>& mBeamletWeights)
+		dH::IntensityMapType *pIntensityMap) // CMatrixNxM<>& mBeamletWeights)
 {
-	CPlan *pPlan = GetPyramid()->GetPlan(nScale);
+	dH::Plan *pPlan = GetPyramid()->GetPlan(nScale);
 	int nBeamletCount = pPlan->GetBeamAt(nBeam/*0*/)->GetBeamletCount();
 	int nBeamletOffset = nBeamletCount / 2;
 	ConformTo<VOXEL_REAL>(pPlan->GetBeamAt(nBeam)->GetIntensityMap(), 
@@ -375,9 +375,9 @@ void
 ///////////////////////////////////////////////////////////////////////////////
 void 
 	PlanOptimizer::IntensityMapToStateVector(int nScale, int nBeam,
-			const CBeam::IntensityMap *pIntensityMap/*CMatrixNxM<>& mBeamletWeights */, CVectorN<>& vState)
+			const dH::IntensityMapType *pIntensityMap/*CMatrixNxM<>& mBeamletWeights */, CVectorN<>& vState)
 {
-	CPlan *pPlan = GetPyramid()->GetPlan(nScale);
+	dH::Plan *pPlan = GetPyramid()->GetPlan(nScale);
 	int nBeamletCount = pPlan->GetBeamAt(nBeam/*0*/)->GetBeamletCount();
 
 	int nBeamletOffset = nBeamletCount / 2;

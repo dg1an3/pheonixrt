@@ -1,8 +1,9 @@
-// Copyright (C) 2nd Messenger Systems
-// $Id: PlanSetupDlg.h 650 2009-11-05 22:24:55Z dglane001 $
+// PlanSetupDlg.h : header file
+//
+
 #pragma once
 
-#include <PlanPyramid.h>
+#include <Plan.h>
 #include <BeamDoseCalc.h>
 
 /////////////////////////////////////////////////////////////////////////////
@@ -12,7 +13,7 @@ class CPlanSetupDlg : public CDialog
 {
 // Construction
 public:
-	CPlanSetupDlg(dH::PlanPyramid *pPlan, CWnd* pParent = NULL);   // standard constructor
+	CPlanSetupDlg(dH::Plan *pPlan, CWnd* pParent = NULL);   // standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(CPlanSetupDlg)
@@ -21,20 +22,22 @@ public:
 	double	m_isoX;
 	double	m_isoY;
 	double	m_isoZ;
+	double m_resolution;
+	double m_energy;
+	double m_termDist;
 	//}}AFX_DATA
 
 	CEdit m_edtAtBeamlet;
 	CEdit m_edtAtBeam;
 
 	// the plan for the dose calc
-	// CPlan *m_pPlan;
-	dH::PlanPyramid *m_pPlanPyramid;
+	DeclareMemberSPtr(Plan, dH::Plan);
 
 	// manages the thread object
 	CWinThread *m_pDCThread;
 
 	// the array of dose calc objects for each beam
-	CAutoPtrArray< CBeamDoseCalc > m_arrBDC;
+	std::vector< dH::BeamDoseCalc::Pointer > m_arrDoseCalculators;
 
 	// Overrides
 	// ClassWizard generated virtual function overrides

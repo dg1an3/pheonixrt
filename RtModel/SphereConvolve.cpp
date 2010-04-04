@@ -1,9 +1,9 @@
-// Copyright (C) 2nd Messenger Systems
-// $Id: SphereConvolve.cpp 602 2008-09-14 16:54:49Z dglane001 $
 #include "StdAfx.h"
 #include "SphereConvolve.h"
 
-const int NUM_THETA = 8;
+namespace dH {
+
+//const int NUM_THETA = 8;
 const int NUM_RADII = 64;
 
 //////////////////////////////////////////////////////////////////////////////
@@ -14,6 +14,21 @@ SphereConvolve::SphereConvolve(void)
 //////////////////////////////////////////////////////////////////////////////
 SphereConvolve::~SphereConvolve(void)
 {
+}
+
+//////////////////////////////////////////////////////////////////////////////
+void 
+	SphereConvolve::GenerateData()
+{
+	// make sure terma is properly allocated
+	this->AllocateOutputs();
+
+	VolumeReal::ConstPointer pDensity = GetInput(0);
+	VolumeReal::ConstPointer pTerma = GetInput(1);
+	VolumeReal::Pointer pEnergy = GetOutput();
+
+	// convolve terma with energy deposition kernel to form dose
+	GetKernel()->CalcSphereConvolve(pDensity, pTerma, GetSlice(), pEnergy); 
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -344,4 +359,6 @@ void
 	{
 		distances[nAt] = distances[nAt-1] + distancePerStep;
 	}
+}
+
 }

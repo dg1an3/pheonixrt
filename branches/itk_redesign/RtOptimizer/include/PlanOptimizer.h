@@ -18,11 +18,11 @@ namespace dH
 class PlanOptimizer
 {
 public:
-	PlanOptimizer(CPlan *pPlan);
+	PlanOptimizer(dH::Plan *pPlan);
 	~PlanOptimizer(void);
 
 	// reference to my plan
-	DECLARE_ATTRIBUTE_PTR(Plan, CPlan);
+	DECLARE_ATTRIBUTE_PTR(Plan, dH::Plan);
 
 	// reference to the plan pyramid manager
 	DECLARE_ATTRIBUTE_PTR(Pyramid, PlanPyramid);
@@ -55,11 +55,11 @@ protected:
 	//void StateVectorToBeamletWeights(int nScale, const CVectorN<>& vState, CMatrixNxM<>& mBeamletWeights);
 	void StateVectorToIntensityMap(int nScale, int nBeam,
 		const CVectorN<>& vState, 
-		CBeam::IntensityMap *pIntensityMap); // CMatrixNxM<>& mBeamletWeights)
+		dH::IntensityMapType *pIntensityMap); // CMatrixNxM<>& mBeamletWeights)
 
 	// void BeamletWeightsToStateVector(int nScale, const CMatrixNxM<>& mBeamletWeights, CVectorN<>& vState);
 	void IntensityMapToStateVector(int nScale, int nBeam,
-			const CBeam::IntensityMap *pIntensityMap/*CMatrixNxM<>& mBeamletWeights */, CVectorN<>& vState);
+			const dH::IntensityMapType *pIntensityMap/*CMatrixNxM<>& mBeamletWeights */, CVectorN<>& vState);
 
 private:
 	// pointers to the other prescription objects

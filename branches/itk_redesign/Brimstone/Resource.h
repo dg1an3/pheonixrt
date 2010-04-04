@@ -26,6 +26,7 @@
 #define IDC_STRUCT_HISTO_VISIBLE        1014
 #define IDC_VOLUME2_EDIT                1015
 #define IDC_EDIT_ISO_OFS_X3             1015
+#define IDC_EDIT_RESOLUTION             1015
 #define IDC_EDIT1                       1017
 #define IDC_RADIO_NONE                  1018
 #define IDC_ATBEAM                      1019
@@ -39,10 +40,12 @@
 #define IDC_CHECK1                      1026
 #define IDC_EDIT_ISO_OFS_X7             1026
 #define IDC_CHECK_CONTOUR               1026
+#define IDC_EDIT_TERMDIST               1026
 #define IDC_SPIN1                       1027
 #define IDC_STRUCTTYPE                  1028
 #define IDC_BTNOPTIMIZE                 1029
 #define IDC_COMBO1                      1030
+#define IDC_ENERGYCOMBO                 1030
 #define IDC_BUTTON1                     1031
 #define ID_SCANBEAMLETS                 32771
 #define ID_GENBEAMLETS                  32773

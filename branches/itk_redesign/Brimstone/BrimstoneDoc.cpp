@@ -53,11 +53,11 @@ void CBrimstoneDoc::DeleteContents()
 {
 	// create series * plan
 	m_pSeries = dH::Series::New();
-	m_pPlan.reset(new CPlan());
+	m_pPlan = dH::Plan::New(); // .reset(new CPlan());
 	m_pPlan->SetSeries(m_pSeries);
 
 #ifdef USE_RTOPT
-	m_pOptimizer.reset(new dH::PlanOptimizer(m_pPlan.get()));
+	m_pOptimizer = new dH::PlanOptimizer(m_pPlan);
 #endif
 
 	CDocument::DeleteContents();
@@ -182,10 +182,10 @@ void CBrimstoneDoc::OnGenbeamlets()
 
 	// set up a new optimizer
 #ifdef USE_RTOPT
-	m_pOptimizer.reset(new dH::PlanOptimizer(m_pPlan.get()));
+	m_pOptimizer = new dH::PlanOptimizer(m_pPlan);
 #endif
 
-	CPlanSetupDlg dlgSetup(m_pOptimizer->GetPyramid(), AfxGetMainWnd());
+	CPlanSetupDlg dlgSetup(m_pOptimizer->GetPlan(), AfxGetMainWnd());
 	if (dlgSetup.DoModal() == IDOK)
 	{
 
@@ -199,8 +199,8 @@ void CBrimstoneDoc::OnGenbeamlets()
 	CVectorN<> vWeights;
 	vWeights.SetDim(1); // 39);
 	vWeights[0 /*19*/] = 0.99; // 70.0;
-	for (int nAtBeam = 0; nAtBeam < m_pPlan->GetBeamCount(); nAtBeam++)
-		m_pPlan->GetBeamAt(nAtBeam)->SetIntensityMap(vWeights);
+	//for (int nAtBeam = 0; nAtBeam < m_pPlan->GetBeamCount(); nAtBeam++)
+	//	m_pPlan->GetBeamAt(nAtBeam)->SetIntensityMap(vWeights);
 	m_pPlan->GetDoseMatrix();
 
 	// this is used to prime CBrimstoneView's optimizer thread

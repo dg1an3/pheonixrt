@@ -1,26 +1,50 @@
-// Copyright (C) 2nd Messenger Systems
-// $Id: SphereConvolve.h 601 2008-09-14 16:48:05Z dglane001 $
+// Copyright (C) 2008 DGLane
+// $Id$
 #pragma once
 
+#include <itkImageToImageFilter.h>
 using namespace itk;
-using namespace std;
 
-class SphereConvolve
+#include <EnergyDepKernel.h>
+
+namespace dH {
+
+//////////////////////////////////////////////////////////////////////////////
+class SphereConvolve 
+	: public ImageToImageFilter<VolumeReal, VolumeReal>
 {
 public:
 	SphereConvolve(void);
 	~SphereConvolve(void);
 
+	// itk typedefs
+	typedef SphereConvolve Self;
+	typedef ImageToImageFilter<VolumeReal, VolumeReal> Superclass;
+	typedef SmartPointer<Self> Pointer;
+	typedef SmartPointer<const Self> ConstPointer;
+
+	// defines itk's New and CreateAnother static functions
+	itkNewMacro(Self);
+
 	// inputs to sphere convolve
-	DECLARE_ATTRIBUTE_PTR(Density, VolumeReal);
-	DECLARE_ATTRIBUTE_PTR(Terma, VolumeReal);
+	DeclareMemberSPtr(Density, VolumeReal);
+	DeclareMemberSPtr(Terma, VolumeReal);
 
 	// output from sphere convolve
-	DECLARE_ATTRIBUTE_PTR(Energy, VolumeReal);
+	DeclareMemberSPtr(Energy, VolumeReal);
+
+	// the associated kernel
+	DeclareMemberSPtr(Kernel, dH::EnergyDepKernel);
+
+	// tells convolver to only operate on this slice
+	DeclareMember(Slice, int);
 
 	// cumulative energy LUT, from the EDK
 	// Z size = 1, as only one theta angle needs to be represented (because the kernel is rotationally symetric)
 	DECLARE_ATTRIBUTE_PTR_GI(CumulativeEnergyLUT, VolumeReal);
+
+	// generates the data on update
+	virtual void GenerateData();
 
 	// top-level spherical convolution
 	void CalcSphereConvolve();
@@ -72,3 +96,5 @@ private:
 	// Z -> theta angle (in deg)
 	VolumeShort::Pointer m_arrOffsetToRadiusLUT[3];
 };
+
+}

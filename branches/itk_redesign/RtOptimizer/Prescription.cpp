@@ -17,7 +17,7 @@ const REAL SIGMOID_SCALE = 0.2; // 0.1; // 0.3; // 0.1; // 1.0;
 //////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
-Prescription::Prescription(CPlan *pPlan/*, int nLevel*/)
+Prescription::Prescription(dH::Plan *pPlan/*, int nLevel*/)
 	: /*CObjectiveFunction(FALSE)
 		, */m_pPlan(pPlan)
 		, m_inputScale(GetProfileReal("Prescription", "InputScale", 0.5))
@@ -99,10 +99,10 @@ void
 	Prescription::AddStructureTerm(VOITerm *pVOIT)
 {
 	// get any beam (as an exemplar)
-	CBeam *pBeam = m_pPlan->GetBeamAt(m_pPlan->GetBeamCount()-1);
+	dH::Beam *pBeam = m_pPlan->GetBeamAt(m_pPlan->GetBeamCount()-1);
 
 	// initialize the sum volume, so as to coincide with the beamlets
-	VolumeReal *pBeamlet = pBeam/*m_pPlan->GetBeamAt(m_pPlan->GetBeamCount()-1)*/->GetBeamlet(0);
+	VolumeReal *pBeamlet = pBeam/*m_pPlan->GetBeamAt(m_pPlan->GetBeamCount()-1)*/->GetBeamletGroup()->GetPixel(BasisGroupType::IndexType()); // GetBeamlet(0);
 	ConformTo<VOXEL_REAL,3>(pBeamlet, m_sumVolume);
 
 	// initialize the histogram region

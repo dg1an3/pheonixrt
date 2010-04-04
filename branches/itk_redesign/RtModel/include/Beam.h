@@ -1,125 +1,80 @@
-// Copyright (C) 2nd Messenger Systems
-// $Id: Beam.h 600 2008-09-14 16:46:15Z dglane001 $
+// Copyright (C) 2000-2008 DG Lane
+// $Id: Beam.cpp,v 1.28 2007-12-10 02:57:30 Derek Lane Exp $
 #pragma once
 
-#include <vector>
-using namespace std;
+#include <IntensityMapAccumulateImageFilter.h>
+#include <inPlaneResampleImageFilter.h>
 
-// model object base class
-#include <ModelObject.h>
+using namespace itk;
 
-// geom model classes
-#include <Polygon.h>
+namespace dH {
 
 // forward declaration
-class CPlan;
+class Plan;
 
 //////////////////////////////////////////////////////////////////////
-// class CBeam
-//
-// represents a single treatment beam
-//////////////////////////////////////////////////////////////////////
-class CBeam : public CModelObject
+class Beam : 
+		public DataObject 
+	// represents a single treatment beam
 {
 public:
 	// constructur/destructor
-	CBeam();
-	virtual ~CBeam();
+	Beam();
+	virtual ~Beam();
 
-	// serialization support
-	DECLARE_SERIAL(CBeam)
+	// itk typedefs
+	typedef Beam Self;
+	typedef DataObject Superclass;
+	typedef SmartPointer<Self> Pointer;
+	typedef SmartPointer<const Self> ConstPointer;
+
+	// defines itk's New and CreateAnother static functions
+	itkNewMacro(Self);
 
 	// pointer to my plan
-	DECLARE_ATTRIBUTE_PTR(Plan, CPlan);
+	DeclareMemberPtr(Plan, dH::Plan);
 
-	//// angle values
-	double GetGantryAngle() const;
-	void SetGantryAngle(double gantryAngle);
-	double GetCouchAngle() const;
-	void SetCouchAngle(double couchAngle);
+	// name of the beam
+	DeclareMember(Name, CString);
+
+	// angle values
+	DeclareMemberGI(GantryAngle, double);
+	// void SetGantryAngle(double angle);
+
+	DeclareMember(CouchAngle, double);
+	DeclareMember(CollimAngle, double);
 
 	// table offset
-	DECLARE_ATTRIBUTE(Isocenter, itk::Vector<REAL>);
+	DeclareMember(Isocenter, Vector<REAL>);
+
+	// pointer to the accumulator filter
+	DeclareMemberSPtr(Accumulator, dH::IntensityMapAccumulateImageFilter);
 
 	// beamlet accessors
+	DeclareMemberSPtr(BeamletGroup, dH::BasisGroupType);
 	int GetBeamletCount();
-	VolumeReal *GetBeamlet(int nShift);
+	VolumeReal::Pointer GetBeamlet(int nAt) { return NULL; }
+
+	// sets up the dose geometry and beamlet arrays
+	//		given the gantry angle, plan dose spacing, and passed beamlet count
+	void UpdateDoseBeamletGeometry();
 
 	// intensity map accessors
-	typedef itk::Image<VOXEL_REAL, 1> IntensityMap;
-	IntensityMap * GetIntensityMap() const;
-	void SetIntensityMap(const CVectorN<>& vWeights);
+	DeclareMemberSPtr(IntensityMap, dH::IntensityMapType);
 
-	// call to deal with intensity map changes
-	void OnIntensityMapChanged();
+	// sets the intensity map geometry
+	void UpdateIntensityMapGeometry(REAL spacing, dH::IntensityMapType::SizeType size);
 
 	// the computed dose for this beam (NULL if no dose exists)
-	virtual VolumeReal *GetDoseMatrix();
+	// this dose is in the beam-specific geometry; i.e. aligned to IEC G system
+	DeclareMemberSPtr(DoseMatrix, VolumeReal);
+
+	// helper to resample the dose back to the plan's geometry
+	DeclareMemberSPtr(DoseResampler, dH::InPlaneResampleImageFilter);
 
 	// beam serialization
-	void Serialize(CArchive &ar);
+	void SerializeExt(CArchive &ar, int nSchema);
 
-protected:
-	friend void GenBeamlets(CBeam *pBeam);
+};	// class Beam
 
-	// CBeamDoseCalc must access this
-	friend class CBeamDoseCalc;
-
-public:
-	/// TODO: make this private
-	mutable VolumeReal::Pointer m_dose;
-	mutable VolumeReal::Pointer m_doseAccumBuffer;
-
-private:
-	// angles
-	/// TODO: get rid of collim
-	double m_collimAngle;
-	double m_gantryAngle;
-	double m_couchAngle;
-
-	// table parameters
-	/// TODO: get rid of table offset
-	itk::Vector<REAL> m_vTableOffset;
-
-	// collimator jaw settings
-	itk::Vector<REAL, 2> m_vCollimMin;
-	itk::Vector<REAL, 2> m_vCollimMax;
-
-	// collection of blocks
-	/// TODO: get rid of blocks
-	CTypedPtrArray<CObArray, CPolygon* > m_arrBlocks;
-
-	mutable bool m_bRecalcDose;
-
-public:
-
-	// the beamlets for the beam
-	std::vector< VolumeReal::Pointer > m_arrBeamlets;
-
-	// flag for recalc of beamlets
-	/// TODO: get rid of this (used for sub-beamlets
-	bool m_bRecalcBeamlets;
-
-	// the intensity map
-	IntensityMap::Pointer/*CVectorN<>*/ m_vBeamletWeights;
-
-};	// class CBeam
-
-#ifdef USING_CLI
-namespace dH
-{
-
-public class Beam : public System::Object
-{
-	Beam();
-
-	property REAL GantryAngle;
-	property REAL CouchAngle;
-	property itk::Point<3> Isocenter;
-
-	itk::Image<3> **m_ppBeamlets;
-	itk::Image<2> *m_pIntensityMap;
-};
-
-}
-#endif
+} 

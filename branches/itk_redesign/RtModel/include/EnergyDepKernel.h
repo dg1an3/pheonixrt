@@ -1,5 +1,7 @@
-// Copyright (C) 2nd Messenger Systems
-// $Id: EnergyDepKernel.h 600 2008-09-14 16:46:15Z dglane001 $
+// Source.h: interface for the CSource class.
+//
+//////////////////////////////////////////////////////////////////////
+
 #pragma once
 
 #include <VectorN.h>
@@ -7,37 +9,56 @@
 
 using namespace itk;
 
+namespace dH {
+
 // constants for the number of entries in the lok
-const int NUM_THETA = 2; // 12; // 8;
+const int NUM_THETA = 12; // 8;
 const int NUM_RADIAL_STEPS = 64;
 
 //////////////////////////////////////////////////////////////////////////////////
-class CEnergyDepKernel  
+class EnergyDepKernel : 
+		public DataObject
 {
 public:
-	CEnergyDepKernel(REAL energy);
-	virtual ~CEnergyDepKernel();
+	EnergyDepKernel();
+	virtual ~EnergyDepKernel();
+
+	// itk typedefs
+	typedef EnergyDepKernel Self;
+	typedef DataObject Superclass;
+	typedef SmartPointer<Self> Pointer;
+	typedef SmartPointer<const Self> ConstPointer;
+
+	// defines itk's New and CreateAnother static functions
+	itkNewMacro(Self);
+
+	// member to set the energy - triggers load on setting
+	DeclareMember(Energy, REAL);
+
+	// reads the appropriate EDK
+	void LoadKernel();
 
 	// returns kernels attenuation coefficient
-	DECLARE_ATTRIBUTE(_mu, REAL);
+	DeclareMember(_mu, REAL);
+
+	// returns kernels attenuation coefficient
+	DeclareMember(TerminateDistance, REAL);
 
 	// top-level spherical convolution
-	VolumeReal::Pointer 
-		CalcSphereConvolve(VolumeReal *pDensity, VolumeReal *pTerma, int nSlice);
+	void CalcSphereConvolve(const VolumeReal *pDensity, 
+			const VolumeReal *pTerma, int nSlice,
+			VolumeReal *pEnergy);
 
 	// spherical convolution ray trace (at a single point)
-	void CalcSphereTrace(VolumeReal *pDensity, VolumeReal *pTerma, 
+	void CalcSphereTrace(const VolumeReal *pDensity, 
+			const VolumeReal *pTerma, 
 			const VolumeReal::IndexType& nNdx, VolumeReal *pEnergy);
 
 protected:
 	// returns number of phi (azimuth) angle increments
 	int GetNumPhi();
 
-
 	// EDK lookup table helpers
-
-	// reads the appropriate EDK
-	void LoadKernel();
 
 	// sets up cumulative energy LUT
 	void InterpCumEnergy(const CMatrixNxM<>& mIncEnergy, 
@@ -45,7 +66,6 @@ protected:
 
 	// returns cumulative energy for given angle / distance
 	double GetCumEnergy(int nPhi, double rad_dist);
-
 
 	// Raytrace lookup table helpers
 
@@ -84,3 +104,5 @@ private:
 	VolumeReal::OffsetType m_radialToOffset[NUM_THETA][48][64];
 
 };	// class CEnergyDepKernel
+
+}

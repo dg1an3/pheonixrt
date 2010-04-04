@@ -1,226 +1,28 @@
-// Copyright (C) 2nd Messenger Systems
-// $Id: EnergyDepKernel.cpp 602 2008-09-14 16:54:49Z dglane001 $
+// Copyright (C) 2008 DGLane
+// $Id$
 #include "stdafx.h"
 #include "EnergyDepKernel.h"
 
+// for reading the kernel
 #include <direct.h>
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
-#define new DEBUG_NEW
-#endif
 
+namespace dH {
 
 //////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
-//////////////////////////////////////////////////////////////////////
-CEnergyDepKernel::CEnergyDepKernel(REAL energy)
-	: m_energy(energy)
+EnergyDepKernel::EnergyDepKernel()
 {
-	LoadKernel();
+	SetTerminateDistance(60.0);
 }
 
 //////////////////////////////////////////////////////////////////////
-CEnergyDepKernel::~CEnergyDepKernel()
+EnergyDepKernel::~EnergyDepKernel()
 {
 }
 
-
-////////////////////////////////////////////////////////////////////////////////////////
-inline int 
-	CEnergyDepKernel::GetNumPhi()
-{
-	return m_mCumEnergy.GetCols();
-}
-
-////////////////////////////////////////////////////////////////////////////////////////
-inline const VolumeReal::OffsetType& 
-	CEnergyDepKernel::GetIndexOffset(int nTheta, int nPhi, int nRadial)																			
-{
-	return m_radialToOffset[nTheta-1][nPhi-1][nRadial-1];
-}
-
-////////////////////////////////////////////////////////////////////////////////////////
-inline double 
-	CEnergyDepKernel::GetRadius(int nTheta, int nPhi, int nRadial)
-	// returns radius in cm
-{
-	return m_radius[nTheta-1][nPhi-1][nRadial];
-}
-
-////////////////////////////////////////////////////////////////////////////////////////
-inline double 
-	CEnergyDepKernel::GetCumEnergy(int nPhi, double rad_dist /* cm */)
-{
-	// The resolution of the array in the radial direction is every mm
-	//	hence the multiply by 10.0 in the arguement.
-	int nRadial = (int) floor(rad_dist * 10.0 + 0.5);
-
-	// check for overflow
-	nRadial = __min(nRadial, m_mCumEnergy.GetRows()-1);
-
-	return m_mCumEnergy[nPhi-1][nRadial];
-}
-
-//////////////////////////////////////////////////////////////////////////////
-VolumeReal::Pointer
-	CEnergyDepKernel::CalcSphereConvolve(VolumeReal *pDensity, VolumeReal *pTerma, int nSlice) 
-	// spherical convolution
-{
-	// initialize energy
-	VolumeReal::Pointer pEnergy = VolumeReal::New();
-	ConformTo<VOXEL_REAL,3>(pTerma, pEnergy);
-	pEnergy->FillBuffer(0.0);
-
-	// set up pixel spacing
-	itk::Vector<REAL> vPixSpacing = pDensity->GetSpacing();
-
-	// convert to cm and set up lookup table for sphere convolve
-	vPixSpacing *= (REAL) 0.1;
-	SetupRadialLUT(vPixSpacing);
-
-	// Now do the convolution.
-	VolumeReal::IndexType nNdx;
-	nNdx[2] = nSlice; // Round<int>(m_vIsocenter_vxl[2]);	// TODO: pass this in
-	// for (nNdx[2] = 0; nNdx[2] < pDensity->GetBufferedRegion().GetSize()[2]; nNdx[2]++)         
-	{
-		for (nNdx[1] = 0; nNdx[1] < pDensity->GetBufferedRegion().GetSize()[1]; nNdx[1]++)        
-		{
-			for (nNdx[0] = 0; nNdx[0] < pDensity->GetBufferedRegion().GetSize()[0]; nNdx[0]++)          
-			{
-				// dose at zero density?
-				if (pDensity->GetPixel(nNdx) > 0.01) 
-				{
-					// spherical convolution at this point
-					CalcSphereTrace(pDensity, pTerma, nNdx, pEnergy); 
-
-					// Convert the energy to dose by dividing by mass
-					// convert to Gy cm**2 and take into account the azimuthal sum
-					pEnergy->GetPixel(nNdx) *= 1.0 / (REAL) NUM_THETA;
-					// 	(VOXEL_REAL) (1.602e-10 / (REAL) NUM_THETA);
-
-					if (pDensity->GetPixel(nNdx) > 0.25)
-						pEnergy->GetPixel(nNdx) /= pDensity->GetPixel(nNdx);
-					else
-						pEnergy->GetPixel(nNdx) = 0.0;
-				}
-			}
-		}
-	}
-
-	// now copy isocenter slice to others
-	int nCount = pEnergy->GetBufferedRegion().GetSize()[1] * pEnergy->GetBufferedRegion().GetSize()[0];
-	VOXEL_REAL *pSrc = &pEnergy->GetBufferPointer()[nSlice * nCount];
-	for (nNdx[2] = 0; nNdx[2] < pEnergy->GetBufferedRegion().GetSize()[2]; nNdx[2]++)         
-	{
-		if (nNdx[2] != nSlice)
-		{
-			VOXEL_REAL *pDst = &pEnergy->GetBufferPointer()[nNdx[2] * nCount];
-			CopyValues<VOXEL_REAL>(pDst, pSrc, nCount);
-		}
-	}
-
-	typedef itk::ImageRegionConstIterator< VolumeReal > ConstIteratorType;
-	typedef itk::ImageRegionIterator< VolumeReal > IteratorType;
-
-	// get new maximum for energy dist
-	REAL dmax = -1e+8;
-	ConstIteratorType inputIt( pEnergy, pEnergy->GetBufferedRegion() );
-	for ( inputIt.GoToBegin(); !inputIt.IsAtEnd(); ++inputIt)
-	{
-		dmax = __max(inputIt.Get(), dmax);
-	}
-
-	// now normalize to dmax
-	if (dmax > 0.0)
-	{
-		IteratorType outputIt( pEnergy, pEnergy->GetBufferedRegion() );
-		for ( outputIt.GoToBegin(); !outputIt.IsAtEnd(); ++outputIt)
-		{
-			outputIt.Value() /= dmax;
-		}
-	}
-
-	return pEnergy;
-
-}	// CEnergyDepKernel::CalcSphereConvolve
-
-///////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 void 
-	CEnergyDepKernel::CalcSphereTrace(VolumeReal *pDensity, VolumeReal *pTerma, 
-			const VolumeReal::IndexType& nNdx, VolumeReal *pEnergy)
-	// helper function to convolve at a single point in the energy volume
-{
-	// TODO: move this to EnergyDepKernel
-	const REAL kernelDensity = 1.0;
-
-	// do for all azimuthal angles
-	for (int nTheta = 1; nTheta <= NUM_THETA; nTheta++)            
-	{
-		// do for zenith angles 
-		for (int nPhi = 1; nPhi <= GetNumPhi(); nPhi++)
-		{
-			// stores total radiological distance traversed
-			REAL radDist = 0.0;
-
-			// stores previous cumulative energy value
-			REAL prevEnergy = 0.0;
-			
-			// loop over radial increments
-			for (int nRadial = 1; nRadial <= NUM_RADIAL_STEPS; nRadial++)       
-			{
-				// integer distances between the interaction and the dose depostion voxels
-				VolumeReal::IndexType nKernelNdx = nNdx;
-				nKernelNdx -= GetIndexOffset(nTheta, nPhi, nRadial);
-				if (!pDensity->GetBufferedRegion().IsInside(nKernelNdx))
-				{
-					break;
-					// continue;
-				}
-
-				// compute physical path length increment (in cm)
-				REAL deltaPhysDist = GetRadius(nTheta, nPhi, nRadial);
-
-				// compute radiological path length increment
-				REAL deltaRadDist = deltaPhysDist 
-						* 1.0 // convolution
-						// * pDensity->GetPixel(nKernelNdx) // superposition
-						/ kernelDensity;
-				
-				// update radiological path
-				radDist += deltaRadDist;
-
-				// quit after 60cm rad dist
-				if (radDist > 4.0) // 2.0) // 10.0) // 60.0)
-				{
-					break;
-				}
-
-				// Use lookup table to find the value of the cumulative energy
-				// deposited up to this radius. No interpolation is done. 
-				REAL totalEnergy = GetCumEnergy(nPhi, radDist); 
-			
-				// Subtract the last cumulative energy from the new cumulative energy
-				// to get the amount of energy deposited in this interval and set the
-				// last cumulative energy for the next time the lookup table is used.
-				REAL energy = totalEnergy - prevEnergy;
-				prevEnergy = totalEnergy;             
-				
-				// The energy is accumulated - superposition
-				pEnergy->GetPixel(nNdx) +=
-					(VOXEL_REAL) (energy * pTerma->GetPixel(nKernelNdx));
-			}     
-		}	
-	}
-
-}	// CEnergyDepKernel::CalcSphereTrace
-
-
-//////////////////////////////////////////////////////////////////////
-void CEnergyDepKernel::LoadKernel()
+	EnergyDepKernel::LoadKernel()
 {
 	CString strFilename;
 
@@ -232,17 +34,17 @@ void CEnergyDepKernel::LoadKernel()
 	int nLastSlash = strFilename.ReverseFind('\\');
 	strFilename = strFilename.Left(nLastSlash);
 
-	if (IsApproxEqual(m_energy, 15.0))
+	if (IsApproxEqual(GetEnergy(), 15.0))
 	{
 		strFilename += "\\15MV_kernel.dat";
 		Set_mu(1.941E-02);
 	}
-	else if (IsApproxEqual(m_energy, 6.0))
+	else if (IsApproxEqual(GetEnergy(), 6.0))
 	{
 		strFilename += "\\6MV_kernel.dat";
 		Set_mu(2.770E-02);
 	}
-	else if (IsApproxEqual(m_energy, 2.0))
+	else if (IsApproxEqual(GetEnergy(), 2.0))
 	{
 		strFilename += "\\2MV_kernel.dat";
 		Set_mu(4.942E-02);
@@ -250,7 +52,7 @@ void CEnergyDepKernel::LoadKernel()
 	}
 	else
 	{
-		ASSERT(FALSE);
+		throw new std::exception("EnergyDepKernel::LoadKernel - Invalid energy value for kernel");
 	}
 
 	// The dose spread arrays produced by SUM_ELEMENT.FOR are read.
@@ -258,8 +60,7 @@ void CEnergyDepKernel::LoadKernel()
 	_tfopen_s(&pFile, strFilename, _T("rt"));
 	if (pFile == NULL)
 	{
-		::AfxMessageBox(_T("Problem reading kernel..."));
-		return;
+		throw new std::exception("EnergyDepKernel::LoadKernel - Kernel file not found");
 	}
 
 	static char pszLine[10000];
@@ -326,7 +127,7 @@ void CEnergyDepKernel::LoadKernel()
 
 //////////////////////////////////////////////////////////////////////////////
 void 
-	CEnergyDepKernel::InterpCumEnergy(const CMatrixNxM<>& mIncEnergy, 
+	EnergyDepKernel::InterpCumEnergy(const CMatrixNxM<>& mIncEnergy, 
 									   const CVectorN<>& vRadialBounds)
 	// looks up the energies for a phi angle setting 
 {
@@ -372,9 +173,208 @@ void
 			}
 		}
 	}
+}
 
-}	// CEnergyDepKernel::InterpCumEnergy
+////////////////////////////////////////////////////////////////////////////////////////
+inline int 
+	EnergyDepKernel::GetNumPhi()
+{
+	return m_mCumEnergy.GetCols();
+}
 
+////////////////////////////////////////////////////////////////////////////////////////
+inline const VolumeReal::OffsetType& 
+	EnergyDepKernel::GetIndexOffset(int nTheta, int nPhi, int nRadial)																			
+{
+	return m_radialToOffset[nTheta-1][nPhi-1][nRadial-1];
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+inline double 
+	EnergyDepKernel::GetRadius(int nTheta, int nPhi, int nRadial)
+	// returns radius in cm
+{
+	return m_radius[nTheta-1][nPhi-1][nRadial];
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+inline double 
+	EnergyDepKernel::GetCumEnergy(int nPhi, double rad_dist /* cm */)
+{
+	// The resolution of the array in the radial direction is every mm
+	//	hence the multiply by 10.0 in the arguement.
+	int nRadial = (int) floor(rad_dist * 10.0 + 0.5);
+
+	// check for overflow
+	nRadial = __min(nRadial, m_mCumEnergy.GetRows()-1);
+
+	return m_mCumEnergy[nPhi-1][nRadial];
+}
+
+//////////////////////////////////////////////////////////////////////////////
+void
+	EnergyDepKernel::CalcSphereConvolve(const VolumeReal *pDensity, 
+			const VolumeReal *pTerma, int nSlice, 
+			VolumeReal *pEnergy) 
+	// spherical convolution
+{
+	// initialize energy to zero
+	pEnergy->FillBuffer(0.0);
+
+	// set up pixel spacing
+	VolumeReal::SpacingType spacing = pDensity->GetSpacing();
+
+	// convert to cm and set up lookup table for sphere convolve
+	spacing *= (REAL) 0.1;
+	SetupRadialLUT(spacing);
+
+	VolumeReal::SizeType size = pDensity->GetBufferedRegion().GetSize();
+	VolumeReal::IndexType index = pDensity->GetBufferedRegion().GetIndex();
+
+	if (nSlice >= 0)
+	{
+		// set up for slice
+		index[2] = nSlice;
+		size[2] = nSlice+1;
+	}
+
+	// Now do the convolution.
+	for (; index[2] < size[2]; index[2]++)         
+	{
+		for (index[1] = 0; index[1] < size[1]; index[1]++)        
+		{
+			for (index[0] = 0; index[0] < size[0]; index[0]++)          
+			{
+				// dose at zero density?
+				if (pDensity->GetPixel(index) > 0.1) 
+				{
+					// spherical convolution at this point
+					CalcSphereTrace(pDensity, pTerma, index, pEnergy); 
+
+					// Convert the energy to dose by dividing by mass
+					// convert to Gy cm**2 and take into account the azimuthal sum
+					pEnergy->GetPixel(index) *= 1.0 / (REAL) NUM_THETA;
+					// 	(VOXEL_REAL) (1.602e-10 / (REAL) NUM_THETA);
+
+				//	if (pDensity->GetPixel(index) > 0.25)
+				//		pEnergy->GetPixel(index) /= pDensity->GetPixel(index);
+				//	else
+				//		pEnergy->GetPixel(index) = 0.0;
+				}
+			}
+		}
+	}
+
+	if (nSlice >= 0)
+	{
+		VolumeReal::SizeType size = pDensity->GetBufferedRegion().GetSize();
+		VolumeReal::IndexType index = pDensity->GetBufferedRegion().GetIndex();
+
+		VolumeReal::IndexType indexIsocenter = pDensity->GetBufferedRegion().GetIndex();
+		indexIsocenter[2] = nSlice;
+
+		// replicate slice across dose matrix
+		for (; index[2] < size[2]; index[2]++)         
+		{
+			if (index[2] != nSlice)
+			{
+				CopyValues<VoxelReal>(&pEnergy->GetPixel(index), &pEnergy->GetPixel(indexIsocenter), size[0] * size[1]);
+			}
+		}
+	}
+
+	// get new maximum for energy dist
+	REAL dmax = -1e+8;
+	ImageRegionConstIterator< VolumeReal > inputIt( pEnergy, pEnergy->GetBufferedRegion() );
+	for ( inputIt.GoToBegin(); !inputIt.IsAtEnd(); ++inputIt)
+	{
+		dmax = __max(inputIt.Get(), dmax);
+	}
+
+	// now normalize to dmax
+	if (dmax > 0.0)
+	{
+		ImageRegionIterator< VolumeReal > outputIt( pEnergy, pEnergy->GetBufferedRegion() );
+		for ( outputIt.GoToBegin(); !outputIt.IsAtEnd(); ++outputIt)
+		{
+			outputIt.Value() /= dmax;
+		}
+	}
+
+}	// CEnergyDepKernel::CalcSphereConvolve
+
+///////////////////////////////////////////////////////////////////////////////
+void 
+	EnergyDepKernel::CalcSphereTrace(const VolumeReal *pDensity, 
+			const VolumeReal *pTerma, const VolumeReal::IndexType& index, 
+			VolumeReal *pEnergy)
+	// helper function to convolve at a single point in the energy volume
+{
+	// TODO: move this to EnergyDepKernel
+	const REAL kernelDensity = 1.0;
+
+	// stores the termination distance
+	const REAL terminateDistance = GetTerminateDistance();
+
+	// do for all azimuthal angles
+	for (int nTheta = 1; nTheta <= NUM_THETA; nTheta++)            
+	{
+		// do for zenith angles 
+		for (int nPhi = 1; nPhi <= GetNumPhi(); nPhi++)
+		{
+			// stores total radiological distance traversed
+			REAL radDist = 0.0;
+
+			// stores previous cumulative energy value
+			REAL prevEnergy = 0.0;
+			
+			// loop over radial increments
+			for (int nRadial = 1; nRadial <= NUM_RADIAL_STEPS; nRadial++)       
+			{
+				// integer distances between the interaction and the dose depostion voxels
+				VolumeReal::IndexType kernelIndex = index;
+				kernelIndex -= GetIndexOffset(nTheta, nPhi, nRadial);
+				if (!pDensity->GetBufferedRegion().IsInside(kernelIndex))
+				{
+					break;
+					// continue;
+				}
+
+				// compute physical path length increment (in cm)
+				REAL deltaPhysDist = GetRadius(nTheta, nPhi, nRadial);
+
+				// compute radiological path length increment
+				REAL deltaRadDist = deltaPhysDist 
+						* 1.0 // convolution
+						// * pDensity->GetPixel(kernelIndex) // superposition
+						/ kernelDensity;
+				
+				// update radiological path
+				radDist += deltaRadDist;
+
+				// quit after specified rad dist
+				if (radDist > terminateDistance) 
+				{
+					break;
+				}
+
+				// Use lookup table to find the value of the cumulative energy
+				// deposited up to this radius. No interpolation is done. 
+				REAL totalEnergy = GetCumEnergy(nPhi, radDist); 
+			
+				// Subtract the last cumulative energy from the new cumulative energy
+				// to get the amount of energy deposited in this interval and set the
+				// last cumulative energy for the next time the lookup table is used.
+				REAL energy = totalEnergy - prevEnergy;
+				prevEnergy = totalEnergy;             
+				
+				// The energy is accumulated - superposition
+				pEnergy->GetPixel(index) +=
+					(VOXEL_REAL) (energy * pTerma->GetPixel(kernelIndex));
+			}     
+		}	
+	}
+}
 
 //////////////////////////////////////////////////////////////////////////////
 void 
@@ -410,14 +410,11 @@ void
 			offset[nI][nN] = Round<int>(factor * radius_out[nI] * vDir[nN]);
 		}
 	}
-
-}	// CEnergyDepKernel::MakeVector
-
-
+}	
 
 //////////////////////////////////////////////////////////////////////////////
 void 
-	CEnergyDepKernel::SetupRadialLUT(const itk::Vector<REAL>& vPixSpacing)
+	EnergyDepKernel::SetupRadialLUT(const itk::Vector<REAL>& vPixSpacing)
 	// sets up the ray trace for conv.
 {
 	// check if we are already set up
@@ -524,5 +521,6 @@ void
 
 	// store the pixel spacing used
 	m_vPixSpacing = vPixSpacing;
+}
 
 }

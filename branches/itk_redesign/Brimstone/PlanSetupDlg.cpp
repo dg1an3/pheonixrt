@@ -1,15 +1,9 @@
-// Copyright (C) 2nd Messenger Systems
-// $Id: PlanSetupDlg.cpp 650 2009-11-05 22:24:55Z dglane001 $
+// PlanSetupDlg.cpp : implementation file
+//
 #include "stdafx.h"
-#include "brimstone.h"
+#include "Brimstone.h"
 #include "PlanSetupDlg.h"
 
-
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
 
 #define WM_DOSECALC_UPDATE WM_APP+9
 #define WM_DOSECALC_DONE WM_APP+10
@@ -18,16 +12,19 @@ static char THIS_FILE[] = __FILE__;
 // CPlanSetupDlg dialog
 
 //////////////////////////////////////////////////////////////////////////////
-CPlanSetupDlg::CPlanSetupDlg(dH::PlanPyramid *pPlanPyramid, CWnd* pParent /*=NULL*/)
+CPlanSetupDlg::CPlanSetupDlg(dH::Plan *pPlan, CWnd* pParent /*=NULL*/)
 	: CDialog(CPlanSetupDlg::IDD, pParent)
-	, m_pPlanPyramid(pPlanPyramid)
-	//, m_pDCThread(NULL)
 {
+	SetPlan(pPlan);
+
 	//{{AFX_DATA_INIT(CPlanSetupDlg)
 	m_nBeamCount = 1;
-	m_isoX = 0.0;
-	m_isoY = 0.0;
-	m_isoZ = 0.0;
+	m_isoX = 230.0;
+	m_isoY = 200.0;
+	m_isoZ = -172.0;
+	m_resolution = 2.0;
+	m_energy = 15.0;
+	m_termDist = 0.2;
 	//}}AFX_DATA_INIT
 }
 
@@ -42,6 +39,9 @@ void
 	DDX_Text(pDX, IDC_EDIT_ISO_OFS_X, m_isoX);
 	DDX_Text(pDX, IDC_EDIT_ISO_OFS_Y, m_isoY);
 	DDX_Text(pDX, IDC_EDIT_ISO_OFS_Z, m_isoZ);
+	DDX_Text(pDX, IDC_EDIT_RESOLUTION, m_resolution);
+	DDX_Text(pDX, IDC_ENERGYCOMBO, m_energy);
+	DDX_Text(pDX, IDC_EDIT_TERMDIST, m_termDist);
 	//}}AFX_DATA_MAP
 	DDX_Control(pDX, IDC_ATBEAM, m_edtAtBeam);
 	DDX_Control(pDX, IDC_ATBEAMLET, m_edtAtBeamlet);
@@ -63,21 +63,16 @@ UINT __cdecl CalculateBeamlets( LPVOID pParam )
 {
 	CPlanSetupDlg *pPSD = (CPlanSetupDlg *) pParam;
 
-	for (int nAtBeam = pPSD->m_arrBDC.GetCount()-1; nAtBeam >= 0; nAtBeam--)
+	for (int nAtBeam = 0; nAtBeam < pPSD->m_arrDoseCalculators.size(); nAtBeam++)
 	{
-		CBeamDoseCalc *pDoseCalc = pPSD->m_arrBDC[nAtBeam];
-
-		// iterate for level 0 beamlets
-		int nBeamletCount = // 5; //3; // 0;
-			19;		// TODO: set beamlet count based on spacing and dose calc region
-			// TODO: reconcile this with nBeamletCount used in PlanPyramid
-		for (int nAtBeamlet = -nBeamletCount; nAtBeamlet <= nBeamletCount; nAtBeamlet++)
+		dH::BeamDoseCalc *pDoseCalc = pPSD->m_arrDoseCalculators[nAtBeam];
+		bool bContinue = true;
+		while (bContinue)
 		{
-			pPSD->PostMessage(WM_DOSECALC_UPDATE, (WPARAM) nAtBeam, (LPARAM) nAtBeamlet);
-			pDoseCalc->CalcBeamlet(nAtBeamlet);
+			dH::BasisGroupType::IndexType currentIndex;
+			bContinue = pDoseCalc->CalcNextBeamlet(currentIndex);
+			pPSD->PostMessage(WM_DOSECALC_UPDATE, (WPARAM) nAtBeam, (LPARAM) currentIndex[0]);
 		}
-
-		pPSD->m_pPlanPyramid->CalcPencilSubBeamlets(nAtBeam);
 	}
 
 	// post done message
@@ -90,38 +85,38 @@ UINT __cdecl CalculateBeamlets( LPVOID pParam )
 void 
 	CPlanSetupDlg::OnBnClickedGo()
 {
-	UpdateData(TRUE);
+	if (!UpdateData(TRUE))
+		return;
 
-	// TODO: delete existing beams?
-	ASSERT(m_pPlanPyramid->GetPlan()->GetBeamCount() == 0);
+	// set the plan dose resolution
+	GetPlan()->SetDoseResolution(m_resolution);
+
+	// set up the isocentric beams
+	GetPlan()->CreateEquidistantBeams(m_nBeamCount, 
+		MakeVector<3>(m_isoX, m_isoY, m_isoZ));
+
+	// set up the kernel to be shared by the dose calculators
+	dH::EnergyDepKernel::Pointer pKernel = dH::EnergyDepKernel::New();
+	pKernel->SetEnergy(m_energy);
+	pKernel->SetTerminateDistance(m_termDist);
+	pKernel->LoadKernel();
 
 	// create the beams
-	for (int nAt = m_nBeamCount-1; nAt >= 0; nAt--)
+	for (int nAt = 0; nAt < GetPlan()->GetBeamCount(); nAt++)
 	{
-		// create the new beam
-		CBeam *pBeam = new CBeam();
-		m_pPlanPyramid->GetPlan()->AddBeam(pBeam);
+		// create the new beam dose calculator
+		dH::BeamDoseCalc::Pointer pDoseCalc = dH::BeamDoseCalc::New();
 
-		// calculate gantry for the beam
-		// TODO: this calculation (+90 degrees) should be moved in to the beam
-		double gantry;
-		gantry = 90.0 + (double) nAt * 360.0 / (double) m_nBeamCount;
-		pBeam->SetGantryAngle(gantry * PI / 180.0);
-
-		// calculate iso position for the beam
-		pBeam->SetIsocenter(MakeVector<3>(m_isoX, m_isoY, m_isoZ));
-
-		CBeamDoseCalc *pDoseCalc = new CBeamDoseCalc(pBeam, m_pPlanPyramid->GetPlan()->m_pKernel);
-
-		// now trigger calculation
-		pDoseCalc->InitCalcBeamlets();
+		dH::Beam *pBeam = GetPlan()->GetBeamAt(nAt);
+		pDoseCalc->SetBeam(pBeam);
+		pDoseCalc->SetKernel(pKernel);
 
 		// and add to the array
-		m_arrBDC.Add(CAutoPtr<CBeamDoseCalc>(pDoseCalc));
+		m_arrDoseCalculators.push_back(pDoseCalc);
 	}
 
-	// this generates all sub-beamlets
-	m_pPlanPyramid->SetPlan(m_pPlanPyramid->GetPlan());
+	m_edtAtBeam.SetWindowText(_T("0"));
+	m_edtAtBeamlet.SetWindowText(_T("*"));
 
 	m_pDCThread = AfxBeginThread(CalculateBeamlets, (LPVOID) this, 
 			THREAD_PRIORITY_BELOW_NORMAL,	// priority

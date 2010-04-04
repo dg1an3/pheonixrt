@@ -13,7 +13,7 @@ namespace dH
 {
 
 ///////////////////////////////////////////////////////////////////////////////
-PlanPyramid::PlanPyramid(CPlan *pPlan)
+PlanPyramid::PlanPyramid(dH::Plan *pPlan)
 {
 	SetPlan(pPlan);
 
@@ -35,7 +35,7 @@ PlanPyramid::~PlanPyramid(void)
 
 ///////////////////////////////////////////////////////////////////////////////
 void 
-	PlanPyramid::SetPlan(CPlan *pPlan)
+PlanPyramid::SetPlan(dH::Plan *pPlan)
 {
 	m_pPlan = pPlan;
 
@@ -44,7 +44,7 @@ void
 	//for (int nLevel = 1; nLevel < m_arrPlans.size(); nLevel++)
 	//	delete m_arrPlans[nLevel];
 	//m_arrPlans.clear();
-	CPlan *pPrevPlan = GetPlan();
+	dH::Plan *pPrevPlan = GetPlan();
 	if (m_arrPlans.size() == 0)
 		m_arrPlans.push_back(pPrevPlan);
 
@@ -52,10 +52,10 @@ void
 	for (int nLevel = 1; nLevel < MAX_SCALES; nLevel++)
 	{
 		doseResolution *= 2.0;
-		CPlan *pNextPlan = NULL; 
+		dH::Plan *pNextPlan = NULL; 
 		if (m_arrPlans.size() <= nLevel)
 		{
-			pNextPlan = new CPlan();
+			pNextPlan = new dH::Plan();
 			m_arrPlans.push_back(pNextPlan);
 		}
 		else
@@ -67,11 +67,11 @@ void
 		pNextPlan->SetDoseResolution(doseResolution);
 		for (int nAt = 0; nAt < GetPlan()->GetBeamCount(); nAt++)
 		{
-			CBeam *pPrevBeam = pPrevPlan->GetBeamAt(nAt);
-			CBeam *pNextBeam = NULL;
+			dH::Beam *pPrevBeam = pPrevPlan->GetBeamAt(nAt);
+			dH::Beam *pNextBeam = NULL;
 			if (pNextPlan->GetBeamCount() <= nAt)
 			{
-				pNextBeam = new CBeam(/*pPrevBeam*/);
+				pNextBeam = new dH::Beam(/*pPrevBeam*/);
 				// need to add the beam first, because the plan is needed to set gantry angle
 				pNextPlan->AddBeam(pNextBeam);
 			}
@@ -92,7 +92,7 @@ void
 }	// PlanPyramid::SetPlan
 
 ///////////////////////////////////////////////////////////////////////////////
-CPlan *
+dH::Plan *
 	PlanPyramid::GetPlan(int nLevel)
 {
 	return m_arrPlans[nLevel];
@@ -190,11 +190,11 @@ void
 	// make sure pencil subbeamlets are properly generated
 	for (int nAt = ((nBeam == -1) ? (GetPlan()->GetBeamCount()-1) : nBeam); nAt >= ((nBeam == -1) ? 0 : nBeam); nAt--)
 	{
-		CBeam *pBeam = GetPlan()->GetBeamAt(nAt);
+		dH::Beam *pBeam = GetPlan()->GetBeamAt(nAt);
 
 		// only recalc if they need to be
-		if (!pBeam->m_bRecalcBeamlets)
-			return;
+		//if (!pBeam->m_bRecalcBeamlets)
+		//	return;
 
 			// stores beamlet count for level N
 		int nBeamletCount = /*m_nBeamletCount*/ // 5; // 
@@ -207,21 +207,21 @@ void
 		// now generate level 1..n beamlets
 		for (int nAtScale = 1; nAtScale < MAX_SCALES; nAtScale++)
 		{
-			CBeam *pBeamSub = m_arrPlans[nAtScale]->GetBeamAt(nAt);
-			CBeam *pBeamSubPrev = m_arrPlans[nAtScale-1]->GetBeamAt(nAt);
+			dH::Beam *pBeamSub = m_arrPlans[nAtScale]->GetBeamAt(nAt);
+			dH::Beam *pBeamSubPrev = m_arrPlans[nAtScale-1]->GetBeamAt(nAt);
 
 			// each level halves the number of beamlets
 			nBeamletCount /= 2;
 			beamletSpacing *= 2.0;
 
 			// set up the beams beamlets; do this by defining the intensity map parameters
-			CBeam::IntensityMap *pIM = pBeamSub->GetIntensityMap();
+			dH::IntensityMapType *pIM = pBeamSub->GetIntensityMap();
 
 			// set up the intensity map indexing
-			CBeam::IntensityMap::RegionType region;
-			itk::Index<1> index = {{-nBeamletCount}};
+			dH::IntensityMapType::RegionType region;
+			dH::IntensityMapType::IndexType index = {{-nBeamletCount}};
 			region.SetIndex(index);
-			region.SetSize(MakeSize(nBeamletCount*2 + 1));
+			region.SetSize(MakeSize(nBeamletCount*2 + 1, 1));
 			pIM->SetRegions(region);	/// TODO: make this index from -n/2..n/2
 			pIM->Allocate();
 
@@ -234,7 +234,7 @@ void
 			pIM->FillBuffer(0);
 
 			// this will allocate the necessary beamlets
-			pBeamSub->OnIntensityMapChanged();
+			// pBeamSub->OnIntensityMapChanged();
 
 			typedef itk::MultiResolutionPyramidImageFilter<VolumeReal, VolumeReal> PyramidType;
 			PyramidType::Pointer pPyramid = PyramidType::New();
@@ -323,15 +323,15 @@ void
 		}
 
 		/// TODO: move this flag to PlanPyramid::m_bRecalcBeamlets
-		pBeam->m_bRecalcBeamlets = false;
+		// pBeam->m_bRecalcBeamlets = false;
 	}
 
 }	// PlanPyramid::CalcPencilSubBeamlets
 
 ///////////////////////////////////////////////////////////////////////////////
 void
-PlanPyramid::InvFiltIntensityMap(int nLevel, const CBeam::IntensityMap * vWeights,
-								CBeam::IntensityMap * vFiltWeights)
+PlanPyramid::InvFiltIntensityMap(int nLevel, const dH::IntensityMapType * vWeights,
+								dH::IntensityMapType * vFiltWeights)
 {
 #define MANUAL_INTERP
 #ifdef MANUAL_INTERP
@@ -376,8 +376,8 @@ PlanPyramid::InvFiltIntensityMap(int nLevel, const CBeam::IntensityMap * vWeight
 	}
 #endif
 
-// #define FUCK_FILTER
-#ifdef FUCK_FILTER
+// #define UCK_FILTER
+#ifdef UCK_FILTER
 	{
 	typedef itk::ResampleImageFilter<CBeam::IntensityMap, CBeam::IntensityMap> ResamplerType;
 	ResamplerType::Pointer filter = ResamplerType::New();

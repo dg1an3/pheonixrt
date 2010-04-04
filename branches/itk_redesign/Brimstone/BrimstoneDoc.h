@@ -1,5 +1,7 @@
-// Copyright (C) 2nd Messenger Systems - U. S. Patent 7,369,645
-// $Id: BrimstoneDoc.h 613 2008-09-14 18:47:53Z dglane001 $
+// BrimstoneDoc.h : interface of the CBrimstoneDoc class
+//
+/////////////////////////////////////////////////////////////////////////////
+
 #include <Series.h>
 #include <Plan.h>
 #ifdef USE_RTOPT
@@ -23,12 +25,13 @@ protected: // create from serialization only
 
 // Attributes
 public:
-	dH::Series::Pointer m_pSeries;
-	auto_ptr<CPlan> m_pPlan;
+	DeclareMemberSPtr(Series, dH::Series);
+	DeclareMemberSPtr(Plan, dH::Plan);
 
 #ifdef USE_RTOPT
 	// stores the PlanOptimizer object
-	auto_ptr<dH::PlanOptimizer> m_pOptimizer;
+	// auto_ptr<dH::PlanOptimizer> m_pOptimizer;
+	DECLARE_ATTRIBUTE_PTR(Optimizer, dH::PlanOptimizer);
 #endif
 
 // Operations

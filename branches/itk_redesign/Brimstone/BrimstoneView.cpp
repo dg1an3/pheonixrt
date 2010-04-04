@@ -82,7 +82,7 @@ void
 	CBrimstoneView::AddHistogram(dH::Structure * pStruct)
 	// generates a histogram for the specified structure
 {
-	VolumeReal *pDoseMatrix = GetDocument()->m_pPlan->GetDoseMatrix();
+	VolumeReal *pDoseMatrix = GetDocument()->GetPlan()->GetDoseMatrix();
 	if (pDoseMatrix->GetBufferedRegion().GetNumberOfPixels() == 0)
 		return;
 
@@ -125,7 +125,7 @@ void
 {
 #ifdef USE_RTOPT
 	// add to the prescription object
-	GetDocument()->m_pOptimizer->/*GetPrescription(0)->*/AddStructureTerm(pVOIT);
+	GetDocument()->GetOptimizer()->/*GetPrescription(0)->*/AddStructureTerm(pVOIT);
 
 	// get the struct
 	dH::Structure *pStruct = pVOIT->GetVOI();
@@ -246,18 +246,18 @@ void
 	CView::OnInitialUpdate();
 	
 #ifdef USE_RTOPT
-	m_pOptThread->SetPlanOpt(GetDocument()->m_pOptimizer.get());
+	m_pOptThread->SetPlanOpt(GetDocument()->GetOptimizer());
 #endif
 
-	if (GetDocument()->m_pSeries)
+	if (GetDocument()->GetSeries())
 	{
-		m_wndPlanarView.SetSeries(GetDocument()->m_pSeries);
+		m_wndPlanarView.SetSeries(GetDocument()->GetSeries());
 	}
 
 	// set the initial view center based on series volume
 	m_wndPlanarView.InitZoomCenter();
 
-	CPlan *pPlan = GetDocument()->m_pPlan.get();
+	dH::Plan *pPlan = GetDocument()->GetPlan();
 	if (pPlan)
 	{
 		m_wndPlanarView.SetVolume(pPlan->GetDoseMatrix(), 1);
@@ -275,14 +275,14 @@ void
 	m_graphDVH.RemoveAllDataSeries();
 
 	// generate ADDHISTO events
-	for (int nAt = 0; nAt < GetDocument()->m_pSeries->GetStructureCount(); nAt++)
+	for (int nAt = 0; nAt < GetDocument()->GetSeries()->GetStructureCount(); nAt++)
 	{
-		dH::Structure *pStruct = GetDocument()->m_pSeries->GetStructureAt(nAt);
-		CHistogram *pHisto = GetDocument()->m_pPlan->GetHistogram(pStruct, false);
-		if (NULL != pHisto)
-		{
-			AddHistogram(pStruct);
-		}
+		dH::Structure *pStruct = GetDocument()->GetSeries()->GetStructureAt(nAt);
+		//CHistogram *pHisto = GetDocument()->GetPlan()->GetHistogram(pStruct, false);
+		//if (NULL != pHisto)
+		//{
+		//	AddHistogram(pStruct);
+		//}
 	}
 
 	m_graphDVH.Invalidate(TRUE);
@@ -366,7 +366,7 @@ LRESULT
 		const int nUpdateEvery = 1;
 		if (m_nTotalIter % nUpdateEvery == 0)
 		{
-			GetDocument()->m_pOptimizer->SetStateVectorToPlan(pOID->m_vParam);
+			GetDocument()->GetOptimizer()->SetStateVectorToPlan(pOID->m_vParam);
 		}
 		m_nTotalIter++;
 
@@ -385,7 +385,7 @@ LRESULT
 	COptThread::COptIterData *pOID = (COptThread::COptIterData *) lParam;
 	if (pOID != NULL)
 	{
-		GetDocument()->m_pOptimizer->SetStateVectorToPlan(pOID->m_vParam);
+		GetDocument()->GetOptimizer()->SetStateVectorToPlan(pOID->m_vParam);
 		RedrawWindow(NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
 	}
 
@@ -399,7 +399,7 @@ LRESULT
 void 
 	CBrimstoneView::ScanBeamlets(int nLevel)
 {
-	CPlan *pPlan = GetDocument()->m_pPlan.get();
+	dH::Plan *pPlan = GetDocument()->GetPlan();
 
 	if (nLevel == 0)
 	{
@@ -415,8 +415,8 @@ void
 
 			for (int nAtBeam = 0; nAtBeam < pPlan->GetBeamCount(); nAtBeam++)
 			{
-				CBeam *pBeam = pPlan->GetBeamAt(nAtBeam);
-				pBeam->SetIntensityMap(vWeights);
+				dH::Beam *pBeam = pPlan->GetBeamAt(nAtBeam);
+				// pBeam->SetIntensityMap(vWeights);
 			}
 			//CVolume<VOXEL_REAL> *pDose = 
 			pPlan->GetDoseMatrix();		// triggers recalc

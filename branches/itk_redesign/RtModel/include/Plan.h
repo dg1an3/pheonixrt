@@ -1,136 +1,73 @@
-// Copyright (C) 2nd Messenger Systems
-// $Id: Plan.h 640 2009-06-13 05:06:50Z dglane001 $
-#if !defined(PLAN_H)
-#define PLAN_H
-
-#if _MSC_VER > 1000
+// Copyright (C) 2000-2008  Derek G. Lane
+// $Id: Plan.h,v 1.13 2007-12-10 02:57:08 Derek Lane Exp $
 #pragma once
-#endif // _MSC_VER > 1000
 
-// series upon which plan is based
 #include <Series.h>
-
-// beams belonging to the plan
 #include <Beam.h>
 
-// histograms for the plan
-#ifdef USE_RTOPT
-#include <Histogram.h>
-#endif
-
-class CHistogram;
-class CEnergyDepKernel;
-
-namespace dH
-{
-	class PlanPyramid;
-}
+namespace dH {
 
 //////////////////////////////////////////////////////////////////////
-// class CPlan
-//
-// represents a treatment plan
-//////////////////////////////////////////////////////////////////////
-class CPlan : public CModelObject
+class Plan : 
+		public DataObject
+	// represents a treatment plan
 {
 public:
 	// constructor
-	CPlan();
-	virtual ~CPlan();
+	Plan();
+	virtual ~Plan();
 
-	// dynamic create
-	DECLARE_SERIAL(CPlan)
+	// itk typedefs
+	typedef Plan Self;
+	typedef DataObject Superclass;
+	typedef SmartPointer<Self> Pointer;
+	typedef SmartPointer<const Self> ConstPointer;
+
+	// defines itk's New and CreateAnother static functions
+	itkNewMacro(Self);
 
 	// series accessor
-	DECLARE_ATTRIBUTE_PTR_GI(Series, dH::Series);
+	DeclareMemberSPtrGet(Series, dH::Series);
+	void SetSeries(dH::Series *pValue);
 
-	// histogram accessor / creator
-	CHistogram *GetHistogram(dH::Structure *pSurface, bool bCreate);
-	void RemoveHistogram(dH::Structure *pStructure);
+	// plan name
+	DeclareMember(Name, CString);
 
 	// the beams for this plan
 	int GetBeamCount() const;
-	CBeam * GetBeamAt(int nAt);
-	int AddBeam(CBeam *pBeam);
+	dH::Beam * GetBeamAt(int nAt);
+	int AddBeam(dH::Beam *pBeam);
+
+	// creates a set of N equidistant beams
+	void CreateEquidistantBeams(int nBeamCount, 
+		const Vector<REAL>& vIsocenter);
 
 	// helper functions
 	int GetTotalBeamletCount();
 
-	// helper to get formatted mass density volume
-	/// TODO: move this to dose calc
-	VolumeReal * GetMassDensity();
+	// sets shape for dose matrix
+	DeclareMemberGI(DoseResolution, REAL);
+	// void SetDoseResolution(const Real& value);
 
 	// the computed dose for this plan (NULL if no dose exists)
-	VolumeReal * GetDoseMatrix();
+	DeclareMemberSPtr(DoseMatrix, VolumeReal);
 
-	// calls update on all internal histograms
-	void UpdateAllHisto();
+	// called to update dose matrix geometry, when DoseResolution or Series changes
+	void UpdateDoseMatrixGeometry();
 
-	// sets shape for dose matrix
-	DECLARE_ATTRIBUTE_GI(DoseResolution, REAL);
+	// accumulator for adding up beamlet doses
+	DeclareMemberSPtr(Accumulator, dH::IntensityMapAccumulateImageFilter);
 
-// Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CPlan)
-	public:
-	virtual void Serialize(CArchive& ar);
-	//}}AFX_VIRTUAL
+	// called to update Accumulator geometry
+	void UpdateBeamAccumulator();
 
-// Implementation
-public:
-
-	// stores the energy dep kernel
-	/// TODO: move this elsewhere
-	CEnergyDepKernel * m_pKernel;
-
-
-#ifdef _DEBUG
-	virtual void AssertValid() const;
-	virtual void Dump(CDumpContext& dc) const;
-#endif
+	// serialization support
+	void SerializeExt(CArchive& ar, int nSchema);
 
 protected:
-	friend class dH::PlanPyramid;
-
 	// the plan's beams
-	CTypedPtrArray<CObArray, CBeam*> m_arrBeams;
+	std::vector<dH::Beam::Pointer> m_arrBeams;
 
-private:
-	// storing resampled mass density
-	VolumeReal::Pointer m_pMassDensity;
-
-public:
-	// the dose matrix for the plan
-	VolumeReal::Pointer m_pDose;
-
-	// helper volumes for dose summation
-	VolumeReal::Pointer m_pTempBuffer;
-	VolumeReal::Pointer m_pBeamDoseRot;
-
-private:
-	// the histograms
-	CTypedPtrMap<CMapStringToOb, CString, CHistogram*> m_mapHistograms;
-
-};	// class CPlan
-
-#ifdef USING_CLI
-namespace dH
-{
-
-public ref class Plan : public System::Object
-{
-	Plan();
-
-	property System::String Name;
-	property System::Collection::Generic::List<Beam^>^ Beams;
-};
+};	// class Plan
 
 }
-#endif
-
-/////////////////////////////////////////////////////////////////////////////
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
-
-#endif // !defined(AFX_PLAN_H__71D1495A_EE39_11D4_9E36_00B0D0609AB0__INCLUDED_)

@@ -20,6 +20,7 @@ typedef float REAL;
 #define REAL_FMT "%f"
 #else
 typedef double REAL;
+typedef double Real;
 #define REAL_FMT "%lf"
 #endif
 #endif

@@ -357,6 +357,10 @@
 				RelativePath=".\Structure.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\TermaCalculator.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -405,6 +409,10 @@
 			</File>
 			<File
 				RelativePath=".\include\Structure.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\TermaCalculator.h"
 				>
 			</File>
 		</Filter>

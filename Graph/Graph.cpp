@@ -67,7 +67,7 @@ CDataSeries *CGraph::GetDataSeriesAt(int nAt)
 void CGraph::AddDataSeries(CDataSeries *pSeries)
 {
 	pSeries->m_pGraph = this;
-	AddObserver(&pSeries->GetChangeEvent(), this, &CGraph::OnDataSeriesChanged);
+	// AddObserver(&pSeries->GetChangeEvent(), this, &CGraph::OnDataSeriesChanged);
 
 	m_arrDataSeries.Add(pSeries);
 

@@ -10,8 +10,7 @@
 
 class CGraph;
 
-class CDataSeries :
-	public CModelObject
+class CDataSeries : public CModelObject
 {
 public:
 	CDataSeries(void);

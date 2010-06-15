@@ -12,8 +12,9 @@
 		, m_bRecalcCurve(true)
 {
 #ifdef USE_RTOPT
-	AddObserver(&m_pHistogram->GetChangeEvent(), this, 
-		&CHistogramDataSeries::OnHistogramChanged);
+	m_pHistogram->GetChangeEvent().AddObserver(this, 
+	// AddObserver(&m_pHistogram->GetChangeEvent(), this, 
+		(ListenerFunction) &CHistogramDataSeries::OnHistogramChanged);
 #endif
 
 	// OnHistogramChanged(NULL, NULL);
@@ -65,7 +66,9 @@ void
 	m_bRecalcCurve = true;
 
 	// propagate change
-	GetChangeEvent().Fire();
+	// GetChangeEvent().Fire();
+	if (m_pGraph)
+		m_pGraph->OnDataSeriesChanged(NULL, NULL);
 
 }	// CHistogramDataSeries::OnHistogramChanged
 

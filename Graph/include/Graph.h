@@ -98,7 +98,7 @@ public:
 
 private:
 	// the array of data series
-	CTypedPtrArray<CObArray, CDataSeries*> m_arrDataSeries;
+	CTypedPtrArray<CPtrArray, CDataSeries*> m_arrDataSeries;
 
 	// graph plot area
 	int m_arrMargins[4];

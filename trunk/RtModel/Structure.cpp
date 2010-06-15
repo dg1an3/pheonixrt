@@ -315,7 +315,7 @@ void
 	}
 }
 
-
+#ifdef USE_MFC_SERIALIZATION
 ///////////////////////////////////////////////////////////////////////////////
 void 
 	Structure::SerializeExt(CArchive& ar, int nSchema)
@@ -387,5 +387,6 @@ void
 		m_bRecalcRegion = true;
 
 }	// Structure::Serialize
+#endif
 
 EndNamespace(dH)

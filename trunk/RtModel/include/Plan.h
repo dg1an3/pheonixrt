@@ -38,8 +38,10 @@ public:
 	CPlan();
 	virtual ~CPlan();
 
+#ifdef USE_MFC_SERIALIZATION
 	// dynamic create
 	DECLARE_SERIAL(CPlan)
+#endif
 
 	// series accessor
 	DECLARE_ATTRIBUTE_PTR_GI(Series, CSeries);
@@ -73,7 +75,9 @@ public:
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CPlan)
 	public:
+#ifdef USE_MFC_SERIALIZATION
 	virtual void Serialize(CArchive& ar);
+#endif
 	//}}AFX_VIRTUAL
 
 // Implementation
@@ -93,7 +97,7 @@ protected:
 	friend class dH::PlanPyramid;
 
 	// the plan's beams
-	CTypedPtrArray<CObArray, CBeam*> m_arrBeams;
+	CTypedPtrArray<CPtrArray, CBeam*> m_arrBeams;
 
 private:
 	// storing resampled mass density

@@ -20,25 +20,38 @@
 //		3) possibly has children
 //		4) can be serialized
 //////////////////////////////////////////////////////////////////////
-class CModelObject : public CObject
+class CModelObject 
+#ifdef USE_MFC_SERIALIZATION
+	: public CObject
+#endif
 {
 public:
 	// constructors/destructors
-	CModelObject(const CString& strName = _T(""));
+	CModelObject(
+#ifdef USE_MODEL_NAME
+		const CString& strName = _T("")
+#endif
+		);
 	virtual ~CModelObject();
 
+#ifdef USE_MFC_SERIALIZATION
 	// makes the model object serializable
 	DECLARE_SERIAL(CModelObject)
+#endif
 
+#ifdef USE_MODEL_NAME
 	// the given name for this model object
 	const CString& GetName() const;
 	void SetName(const CString& strName);
+#endif
 
 	// returns a reference to this object's change event
 	CObservableEvent& GetChangeEvent();
 
+#ifdef USE_MFC_SERIALIZATION
 	// serialization
 	virtual void Serialize( CArchive& ar );
+#endif
 
 protected:
 	// the name of the object

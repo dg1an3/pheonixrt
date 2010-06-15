@@ -32,8 +32,10 @@ public:
 	// defines itk's New and CreateAnother static functions
 	itkNewMacro(Self);
 
+#ifdef USE_MFC_SERIALIZATION
 	// serialization
 	void SerializeExt(CArchive& ar, int nSchema);
+#endif
 
 	// name of the structure
 	DeclareMember(Name, CString);
@@ -87,7 +89,7 @@ public:
 
 private:
 	// contours for the structure
-	CTypedPtrArray<CObArray, CPolygon*> m_arrContours;
+	CTypedPtrArray<CPtrArray, CPolygon*> m_arrContours;
 
 	// reference distances for the contours
 	CArray<REAL, REAL> m_arrRefDist;

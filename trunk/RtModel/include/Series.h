@@ -18,8 +18,10 @@ public:
 	CSeries();          
 	virtual ~CSeries();
 
+#ifdef USE_MFC_SERIALIZATION
 	DECLARE_SERIAL(CSeries)
 	virtual void Serialize(CArchive& ar);
+#endif
 
 	// Structures for the series
 	int GetStructureCount() const;

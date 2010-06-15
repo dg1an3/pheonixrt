@@ -26,8 +26,10 @@ public:
 	CBeam();
 	virtual ~CBeam();
 
+#ifdef USE_MFC_SERIALIZATION
 	// serialization support
 	DECLARE_SERIAL(CBeam)
+#endif
 
 	// pointer to my plan
 	DECLARE_ATTRIBUTE_PTR(Plan, CPlan);
@@ -56,8 +58,10 @@ public:
 	// the computed dose for this beam (NULL if no dose exists)
 	virtual VolumeReal *GetDoseMatrix();
 
+#ifdef USE_MFC_SERIALIZATION
 	// beam serialization
 	void Serialize(CArchive &ar);
+#endif
 
 protected:
 	friend void GenBeamlets(CBeam *pBeam);
@@ -87,7 +91,7 @@ private:
 
 	// collection of blocks
 	/// TODO: get rid of blocks
-	CTypedPtrArray<CObArray, CPolygon* > m_arrBlocks;
+	// CTypedPtrArray<CPtrArray, CPolygon* > m_arrBlocks;
 
 	mutable bool m_bRecalcDose;
 

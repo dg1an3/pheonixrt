@@ -72,14 +72,17 @@ void CBrimstoneDoc::Serialize(CArchive& ar)
 	CObArray arrWorkspace;
 	if (ar.IsStoring())
 	{
+#ifdef USE_MFC_SERIALIZATION
 		arrWorkspace.Add(m_pSeries.get());
 		arrWorkspace.Add(m_pPlan.get());
+#endif
 	}
 
 	arrWorkspace.Serialize(ar);
 
 	if (ar.IsLoading())
 	{
+#ifdef USE_MFC_SERIALIZATION
 		m_pSeries.reset();
 		m_pPlan.reset();
 		for (int nAt = 0; nAt < arrWorkspace.GetSize(); nAt++)
@@ -144,6 +147,7 @@ void CBrimstoneDoc::Serialize(CArchive& ar)
 #ifdef USE_RTOPT
 		// create an empty prescription, if none available
 		m_pOptimizer.reset(new dH::PlanOptimizer(m_pPlan.get()));
+#endif
 #endif
 	}
 }

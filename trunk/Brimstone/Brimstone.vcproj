@@ -72,9 +72,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="$(DCMTK_BUILD_DIR)\dcmimgle\libsrc\release\dcmimgle.lib $(DCMTK_BUILD_DIR)\dcmdata\libsrc\release\dcmdata.lib $(DCMTK_BUILD_DIR)\ofstd\libsrc\release\ofstd.lib ITKAlgorithms.lib ITKBasicFilters.lib ITKCommon.lib itkvnl_inst.lib itkvnl_algo.lib itkv3p_netlib.lib itkvnl.lib itkvcl.lib itksys.lib ippi.lib ipps.lib ippm.lib ippcore.lib ws2_32.lib netapi32.lib"
+				AdditionalDependencies="dcmimgle.lib dcmdata.lib ofstd.lib ITKAlgorithms.lib ITKBasicFilters.lib ITKCommon.lib itkvnl_inst.lib itkvnl_algo.lib itkv3p_netlib.lib itkvnl.lib itkvcl.lib itksys.lib ippi.lib ipps.lib ippm.lib ippcore.lib ws2_32.lib netapi32.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="$(ITK_BUILD_DIR)\bin\Debug"
+				AdditionalLibraryDirectories="&quot;$(ITK_BUILD_DIR)\bin\Debug&quot;;&quot;$(DCMTK_DIR)\lib\debug&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				RandomizedBaseAddress="1"
@@ -242,9 +242,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="$(DCMTK_BUILD_DIR)\dcmimgle\libsrc\release\dcmimgle.lib $(DCMTK_BUILD_DIR)\dcmdata\libsrc\release\dcmdata.lib $(DCMTK_BUILD_DIR)\ofstd\libsrc\release\ofstd.lib ITKAlgorithms.lib ITKBasicFilters.lib ITKCommon.lib itkvnl_inst.lib itkvnl_algo.lib itkv3p_netlib.lib itkvnl.lib itkvcl.lib itksys.lib ippi.lib ipps.lib ippm.lib ippcore.lib ws2_32.lib netapi32.lib"
+				AdditionalDependencies="dcmimgle.lib dcmdata.lib ofstd.lib ITKAlgorithms.lib ITKBasicFilters.lib ITKCommon.lib itkvnl_inst.lib itkvnl_algo.lib itkv3p_netlib.lib itkvnl.lib itkvcl.lib itksys.lib ippi.lib ipps.lib ippm.lib ippcore.lib ws2_32.lib netapi32.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="$(ITK_BUILD_DIR)\bin\Release"
+				AdditionalLibraryDirectories="&quot;$(ITK_BUILD_DIR)\bin\Release&quot;;&quot;$(DCMTK_DIR)\lib\release&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"

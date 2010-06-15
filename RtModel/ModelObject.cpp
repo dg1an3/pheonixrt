@@ -23,11 +23,17 @@ static char THIS_FILE[]=__FILE__;
 //////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////
-CModelObject::CModelObject(const CString& strName)
+CModelObject::CModelObject(
+#ifdef USE_MODEL_NAME
+						   const CString& strName
+#endif
+						   )
 #pragma warning(disable: 4355)
-	: m_eventChange(this),
+	: m_eventChange(this)
 #pragma warning(default: 4355)
-		m_strName(strName)
+#ifdef USE_MODEL_NAME
+		, m_strName(strName)
+#endif
 	// constructs a model object with the given name
 {
 }	// CModelObject::CModelObject
@@ -43,8 +49,11 @@ CModelObject::~CModelObject()
 //////////////////////////////////////////////////////////////////////
 // declares CModelObject as a serializable class
 //////////////////////////////////////////////////////////////////////
+#ifdef USE_MFC_SERIALIZATION
 IMPLEMENT_SERIAL(CModelObject, CObject, 1)
+#endif
 
+#ifdef USE_MODEL_NAME
 //////////////////////////////////////////////////////////////////////
 const CString& 
 	CModelObject::GetName() const
@@ -68,15 +77,18 @@ void
 	GetChangeEvent().Fire();
 
 }	// CModelObject::SetName
+#endif
 
-
+#ifdef USE_MFC_SERIALIZATION
 //////////////////////////////////////////////////////////////////////
 void 
 	CModelObject::Serialize( CArchive& ar )
 	// serialization
 {
+#ifdef USE_MFC_SERIALIZATION
 	// serialize the base class
 	CObject::Serialize(ar);
+#endif
 
 	// serialize the object's name
 	SERIALIZE_VALUE(ar, m_strName);
@@ -87,3 +99,4 @@ void
 
 }	// CModelObject::Serialize
 
+#endif

@@ -42,7 +42,9 @@ CPolygon::CPolygon(const CPolygon& fromPoly)
 //////////////////////////////////////////////////////////////////////
 #define POLYGON_SCHEMA 2
 	// Schema 1: geometry description, blocks
+#ifdef USE_MFC_SERIALIZATION
 IMPLEMENT_SERIAL(CPolygon, CObject, VERSIONABLE_SCHEMA | POLYGON_SCHEMA)
+#endif
 
 //////////////////////////////////////////////////////////////////////
 // CPolygon::~CPolygon
@@ -183,7 +185,7 @@ void CPolygon::UnlockVertexMatrix(BOOL bChanged)
 }	// CPolygon::UnlockVertexMatrix
 
 
-
+#ifdef USE_MFC_SERIALIZATION
 //////////////////////////////////////////////////////////////////////
 // CPolygon::Serialize
 // 
@@ -198,4 +200,4 @@ void CPolygon::Serialize(CArchive &ar)
 	SERIALIZE_VALUE(ar, m_mVertex);
 
 }	// CPolygon::Serialize
-
+#endif

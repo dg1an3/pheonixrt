@@ -6,6 +6,7 @@
 
 // the main include for the class
 #include "Observer.h"
+#include "ModelObject.h"
 
 // debug new statement
 #ifdef _DEBUG
@@ -20,7 +21,7 @@ static char THIS_FILE[]=__FILE__;
 // 
 // creates an event for the parent object
 //////////////////////////////////////////////////////////////////////
-CObservableEvent::CObservableEvent(CObject *pParent)
+CObservableEvent::CObservableEvent(CModelObject *pParent)
 	: m_pParent(pParent)
 {
 }
@@ -35,7 +36,7 @@ IMPLEMENT_DYNAMIC(CObservableEvent, CObject)
 // 
 // returns the parent of this event
 //////////////////////////////////////////////////////////////////////
-CObject *CObservableEvent::GetParent()
+CModelObject *CObservableEvent::GetParent()
 {
 	return m_pParent;
 }
@@ -45,12 +46,12 @@ CObject *CObservableEvent::GetParent()
 // 
 // member function to an observer to the CEvent
 //////////////////////////////////////////////////////////////////////
-void CObservableEvent::AddObserver(CObject *pObserver, ChangeFunction func) const
+void CObservableEvent::AddObserver(CModelObject *pObserver, ChangeFunction func) const
 {
 	// see if the pair is already present
-	std::multimap<CObject*,ChangeFunction>::iterator iter;
+	std::multimap<CModelObject*,ChangeFunction>::iterator iter;
 	iter = find(m_arrObservers.begin(), m_arrObservers.end(), 
-		std::pair<CObject* const,ChangeFunction>(pObserver, func));
+		std::pair<CModelObject* const,ChangeFunction>(pObserver, func));
 
 	// if not found,
 	if (iter == m_arrObservers.end())
@@ -64,12 +65,12 @@ void CObservableEvent::AddObserver(CObject *pObserver, ChangeFunction func) cons
 // 
 // member function to an observer to the CEvent
 //////////////////////////////////////////////////////////////////////
-void CObservableEvent::RemoveObserver(CObject *pObserver, ChangeFunction func) const
+void CObservableEvent::RemoveObserver(CModelObject *pObserver, ChangeFunction func) const
 {
 	// see if the pair is present
-	std::multimap<CObject*,ChangeFunction>::iterator iter;
+	std::multimap<CModelObject*,ChangeFunction>::iterator iter;
 	iter = find(m_arrObservers.begin(), m_arrObservers.end(), 
-		std::pair<CObject* const,ChangeFunction>(pObserver, func));
+		std::pair<CModelObject* const,ChangeFunction>(pObserver, func));
 
 	// if so,
 	if (iter != m_arrObservers.end())
@@ -87,9 +88,11 @@ void CObservableEvent::RemoveObserver(CObject *pObserver, ChangeFunction func) c
 void CObservableEvent::Fire(void *pValue)
 {
 	// iterate over listeners
-	std::multimap<CObject*,ChangeFunction>::iterator iter;
+	std::multimap<CModelObject*,ChangeFunction>::iterator iter;
 	for (iter = m_arrObservers.begin(); iter != m_arrObservers.end(); iter++)
-
+	{
 		// firing event handler
-		((iter->first)->*(iter->second))(this, pValue);
+		CModelObject * pModelObject = (iter->first);
+		(pModelObject->*(iter->second))(this, pValue);
+	}
 }

@@ -26,8 +26,10 @@ public:
 	CPolygon(const CPolygon& fromPoly);
 	virtual ~CPolygon();
 
+#ifdef USE_MFC_SERIALIZATION
 	// serialization support for the polygon
 	DECLARE_SERIAL(CPolygon)
+#endif
 
 	// assignment operator
 	CPolygon& operator=(const CPolygon& fromPoly);
@@ -46,8 +48,10 @@ public:
 	CMatrixNxM<>& LockVertexMatrix();
 	void UnlockVertexMatrix(BOOL bChanged = TRUE);
 
+#ifdef USE_MFC_SERIALIZATION
 	// serializes the polygon
 	void Serialize(CArchive &ar);
+#endif
 
 public:
 	// the polygon's vertex array

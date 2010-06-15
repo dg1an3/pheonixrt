@@ -33,10 +33,10 @@ CBeam::~CBeam()
 	// destroys the CBeam object
 {
 	// delete the blocks
-	for (int nAt = 0; nAt < m_arrBlocks.GetSize(); nAt++)
-	{
-		delete m_arrBlocks[nAt];
-	}
+	//for (int nAt = 0; nAt < m_arrBlocks.GetSize(); nAt++)
+	//{
+	//	delete m_arrBlocks[nAt];
+	//}
 
 }	// CBeam::~CBeam
 
@@ -228,6 +228,8 @@ VolumeReal *
 
 }	// CBeam::GetDoseMatrix
 
+#ifdef USE_MFC_SERIALIZAION
+
 //////////////////////////////////////////////////////////////////////
 // CBeam serialization
 // 
@@ -312,32 +314,32 @@ void
 
 	// serialize the block(s) -- first prepare the array
 	/// TODO: get rid of blocks
-	if (ar.IsLoading())
-	{
-		// delete any existing structures
-		for (int nAt = 0; nAt < m_arrBlocks.GetSize(); nAt++)
-		{
-			delete m_arrBlocks[nAt];
-		}
-		m_arrBlocks.SetSize(0);
+	//if (ar.IsLoading())
+	//{
+	//	// delete any existing structures
+	//	for (int nAt = 0; nAt < m_arrBlocks.GetSize(); nAt++)
+	//	{
+	//		delete m_arrBlocks[nAt];
+	//	}
+	//	m_arrBlocks.SetSize(0);
 
-		DWORD nCount = (DWORD) ar.ReadCount();
-		for (int nAt = 0; nAt < (int) nCount; nAt++)
-		{
-			// and add it to the array
-			m_arrBlocks.Add(new CPolygon());
-		}
-	}
-	else
-	{
-		ar.WriteCount(m_arrBlocks.GetSize());
-	}
+	//	DWORD nCount = (DWORD) ar.ReadCount();
+	//	for (int nAt = 0; nAt < (int) nCount; nAt++)
+	//	{
+	//		// and add it to the array
+	//		m_arrBlocks.Add(new CPolygon());
+	//	}
+	//}
+	//else
+	//{
+	//	ar.WriteCount(m_arrBlocks.GetSize());
+	//}
 
-	// now serialize the blocks
-	for (int nAt = 0; nAt < m_arrBlocks.GetSize(); nAt++)
-	{
-		m_arrBlocks[nAt]->Serialize(ar);
-	}
+	//// now serialize the blocks
+	//for (int nAt = 0; nAt < m_arrBlocks.GetSize(); nAt++)
+	//{
+	//	m_arrBlocks[nAt]->Serialize(ar);
+	//}
 
 	// check the beam object's schema; only serialize the dose if 
 	//		we are storing or if we are loading with schema >= 2
@@ -414,3 +416,5 @@ void
 	m_bRecalcBeamlets = true;
 
 }	// CBeam::Serialize
+
+#endif

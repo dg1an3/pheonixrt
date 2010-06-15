@@ -27,7 +27,9 @@ void
 	CDataSeries::SetColor(const COLORREF& color)
 {
 	m_Color = color;
-	GetChangeEvent().Fire();
+	// GetChangeEvent().Fire();
+	if (m_pGraph)
+		m_pGraph->OnDataSeriesChanged(NULL, NULL);
 
 }	// CDataSeries::SetColor
 
@@ -49,7 +51,9 @@ void
 	m_mData = mData;
 
 	// notify
-	GetChangeEvent().Fire();
+	// GetChangeEvent().Fire();
+	if (m_pGraph)
+		m_pGraph->OnDataSeriesChanged(NULL, NULL);
 
 }	// CDataSeries::SetDataMatrix
 

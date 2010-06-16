@@ -1,6 +1,7 @@
 // Copyright (C) 2nd Messenger Systems
 // $Id: Structure.h 640 2009-06-13 05:06:50Z dglane001 $
-#pragma once
+#if !defined(_STRUCTURE_H__INCLUDED_)
+#define _STRUCTURE_H__INCLUDED_
 
 #include <ModelObject.h>
 
@@ -13,7 +14,8 @@ using namespace itk;
 // forward definition of Series class
 class CSeries;
 
-BeginNamespace(dH)
+namespace dH
+{
 
 //////////////////////////////////////////////////////////////////////
 class Structure : public DataObject
@@ -31,11 +33,6 @@ public:
 
 	// defines itk's New and CreateAnother static functions
 	itkNewMacro(Self);
-
-#ifdef USE_MFC_SERIALIZATION
-	// serialization
-	void SerializeExt(CArchive& ar, int nSchema);
-#endif
 
 	// name of the structure
 	DeclareMember(Name, CString);
@@ -109,4 +106,6 @@ private:
 
 };	// class Structure
 
-EndNamespace(dH)
+} // namespace dH
+
+#endif // !defined(_STRUCTURE_H__INCLUDED_)

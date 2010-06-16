@@ -11,7 +11,8 @@
 #include <Structure.h>
 #include <Series.h>
 
-BeginNamespace(dH)
+namespace dH
+{
 
 ///////////////////////////////////////////////////////////////////////////////
 Structure::Structure()
@@ -315,78 +316,5 @@ void
 	}
 }
 
-#ifdef USE_MFC_SERIALIZATION
-///////////////////////////////////////////////////////////////////////////////
-void 
-	Structure::SerializeExt(CArchive& ar, int nSchema)
-{
-	// schema for the plan object
-	// UINT nSchema = ar.IsLoading() ? ar.GetObjectSchema() : STRUCTURE_SCHEMA;
 
-	// CModelObject::Serialize(ar);
-	if (ar.IsLoading())
-	{
-		ar >> m_Name;	
-	}
-	else
-	{
-		ar << m_Name;
-	}
-
-	//if (ar.IsLoading())
-	//{
-	//	ar >> m_pSeries;	
-	//}
-	//else
-	//{
-	//	ar << m_pSeries;
-	//}
-
-	m_arrContours.Serialize(ar);
-	m_arrRefDist.Serialize(ar);
-
-	if (nSchema >= 2)
-	{
-		if (ar.IsLoading())
-		{
-			ar >> m_Color;	
-		}
-		else
-		{
-			ar << m_Color;
-		}
-	}
-
-	if (nSchema >= 3)
-	{
-		if (ar.IsLoading())
-		{
-			int nIntType;
-			ar >> nIntType;
-			m_Type = (StructType) nIntType;
-		}
-		else
-		{
-			ar << (int) m_Type;
-		}
-	}
-
-	if (nSchema >= 4)
-	{
-		if (ar.IsLoading())
-		{
-			ar >> m_Visible;
-		}
-		else
-		{
-			ar << m_Visible;
-		}
-	}
-
-	if (ar.IsLoading())
-		m_bRecalcRegion = true;
-
-}	// Structure::Serialize
-#endif
-
-EndNamespace(dH)
+} // namespace dH

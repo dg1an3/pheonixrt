@@ -23,7 +23,7 @@ protected: // create from serialization only
 
 // Attributes
 public:
-	auto_ptr<CSeries> m_pSeries;
+	auto_ptr<dH::Series> m_pSeries;
 	auto_ptr<CPlan> m_pPlan;
 
 #ifdef USE_RTOPT

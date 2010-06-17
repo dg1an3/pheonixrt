@@ -1,50 +1,47 @@
 // Copyright (C) 2nd Messenger Systems
 // $Id: Series.h 640 2009-06-13 05:06:50Z dglane001 $
-#if !defined(AFX_SERIES_H__731877C4_EE46_11D4_9E36_00B0D0609AB0__INCLUDED_)
-#define AFX_SERIES_H__731877C4_EE46_11D4_9E36_00B0D0609AB0__INCLUDED_
-
-#pragma once
+#if !defined(_SERIES_H__INCLUDED_)
+#define _SERIES_H__INCLUDED_
 
 #include <Structure.h>
 
-///////////////////////////////////////////////////////////////////////////////
-// class CSeries
-// 
-// <description>
-///////////////////////////////////////////////////////////////////////////////
-class CSeries : public CModelObject
+namespace dH
+{
+
+/**
+ * Series groups structure and CT in to single object
+ */
+class Series : public CModelObject
 {
 public:
-	CSeries();          
-	virtual ~CSeries();
+	Series();          
 
-#ifdef USE_MFC_SERIALIZATION
-	DECLARE_SERIAL(CSeries)
-	virtual void Serialize(CArchive& ar);
-#endif
+	/**
+	 * Volume data for the series
+	 */ 
+	VolumeReal *GetDensity();
+	void SetDensity(VolumeReal *pValue);
 
-	// Structures for the series
+	/**
+	 * Structures for the series
+	 */
 	int GetStructureCount() const;
-	dH::Structure *GetStructureAt(int nAt);
-	dH::Structure * GetStructureFromName(const CString& strName);
-	void AddStructure(dH::Structure *pStruct);
-
-	// Volume data for the series
-	DECLARE_ATTRIBUTE_SPTR(Density, VolumeReal);
-
-#ifdef _DEBUG
-	virtual void AssertValid() const;
-	virtual void Dump(CDumpContext& dc) const;
-#endif
+	Structure * GetStructureAt(int nAt);
+	Structure * GetStructureFromName(const std::string &strName);
+	void AddStructure(Structure *pStruct);
 
 private:
-	//CTypedPtrArray<CObArray, CStructure*> m_arrStructures;
-	// the structure array
-	std::vector< dH::Structure::Pointer > m_arrStructures;
+	/**
+	 * density volume for the series
+	 */
+	VolumeReal::Pointer m_pDensity;
+
+	/**
+	 * the structure array
+	 */
+	std::vector<Structure::Pointer> m_arrStructures;
 };
 
+}	// namespace dH
 
-//{{AFX_INSERT_LOCATION}	// CSeries}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
-
-#endif // !defined(AFX_SERIES_H__731877C4_EE46_11D4_9E36_00B0D0609AB0__INCLUDED_)
+#endif // !defined(_SERIES_H__INCLUDED_)

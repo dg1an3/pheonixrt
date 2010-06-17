@@ -22,7 +22,7 @@ public:
 
 // Attributes
 	// points to the currently displayed series
-	DECLARE_ATTRIBUTE_PTR_GI(Series, CSeries);
+	DECLARE_ATTRIBUTE_PTR_GI(Series, dH::Series);
 
 	// displayed volumes
 	void SetVolume(VolumeReal *pVolume, int nVolumeAt = 0);

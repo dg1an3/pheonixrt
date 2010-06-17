@@ -11,49 +11,68 @@ using namespace itk;
 
 #include <itkMultiResolutionPyramidImageFilter.h> 
 
-// forward definition of Series class
-class CSeries;
-
 namespace dH
 {
 
-//////////////////////////////////////////////////////////////////////
-class Structure : public DataObject
+// forward definition of Series class
+class Series;
+
+/**
+ * represents a structure (ROI) defined in the CT coordinate system.
+ * read in as a stack a contours, it is converted to a binary volume
+ */
+class Structure : public CModelObject
 {
-	// constructor / destructor
 	Structure();
 	virtual ~Structure();
 
 public:
-	// itk typedefs
+	/**
+	 * itk typedefs
+	 */
 	typedef Structure Self;
 	typedef DataObject Superclass;
 	typedef SmartPointer<Self> Pointer;
 	typedef SmartPointer<const Self> ConstPointer;
 
-	// defines itk's New and CreateAnother static functions
+	/**
+	 * defines itk's New and CreateAnother static functions
+	 */
 	itkNewMacro(Self);
 
-	// name of the structure
-	DeclareMember(Name, CString);
+	/**
+	 * name of the structure
+	 */
+	const std::string& GetName();
+	void SetName(const std::string& strName);
 
-	// contour accessors
+	/**
+	 * contour accessors
+	 */
 	int GetContourCount() const;
 	CPolygon *GetContour(int nAt);
-	REAL GetContourRefDist(int nIndex) const;
+	REAL GetContourRefDist(int nIndex);
 
 	void AddContour(CPolygon *pPoly, REAL refDist);
 
-	// constant for maximum scales
+	/**
+	 * constant for maximum scales
+	 */
 	static const int MAX_SCALES = 5;
 
-	// multi-scale region accessor
+	/**
+	 * multi-scale region accessor
+	 */
 	const VolumeReal * GetRegion(int nLevel);
 
-	// forms / returns a region conformant to another volume
+	/**
+	 * forms / returns a region conformant to another volume
+	 */
 	VolumeReal * GetConformRegion(itk::ImageBase<3> *pVolume);
 
-	// enum for structure type
+	/**
+	 * enum for structure type
+	 */
 	enum  StructType 
 	{ 
 		eNONE = 0, 
@@ -61,50 +80,98 @@ public:
 		eOAR = 2
 	};
 
-	// accessors for struct type
+	/**
+	 * accessors for struct type
+	 */
 	DeclareMember(Type, StructType);
 
-	// priority for structure (determines excluded region logic)
+	/**
+	 * priority for structure (determines excluded region logic)
+	 */
 	DeclareMemberGI(Priority, int);
 
-	// accessor for visible flag
+	/**
+	 * accessor for visible flag
+	 */
 	DeclareMember(Visible, bool);
 
-	// accessor for display color
+	/**
+	 * accessor for display color
+	 */
 	DeclareMember(Color, COLORREF);
 
-	// series accessor
-	DeclareMemberPtr(Series, CSeries);
+	/**
+	 * series accessor
+	 */
+	DeclareMemberPtr(Series, dH::Series);
 
-//protected:
+protected:
 
-	// region calc for base scale
+	/**
+	 * region calc for base scale
+	 */
 	void CalcRegion();
 
-	// helper - converts contours to a region
+	/**
+	 * helper - converts contours to a region
+	 */
 	void ContoursToRegion(VolumeReal *pRegion);
 
 private:
-	// contours for the structure
-	CTypedPtrArray<CPtrArray, CPolygon*> m_arrContours;
+	/**
+	 * the structure's name
+	 */
+	std::string m_strName;
 
-	// reference distances for the contours
-	CArray<REAL, REAL> m_arrRefDist;
+	/**
+	 * contours for the structure
+	 */
+	typedef std::multimap<REAL, itk::SmartPointer<CPolygon> > ContourMapType;
+	ContourMapType m_arrContours;
 
-	// region (binary volume) representation (for base layer)
+	/**
+	 * reference distances for the contours
+	 */
+	// CArray<REAL, REAL> m_arrRefDist;
+
+	/**
+	 * region (binary volume) representation (for base layer)
+	 */
 	VolumeReal::Pointer m_pRegion0;
 
-	// pyramid for the regions
+	/**
+	 * pyramid for the regions
+	 */
 	typedef MultiResolutionPyramidImageFilter<VolumeReal, VolumeReal> PyramidType;
 	PyramidType::Pointer m_pPyramid;
 
-	// flag to indicate region recalc is needed
+	/**
+	 * flag to indicate region recalc is needed
+	 */
 	bool m_bRecalcRegion;
 
-	// stores cache of resampled regions
+	/**
+	 * stores cache of resampled regions
+	 */
 	std::vector< VolumeReal::Pointer > m_arrConformRegions;
 
 };	// class Structure
+
+//////////////////////////////////////////////////////////////////////////////
+inline
+const std::string& 
+	Structure::GetName()
+{
+	return m_strName;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+inline
+void 
+	Structure::SetName(const std::string& strName)
+{
+	m_strName = strName;
+}
 
 } // namespace dH
 

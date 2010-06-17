@@ -57,7 +57,7 @@ CPlan::~CPlan()
 
 ///////////////////////////////////////////////////////////////////////////////
 void 
-	CPlan::SetSeries(CSeries *pSeries)
+	CPlan::SetSeries(dH::Series *pSeries)
 {
 	// store the series pointer
 	m_pSeries = pSeries;
@@ -222,7 +222,7 @@ CHistogram *
 {
 	CHistogram *pHisto = NULL;
 #ifdef USE_RTOPT
-	if (!m_mapHistograms.Lookup(pStructure->GetName(), pHisto))
+	if (!m_mapHistograms.Lookup(CString(pStructure->GetName().c_str()), pHisto))
 	{
 		if (bCreate)
 		{
@@ -241,7 +241,7 @@ CHistogram *
 			pHisto->SetSlice(nSlice);
 
 			// add to map
-			m_mapHistograms[pStructure->GetName()] = pHisto;
+			m_mapHistograms[CString(pStructure->GetName().c_str())] = pHisto;
 		}
 	}
 
@@ -263,9 +263,9 @@ void
 {
 #ifdef USE_RTOPT
 	CHistogram *pHisto = NULL;
-	if (m_mapHistograms.Lookup(pStructure->GetName(), pHisto))
+	if (m_mapHistograms.Lookup(CString(pStructure->GetName().c_str()), pHisto))
 	{
-		m_mapHistograms.RemoveKey(pStructure->GetName());
+		m_mapHistograms.RemoveKey(CString(pStructure->GetName().c_str()));
 		delete pHisto;
 	}
 #endif

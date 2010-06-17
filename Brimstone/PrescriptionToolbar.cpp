@@ -184,11 +184,11 @@ void
 	{
 		m_cbSSelect.ResetContent();
 
-		CSeries *pSeries = GetDocument()->m_pSeries.get();
+		dH::Series *pSeries = GetDocument()->m_pSeries.get();
 		for (int nStruct = 0; nStruct < pSeries->GetStructureCount(); nStruct++)
 		{
 			dH::Structure *pStruct = pSeries->GetStructureAt(nStruct);
-			int nIndex = m_cbSSelect.AddString(pStruct->GetName());
+			int nIndex = m_cbSSelect.AddString(CString(pStruct->GetName().c_str()));
 			m_cbSSelect.SetItemDataPtr(nIndex, (void *) pStruct);
 		}
 	}

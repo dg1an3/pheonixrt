@@ -52,7 +52,7 @@ CBrimstoneDoc::~CBrimstoneDoc()
 void CBrimstoneDoc::DeleteContents() 
 {
 	// create series * plan
-	m_pSeries.reset(new CSeries());
+	m_pSeries.reset(new dH::Series());
 	m_pPlan.reset(new CPlan());
 	m_pPlan->SetSeries(m_pSeries.get());
 
@@ -258,7 +258,7 @@ void CBrimstoneDoc::OnFileImportDcm()
 #endif
 
 		dH::Structure *pStruct = this->m_pSeries->GetStructureAt(0);
-		CString strName = pStruct->GetName();
+		CString strName(pStruct->GetName().c_str());
 		//pStruct->CalcRegion();
 
 		// TODO: update the viewer with the correct plane isocenter position

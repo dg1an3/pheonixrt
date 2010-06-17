@@ -14,13 +14,16 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-class CSeries;
+namespace dH
+{
+class Series;
+}
 
 //////////////////////////////////////////////////////////////////////////////
 class CSeriesDicomImporter  
 {
 public:
-	CSeriesDicomImporter(CSeries *pSeries, CFileDialog *pDlg);
+	CSeriesDicomImporter(dH::Series *pSeries, CFileDialog *pDlg);
 	virtual ~CSeriesDicomImporter();
 
 	// processes next file / image
@@ -37,7 +40,7 @@ public:
 
 private:
 	// the series for the importer
-	CSeries *m_pSeries;
+	dH::Series *m_pSeries;
 
 	// the file dialog and position of the file
 	CFileDialog *m_pDlg;

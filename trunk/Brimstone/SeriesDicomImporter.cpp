@@ -32,7 +32,7 @@ if (!(x.good()))	\
 //////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////////
-CSeriesDicomImporter::CSeriesDicomImporter(CSeries *pSeries, CFileDialog *pDlg)
+CSeriesDicomImporter::CSeriesDicomImporter(dH::Series *pSeries, CFileDialog *pDlg)
 : m_pSeries(pSeries),
 	m_pDlg(pDlg),
 	m_posFile(NULL),

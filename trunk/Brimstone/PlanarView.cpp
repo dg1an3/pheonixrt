@@ -46,7 +46,7 @@ CPlanarView::~CPlanarView()
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 void 
-	CPlanarView::SetSeries(CSeries *pSeries)
+	CPlanarView::SetSeries(dH::Series *pSeries)
 {
 	m_pSeries = pSeries;
 	SetVolume(GetSeries()->GetDensity(), 0);

@@ -3,13 +3,16 @@
 #if !defined(_MODELOBJECT_H__INCLUDED_)
 #define _MODELOBJECT_H__INCLUDED_
 
+#include <ItkUtils.h>
+using namespace itk;
+
 #include "Observer.h"
 
 /**
  * CModelObject can fire change events observable,
  * and is serializable
  */
-class CModelObject 
+class CModelObject : public DataObject
 {
 public:
 	CModelObject();

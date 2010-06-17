@@ -6,48 +6,51 @@
 
 #include <Series.h>
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-/////////////////////////////////////////////////////////////////////////////
-// CSeries
+namespace dH 
+{
 
 ///////////////////////////////////////////////////////////////////////////////
-CSeries::CSeries()
+Series::Series()
 {
 	SetDensity(VolumeReal::New());
+}
 
-}	// CSeries::CSeries
-
-///////////////////////////////////////////////////////////////////////////////
-CSeries::~CSeries()
-{
-}	// CSeries::~CSeries
 
 ///////////////////////////////////////////////////////////////////////////////
-int CSeries::GetStructureCount() const
-{
-	return (int) m_arrStructures.size/*GetSize*/();
-
-}	// CSeries::GetStructureCount
+VolumeReal *
+	Series::GetDensity()
+{ 
+	return m_pDensity; 
+}		
 
 ///////////////////////////////////////////////////////////////////////////////
-dH::Structure *CSeries::GetStructureAt(int nAt)
-{
-	return (dH::Structure *) m_arrStructures.at(nAt);
+void 
+	Series::SetDensity(VolumeReal *pValue)
+{ 
+	m_pDensity = pValue; 
+}
 
-}	// CSeries::GetStructureAt
+///////////////////////////////////////////////////////////////////////////////
+int 
+	Series::GetStructureCount() const
+{
+	return (int) m_arrStructures.size();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+Structure *
+	Series::GetStructureAt(int nAt)
+{
+	return (Structure *) m_arrStructures.at(nAt);
+}
 
 /////////////////////////////////////////////////////////////////////////////
-dH::Structure * 
-	CSeries::GetStructureFromName(const CString &strName)
+Structure * 
+	Series::GetStructureFromName(const std::string &strName)
 {
 	for (int nAt = 0; nAt < GetStructureCount(); nAt++)
 	{
-		if (GetStructureAt(nAt)->GetName() == strName)
+		if (GetStructureAt(nAt)->GetName().compare(strName) == 0)
 		{
 			return GetStructureAt(nAt);
 		}
@@ -58,71 +61,10 @@ dH::Structure *
 
 /////////////////////////////////////////////////////////////////////////////
 void 
-	CSeries::AddStructure(dH::Structure *pStruct)
+	Series::AddStructure(Structure *pStruct)
 {
 	pStruct->SetSeries(this);
 	m_arrStructures.push_back(pStruct);
 }
 
-
-/////////////////////////////////////////////////////////////////////////////
-// CSeries diagnostics
-
-#ifdef _DEBUG
-void CSeries::AssertValid() const
-{
-	CModelObject::AssertValid();
-
-	// m_arrStructures.AssertValid();
-}
-
-void CSeries::Dump(CDumpContext& dc) const
-{
-	CModelObject::Dump(dc);
-}
-#endif //_DEBUG
-
-/////////////////////////////////////////////////////////////////////////////
-// CSeries serialization
-
-#ifdef USE_MFC_SERIALIZATION
-IMPLEMENT_SERIAL(CSeries, CModelObject, 1)
-
-///////////////////////////////////////////////////////////////////////////////
-void CSeries::Serialize(CArchive& ar)
-{
-	CModelObject::Serialize(ar);
-
-	// use temp CVolume for serialization
-	SerializeVolume<VOXEL_REAL>(ar, GetDensity());
-
-	//m_arrStructures.Serialize(ar);
-	if (ar.IsLoading())
-	{
-		// delete existing structures
-		m_arrStructures.clear();
-
-		int nStructureCount = 0;
-		SerializeValue(ar, nStructureCount);
-		for (int nStruct = 0; nStruct < nStructureCount; nStruct++)
-		{
-			dH::Structure::Pointer pStruct = dH::Structure::New();
-			pStruct->SerializeExt(ar, -1);
-			AddStructure(pStruct);
-		}
-	}
-	else if (ar.IsStoring())
-	{
-		int nStructureCount = GetStructureCount();
-		SerializeValue(ar, nStructureCount);
-		for (int nStruct = 0; nStruct < nStructureCount; nStruct++)
-		{
-			GetStructureAt(nStruct)->SerializeExt(ar, -1);
-		}
-	}
-
-}	// CSeries::Serialize
-#endif
-
-/////////////////////////////////////////////////////////////////////////////
-// CSeries commands
+}	// namespace dH

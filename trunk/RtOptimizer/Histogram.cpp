@@ -21,8 +21,8 @@ CHistogram::CHistogram(VolumeReal *pVolume, VolumeReal *pRegion)
 	: m_bRecomputeBins(TRUE)
 		, m_bRecomputeCumBins(TRUE)
 
-		, m_pVolume(pVolume)
-		, m_pRegion(pRegion)
+		, m_pVolume(NULL)
+		, m_pRegion(NULL)
 
 		, m_bRecomputeBinScaledVolume(TRUE)
 
@@ -33,6 +33,9 @@ CHistogram::CHistogram(VolumeReal *pVolume, VolumeReal *pRegion)
 		, m_varMax(0.1 * 0.1) // binKernelSigma^2
 		, m_Slice(0)
 {
+	SetVolume(pVolume);
+	SetRegion(pRegion);
+
 	SetBinning((REAL) 0.0, (REAL) 0.1, GBINS_BUFFER);
 	SetGBinVar(m_pAV, m_varMin, m_varMax);
 
@@ -68,7 +71,8 @@ void
 	OnVolumeChange(NULL, NULL);
 
 	// fire a change event
-	GetChangeEvent().Fire();
+	//GetChangeEvent().Fire();
+	this->DataHasBeenGenerated(); // Modified();
 
 }	// CHistogram::SetVolume
 
@@ -88,7 +92,8 @@ void
 	// m_bRecomputeCumBins = TRUE;
 
 	// fire a change event
-	GetChangeEvent().Fire();
+	//GetChangeEvent().Fire();
+	this->DataHasBeenGenerated(); // Modified();
 
 }	// CHistogram::SetRegion
 
@@ -215,10 +220,11 @@ void
 	m_bRecomputeBinScaledVolume = TRUE;
 
 	// fire binning change event
-	GetBinningChangeEvent().Fire();
+	//GetBinningChangeEvent().Fire();
 
 	// also firing main for legacy reasons
-	GetChangeEvent().Fire();
+	//GetChangeEvent().Fire();
+	this->DataHasBeenGenerated(); // Modified();
 
 }	// CHistogram::SetGBinVar
 
@@ -625,7 +631,8 @@ void
 	// TODO: flag recompute dVolume_x_Region
 
 	// fire a change event
-	GetChangeEvent().Fire();
+	//GetChangeEvent().Fire();
+	this->DataHasBeenGenerated(); // Modified();
 
 }	// CHistogram::OnVolumeChange
 
@@ -643,17 +650,20 @@ void
 	m_bRecomputeCumBins = TRUE;
 
 
-	// set up the constant fractional variance volumes
-	// initialize max to all 1.0s and min to all 0.0s to allow basic computation
-	VolumeReal::Pointer constVolVarFracLo = VolumeReal::New(); 
-	ConformTo<VOXEL_REAL,3>(m_pRegion, constVolVarFracLo);
-	constVolVarFracLo->FillBuffer(0.0);
+	if (m_pRegion != NULL)
+	{
+		// set up the constant fractional variance volumes
+		// initialize max to all 1.0s and min to all 0.0s to allow basic computation
+		VolumeReal::Pointer constVolVarFracLo = VolumeReal::New(); 
+		ConformTo<VOXEL_REAL,3>(m_pRegion, constVolVarFracLo);
+		constVolVarFracLo->FillBuffer(0.0);
 
-	VolumeReal::Pointer constVolVarFracHi = VolumeReal::New(); 
-	ConformTo<VOXEL_REAL,3>(m_pRegion, constVolVarFracHi);
-	constVolVarFracHi->FillBuffer(1.0);
+		VolumeReal::Pointer constVolVarFracHi = VolumeReal::New(); 
+		ConformTo<VOXEL_REAL,3>(m_pRegion, constVolVarFracHi);
+		constVolVarFracHi->FillBuffer(1.0);
 
-	SetVarFracVolumes(constVolVarFracLo, constVolVarFracHi);
+		SetVarFracVolumes(constVolVarFracLo, constVolVarFracHi);
+	}
 }
 
 

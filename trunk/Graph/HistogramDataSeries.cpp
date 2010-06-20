@@ -12,10 +12,12 @@
 		, m_bRecalcCurve(true)
 {
 #ifdef USE_RTOPT
-	m_pHistogram->GetChangeEvent().AddObserver(this, 
-	// AddObserver(&m_pHistogram->GetChangeEvent(), this, 
-		(ListenerFunction) &CHistogramDataSeries::OnHistogramChanged);
+	//m_pHistogram->GetChangeEvent().AddObserver(this, 
+	//// AddObserver(&m_pHistogram->GetChangeEvent(), this, 
+	//	(dH::ListenerFunction) &CHistogramDataSeries::OnHistogramChanged);
 #endif
+
+	UseForAutoScale = false;
 
 	// OnHistogramChanged(NULL, NULL);
 
@@ -28,11 +30,15 @@
 
 ////////////////////////////////////////////////////////////////////////////
 const CMatrixNxM<>& 
-	CHistogramDataSeries::GetDataMatrix() const
+	CHistogramDataSeries::GetDataMatrix()
 	// recalculates the data matrix based on current histogram, if flagged
 {
+	if (m_pHistogram->GetUpdateMTime() < GetUpdateMTime())
+		return CDataSeries::GetDataMatrix();
+
 #ifdef USE_RTOPT
-	if (m_bRecalcCurve)
+	if (/*m_bRecalcCurve 
+		|| */true)
 	{
 		// now draw the histogram
 		const CVectorN<>& arrBins = GetHistogram()->GetCumBins();
@@ -52,6 +58,7 @@ const CMatrixNxM<>&
 		}	
 
 		m_bRecalcCurve = false;
+		this->DataHasBeenGenerated(); // Modified();
 	}
 #endif
 	return CDataSeries::GetDataMatrix();

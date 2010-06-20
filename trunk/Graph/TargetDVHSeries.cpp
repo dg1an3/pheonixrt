@@ -12,7 +12,7 @@ CTargetDVHSeries::CTargetDVHSeries(dH::KLDivTerm *pKLDT)
 {
 #ifdef USE_RTOPT
 	m_pKLDivTerm->GetChangeEvent().AddObserver(this, 
-		(ListenerFunction) &CTargetDVHSeries::OnKLDTChanged);
+		(dH::ListenerFunction) &CTargetDVHSeries::OnKLDTChanged);
 #endif
 
 	OnKLDTChanged(NULL, NULL);

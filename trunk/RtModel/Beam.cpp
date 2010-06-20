@@ -105,7 +105,7 @@ void
 #endif
 
 	// finally change event
-	GetChangeEvent().Fire();
+	//GetChangeEvent().Fire();
 
 }	// CBeam::SetGantryAngle
 
@@ -124,7 +124,7 @@ void
 	// sets the couch angle value
 {
 	m_couchAngle = couchAngle;
-	GetChangeEvent().Fire();
+	//GetChangeEvent().Fire();
 
 }	// CBeam::SetCouchAngle
 
@@ -172,7 +172,7 @@ void
 	m_bRecalcDose = TRUE;
 
 	// fire change
-	GetChangeEvent().Fire();
+	//GetChangeEvent().Fire();
 
 }	// CBeam::SetIntensityMap
 
@@ -195,7 +195,7 @@ void
 	m_bRecalcDose = TRUE;
 
 	// fire change
-	GetChangeEvent().Fire();
+	// GetChangeEvent().Fire();
 }
 
 //////////////////////////////////////////////////////////////////////

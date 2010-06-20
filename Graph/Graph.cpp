@@ -70,6 +70,7 @@ void CGraph::AddDataSeries(CDataSeries *pSeries)
 	// AddObserver(&pSeries->GetChangeEvent(), this, &CGraph::OnDataSeriesChanged);
 
 	m_arrDataSeries.Add(pSeries);
+	OnDataSeriesChanged(NULL, NULL);
 
 }	// CGraph::AddDataSeries
 
@@ -137,6 +138,9 @@ void
 	// find the min / max for mantissa and abcsisca
 	for (int nAt = 0; nAt < m_arrDataSeries.GetSize(); nAt++)
 	{
+		if (!m_arrDataSeries[nAt]->UseForAutoScale)
+			continue;
+
 		const CMatrixNxM<>& mData = m_arrDataSeries[nAt]->GetDataMatrix();
 		for (int nAtPoint = 0; nAtPoint < mData.GetCols(); nAtPoint++)
 		{
@@ -148,8 +152,8 @@ void
 				|| mData[nAtPoint][1] > 0.0) */
 			{
 				SetAxesMax(MakeVector<2>(
-					__max(GetAxesMax()[0], mData[nAtPoint][0]),
-					__max(GetAxesMax()[1], mData[nAtPoint][1])));
+					__max(GetAxesMax()[0], mData[nAtPoint][0]*1.2),
+					__max(GetAxesMax()[1], mData[nAtPoint][1]*1.2)));
 			} 
 /*			else 
 			{

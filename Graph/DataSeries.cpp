@@ -12,6 +12,7 @@
 		, m_Color(RGB(255, 0, 0))
 		, m_HasHandles(false)
 		, m_PenStyle(PS_SOLID)
+		, UseForAutoScale(true)
 { 
 }	// CDataSeries::CDataSeries
 
@@ -35,7 +36,7 @@ void
 
 ////////////////////////////////////////////////////////////////////////////
 const CMatrixNxM<>& 
-	CDataSeries::GetDataMatrix() const
+	CDataSeries::GetDataMatrix()
 		// accessor for the data series data
 {
 	return m_mData;

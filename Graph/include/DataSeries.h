@@ -24,7 +24,7 @@ public:
 	DECLARE_ATTRIBUTE(PenStyle, int);
 
 	// accessors for the data series data
-	virtual const CMatrixNxM<>& GetDataMatrix() const;
+	virtual const CMatrixNxM<>& GetDataMatrix();
 	virtual void SetDataMatrix(const CMatrixNxM<>& mData);
 	void AddDataPoint(const itk::Vector<REAL,2>& vDataPt);
 
@@ -40,6 +40,8 @@ public:
 	//		1 for increasing,
 	//		0 for not monotonic
 	DECLARE_ATTRIBUTE(MonotonicDirection, int);
+
+	bool UseForAutoScale;
 
 protected:
 	friend CGraph;

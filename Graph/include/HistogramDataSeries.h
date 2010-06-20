@@ -18,7 +18,7 @@ public:
 
 	DECLARE_ATTRIBUTE_PTR(Histogram, CHistogram);
 
-	virtual const CMatrixNxM<>& GetDataMatrix() const;
+	virtual const CMatrixNxM<>& GetDataMatrix();
 
 	void OnHistogramChanged(CObservableEvent *, void *);
 

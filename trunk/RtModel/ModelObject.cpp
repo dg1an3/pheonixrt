@@ -8,18 +8,16 @@
 // the main include for the class
 #include "ModelObject.h"
 
+namespace dH
+{
+
 //////////////////////////////////////////////////////////////////////
-CModelObject::CModelObject()
+ModelObject::ModelObject()
 #pragma warning(disable: 4355)
 	: m_eventChange(this)
 #pragma warning(default: 4355)
 	// constructs a model object with the given name
 {
-}	// CModelObject::CModelObject
+}
 
-
-//////////////////////////////////////////////////////////////////////
-CModelObject::~CModelObject()
-	// destroys the model objects
-{
-}	// CModelObject::~CModelObject
+}

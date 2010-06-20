@@ -5,53 +5,48 @@
 
 #include <map>
 
+namespace dH
+{
+
 // forward declaration of the CObservableEvent class
-class CObservableEvent;
-class CModelObject;
+class ObservableEvent;
+class ModelObject;
 
 // defines the ChangeFunction which is called when a change occurs
-typedef void (CModelObject::*ListenerFunction)(CObservableEvent *, void *);
+typedef void (ModelObject::*ListenerFunction)(ObservableEvent *, void *);
 
 /**
  * a CObservableEvent fires change events that can be processed by 
  * an observer
  */
-class CObservableEvent
+class ObservableEvent
 {
 public:
-	/**
-	 * creates an event for the parent object
-	 */
-	CObservableEvent(CModelObject *pParent = NULL);
+	/** creates an event for the parent object */
+	ObservableEvent(ModelObject *pParent = NULL);
 
-	/**
-	 * returns the parent of this event
-	 */
-	CModelObject *GetParent();
+	/** returns the parent of this event */
+	ModelObject *GetParent();
 
-	/**
-	 * accessors for the observer list
-	 */ 
-	void AddObserver(CModelObject *pObserver, ListenerFunction func) const;
-	void RemoveObserver(CModelObject *pObserver, ListenerFunction func) const;
+	/** accessors for the observer list */ 
+	void AddObserver(ModelObject *pObserver, ListenerFunction func) const;
+	void RemoveObserver(ModelObject *pObserver, ListenerFunction func) const;
 
-	/**
-	 * called to fire a change
-	 */
+	/** called to fire a change */
 	void Fire(void *pValue = NULL);
 
 private:
-	/**
-	 * the parent object of this event
-	 */
-	CModelObject *m_pParent;
+	/** the parent object of this event */
+	ModelObject *m_pParent;
 
-	/**
-	 * the array of observers
-	 */
-	typedef std::multimap<CModelObject*,ListenerFunction> ListenerMapType;
-	typedef std::pair<CModelObject* const,ListenerFunction> MapEntryType;
+	/** the array of observers */
+	typedef std::multimap<ModelObject*,ListenerFunction> ListenerMapType;
+	typedef std::pair<ModelObject* const,ListenerFunction> MapEntryType;
 	mutable ListenerMapType m_arrObservers;
 };
+
+}
+
+typedef dH::ObservableEvent CObservableEvent;
 
 #endif // !defined(_OBSERVER_H__INCLUDED_)

@@ -8,32 +8,45 @@ using namespace itk;
 
 #include "Observer.h"
 
+namespace dH
+{
+
 /**
- * CModelObject can fire change events observable,
+ * ModelObject can fire change events observable,
  * and is serializable
  */
-class CModelObject : public DataObject
+class ModelObject : public DataObject
 {
 public:
-	CModelObject();
-	virtual ~CModelObject();
+	ModelObject();
+	virtual ~ModelObject() { }
 
-	/**
-	 * returns a reference to this object's change event
-	 */ 
-	CObservableEvent& GetChangeEvent();
+public:
+	/** itk typedefs */
+	typedef ModelObject Self;
+	typedef DataObject Superclass;
+	typedef SmartPointer<Self> Pointer;
+	typedef SmartPointer<const Self> ConstPointer;
+
+	/** returns a reference to this object's change event */ 
+	ObservableEvent& GetChangeEvent();
 
 protected:
-	/**
-	 * the change event for this object
-	 */
-	CObservableEvent m_eventChange;
+	/** the change event for this object */
+	ObservableEvent m_eventChange;
 };
 
 //////////////////////////////////////////////////////////////////////
-inline CObservableEvent& CModelObject::GetChangeEvent()
+inline 
+ObservableEvent& 
+	ModelObject::GetChangeEvent()
 {
 	return m_eventChange;
 }
+
+}	// namespace dH
+
+typedef dH::ModelObject CModelObject;
+
 
 #endif //  !defined(_MODELOBJECT_H__INCLUDED_)

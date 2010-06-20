@@ -8,20 +8,25 @@
 #include "Observer.h"
 #include "ModelObject.h"
 
+namespace dH
+{
+
 //////////////////////////////////////////////////////////////////////
-CObservableEvent::CObservableEvent(CModelObject *pParent)
+ObservableEvent::ObservableEvent(ModelObject *pParent)
 	: m_pParent(pParent)
 {
 }
 
 //////////////////////////////////////////////////////////////////////
-CModelObject *CObservableEvent::GetParent()
+ModelObject *
+	ObservableEvent::GetParent()
 {
 	return m_pParent;
 }
 
 //////////////////////////////////////////////////////////////////////
-void CObservableEvent::AddObserver(CModelObject *pObserver, ListenerFunction func) const
+void 
+	ObservableEvent::AddObserver(ModelObject *pObserver, ListenerFunction func) const
 {
 	// remove if present
 	RemoveObserver(pObserver, func);
@@ -31,7 +36,8 @@ void CObservableEvent::AddObserver(CModelObject *pObserver, ListenerFunction fun
 }
 
 //////////////////////////////////////////////////////////////////////
-void CObservableEvent::RemoveObserver(CModelObject *pObserver, ListenerFunction func) const
+void 
+	ObservableEvent::RemoveObserver(ModelObject *pObserver, ListenerFunction func) const
 {
 	// see if the pair is present
 	ListenerMapType::iterator iter 
@@ -44,7 +50,8 @@ void CObservableEvent::RemoveObserver(CModelObject *pObserver, ListenerFunction 
 }
 
 //////////////////////////////////////////////////////////////////////
-void CObservableEvent::Fire(void *pValue)
+void 
+	ObservableEvent::Fire(void *pValue)
 {
 	// iterate over listeners
 	ListenerMapType::iterator iter = m_arrObservers.begin();
@@ -54,3 +61,5 @@ void CObservableEvent::Fire(void *pValue)
 		((iter->first)->*(iter->second))(this, pValue);
 	}
 }
+
+}	// namespace dH

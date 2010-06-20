@@ -87,6 +87,7 @@ void
 
 	// notify of change
 	GetChangeEvent().Fire();
+	this->DataHasBeenGenerated();
 
 }	// KLDivTerm::SetDVPs
 

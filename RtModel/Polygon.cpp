@@ -124,7 +124,7 @@ int CPolygon::AddVertex(const itk::Vector<REAL,2>& v)
 	m_mVertex[nIndex][1] = v[1];
 
 	// fire a change
-	GetChangeEvent().Fire();
+	//GetChangeEvent().Fire();
 
 	// return the index of the new vertex
 	return nIndex;
@@ -151,7 +151,7 @@ void CPolygon::RemoveVertex(int nIndex)
 	ASSERT(FALSE);
 
 	// fire a change event
-	GetChangeEvent().Fire();
+	//GetChangeEvent().Fire();
 
 }	// CPolygon::RemoveVertex
 
@@ -179,7 +179,7 @@ void CPolygon::UnlockVertexMatrix(BOOL bChanged)
 {
 	if (bChanged)
 	{
-		GetChangeEvent().Fire();
+		//GetChangeEvent().Fire();
 	}
 
 }	// CPolygon::UnlockVertexMatrix

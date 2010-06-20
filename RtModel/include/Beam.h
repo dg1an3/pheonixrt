@@ -19,12 +19,20 @@ class CPlan;
 //
 // represents a single treatment beam
 //////////////////////////////////////////////////////////////////////
-class CBeam : public CModelObject
+class CBeam : public dH::ModelObject
 {
 public:
 	// constructur/destructor
 	CBeam();
 	virtual ~CBeam();
+
+	/** itk typedefs */
+	typedef CBeam Self;
+	typedef ModelObject Superclass;
+	typedef SmartPointer<Self> Pointer;
+	typedef SmartPointer<const Self> ConstPointer;
+
+	itkNewMacro(Self);
 
 #ifdef USE_MFC_SERIALIZATION
 	// serialization support

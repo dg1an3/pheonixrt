@@ -106,7 +106,7 @@ int
 	pBeam->SetPlan(this);
 
 	// a change has occurred, so fire
-	GetChangeEvent().Fire();
+	// GetChangeEvent().Fire();
 
 	return nIndex;
 

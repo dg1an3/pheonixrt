@@ -26,6 +26,8 @@ Structure::Structure()
 	m_pRegion0 = VolumeReal::New();
 	m_pPyramid = PyramidType::New(); 
 
+	m_pPyramid->SetInput(m_pRegion0);
+	m_pPyramid->SetNumberOfLevels(MAX_SCALES);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -83,7 +85,6 @@ const VolumeReal *
 {
 	if (nScale >= MAX_SCALES)
 	{
-		::AfxMessageBox(_T("Too big"));
 		nScale = MAX_SCALES-1;
 	}
 
@@ -129,9 +130,7 @@ void
 		}
 	}
 
-	// set the input to the pyramid and update
-	m_pPyramid->SetInput(m_pRegion0);
-	m_pPyramid->SetNumberOfLevels(MAX_SCALES);
+	// update the pyramid
 	m_pPyramid->Update();
 
 	m_bRecalcRegion = false;
@@ -143,32 +142,6 @@ VolumeReal *
 		Structure::GetConformRegion(itk::ImageBase<3> *pVolume)
 		// forms / returns a resampled region for a given basis
 {
-	VolumeReal::Pointer pConformRegion;
-
-	// find if there is already a region
-	for (int nAt = 0; nAt < (int) m_arrConformRegions.size(); nAt++)
-	{
-		VolumeReal * pTestConformRegion = m_arrConformRegions[nAt];
-		if (IsApproxEqual<3>(pTestConformRegion->GetOrigin(), pVolume->GetOrigin())
-				&& IsApproxEqual<3>(pTestConformRegion->GetSpacing(), pVolume->GetSpacing())
-				&& pTestConformRegion->GetBufferedRegion() == pVolume->GetBufferedRegion())
-		{
-			pConformRegion = pTestConformRegion;
-		}
-	}
-
-	if (pConformRegion.IsNull())
-	{
-		// else form the resampled region
-		pConformRegion = VolumeReal::New(); 
-
-		// and add to cache map
-		m_arrConformRegions.push_back(pConformRegion); 
-	}
-
-	ConformTo<VOXEL_REAL,3>(pVolume, pConformRegion);
-	pConformRegion->FillBuffer(0.0);
-
 	// search for closest level in structure's pyramid
 	int nLevel = -1;
 	itk::Vector<REAL> vDosePixelSpacing = pVolume->GetSpacing();
@@ -200,9 +173,8 @@ VolumeReal *
 	VolumeReal::Pointer pPointToVolume = static_cast<VolumeReal*>(pVolume);
 	resampler->SetOutputParametersFromImage(pPointToVolume);
 	resampler->Update();
-	CopyImage<VOXEL_REAL, 3>(resampler->GetOutput(), pConformRegion);
-
-	return pConformRegion;
+	m_arrResamplers.push_back(resampler);
+	return resampler->GetOutput();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -239,7 +211,6 @@ void
 	for (int nAt = 0; nAt < GetSeries()->GetStructureCount(); nAt++)
 	{
 		GetSeries()->GetStructureAt(nAt)->m_bRecalcRegion = true;
-		GetSeries()->GetStructureAt(nAt)->m_arrConformRegions.clear();
 	}
 }
 

@@ -7,14 +7,17 @@
 using namespace itk;
 
 class CEnergyDepKernel;
-class CBeam;
+namespace dH
+{
+class Beam;
+}
 
 //////////////////////////////////////////////////////////////////////////////////
 class CBeamDoseCalc  
 {
 public:
 	// constructor / destructor
-	CBeamDoseCalc(CBeam *pBeam, CEnergyDepKernel *pKernel); 
+	CBeamDoseCalc(dH::Beam *pBeam, CEnergyDepKernel *pKernel); 
 	virtual ~CBeamDoseCalc();
 
 	// triggers calculation of beam's pencil beams
@@ -49,7 +52,7 @@ public:
 
 private:
 	// my beam
-	CBeam *m_pBeam;
+	dH::Beam *m_pBeam;
 
 	// reference to the source
 	CEnergyDepKernel *m_pKernel;

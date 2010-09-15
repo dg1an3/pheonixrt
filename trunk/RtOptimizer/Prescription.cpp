@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include <ConjGradOptimizer.h>
+#include <HistogramGradient.h>
 
 namespace dH
 {
@@ -281,9 +282,11 @@ REAL
 		{
 			// set fractions to histo
 			pVOIT->GetHistogram()->SetVarFracVolumes(m_volMainMinVar, m_volMainMaxVar);
+			dynamic_cast<CHistogramWithGradient*>(pVOIT->GetHistogram())->vInput = &vInput;
+			dynamic_cast<CHistogramWithGradient*>(pVOIT->GetHistogram())->vInputTrans = &vInputTrans;
 
 			// trigger change
-			pVOIT->GetHistogram()->OnVolumeChange(NULL, NULL);
+			pVOIT->GetHistogram()->OnVolumeChange(); //NULL, NULL);
 
 			if (pGrad)
 			{

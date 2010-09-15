@@ -68,7 +68,7 @@ void
 	m_pVolume = pVolume;
 
 	// update for new volume
-	OnVolumeChange(NULL, NULL);
+	OnVolumeChange(); // NULL, NULL);
 
 	// fire a change event
 	//GetChangeEvent().Fire();
@@ -85,7 +85,7 @@ void
 	m_pRegion = pRegion;
 
 	// trigger update
-	OnRegionChanged(NULL, NULL);
+	OnRegionChanged(); // NULL, NULL);
 
 	// flag recomputation
 	// m_bRecomputeBins = TRUE;
@@ -608,7 +608,7 @@ bool
 
 //////////////////////////////////////////////////////////////////////
 void 
-	CHistogram::OnVolumeChange(CObservableEvent *pSource, void *)
+	CHistogram::OnVolumeChange() // CObservableEvent *pSource, void *)
 	// triggers update of histogram
 {
 	// flag recomputation
@@ -638,7 +638,7 @@ void
 
 //////////////////////////////////////////////////////////////////////
 void 
-	CHistogram::OnRegionChanged(CObservableEvent * pEvt, void * pParam)
+	CHistogram::OnRegionChanged() // CObservableEvent * pEvt, void * pParam)
 	// called when region updated
 {
 	for (int nAt = 0; nAt < m_arr_bRecompute_dVolumes_x_Region.GetSize(); nAt++)

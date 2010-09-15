@@ -6,6 +6,8 @@
 
 //////////////////////////////////////////////////////////////////////
 CHistogramWithGradient::CHistogramWithGradient()
+: vInput(NULL)
+, vInputTrans(NULL)
 {
 	m_groupVolBinScaled = VolumeReal::New();
 }
@@ -201,7 +203,29 @@ const CVectorN<>&
 			Conv_dGauss(arr_dBins, m_bin_dKernelVarMin, arr_dGBinsVarMin);
 			ASSERT(arr_dGBinsVarMax.GetDim() == arr_dGBinsVarMin.GetDim());
 
-			REAL fracMax = ((*m_pAV)[nAt_dBin] - m_varMin) / (m_varMax - m_varMin);
+
+			// determine variance using dSigmoid
+			REAL varSlope = 1.0;
+			REAL varWeight = 1.0;
+			REAL m_inputScale = 0.5;	// should get this from the registry
+			const REAL SIGMOID_SCALE = 0.2; // 0.1; // 0.3; // 0.1; // 1.0;
+				// should get this from Prescription
+			// calculate variance adjustment due to sigmoid transform
+			varSlope = 
+				SIGMOID_SCALE * dSigmoid<REAL>((*vInput)[nAt_dBin], m_inputScale);
+
+			// this is equivalent to scaling the level sigma's so that their current
+			//	value is the equal to that at optimizer value -4.0
+			varSlope /= SIGMOID_SCALE * dSigmoid<REAL>(0.0, m_inputScale);
+
+			// compute the variance adjustment for the beamlet weight
+			varWeight = (*vInputTrans)[nAt_dBin];
+
+			// normalize so that beamlet weight at scale / 2 is 1.0
+			varWeight /= SIGMOID_SCALE / 2.0;
+			REAL actVar = (*m_pAV)[nAt_dBin] * varSlope * varSlope * varWeight * varWeight;
+
+			REAL fracMax = (actVar - m_varMin) / (m_varMax - m_varMin);
 			fracMax = __min(fracMax, 1.0);
 			fracMax = __max(fracMax, 0.0);
 			const REAL fracMin = 1.0 - fracMax; 

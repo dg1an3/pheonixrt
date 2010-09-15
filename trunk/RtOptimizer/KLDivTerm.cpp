@@ -32,8 +32,8 @@ KLDivTerm::KLDivTerm(Structure *pStructure, REAL weight)
 	::AfxGetApp()->WriteProfileInt(_T("KLDivTerm"), _T("TargetCrossEntropy"), nTargetCrossEntropy);
 		
 	// set up to receive binning change events
-	GetHistogram()->GetBinningChangeEvent().AddObserver(this, 
-		(ListenerFunction) &KLDivTerm::OnHistogramBinningChange);
+	//GetHistogram()->GetBinningChangeEvent().AddObserver(this, 
+	//	(ListenerFunction) &KLDivTerm::OnHistogramBinningChange);
 
 }	// KLDivTerm::KLDivTerm
 
@@ -86,8 +86,9 @@ void
 	m_bReconvolve = true;
 
 	// notify of change
-	GetChangeEvent().Fire();
-	this->DataHasBeenGenerated();
+	// GetChangeEvent().Fire();
+	this->Modified();
+	// this->DataHasBeenGenerated();
 
 }	// KLDivTerm::SetDVPs
 
@@ -217,6 +218,9 @@ REAL
 	KLDivTerm::Eval(CVectorN<> *pvGrad, const CArray<BOOL, BOOL>& arrInclude)
 	// evaluates the term (and optionally gradient)
 {
+	// trigger update of targets
+	OnHistogramBinningChange(); // NULL, NULL);
+
 	REAL sum = 0.0;
 
 	// get the calculated histogram bins
@@ -243,7 +247,7 @@ REAL
 	}
 	else // if (m_bTargetCrossEntropy)
 	{
-#define IPP_CALC_KLDIV
+//#define IPP_CALC_KLDIV
 #ifdef IPP_CALC_KLDIV
 		if (m_vCalc_EPS.GetDim() < calcGPDF.GetDim())
 		{
@@ -472,7 +476,7 @@ VOITerm *
 
 ///////////////////////////////////////////////////////////////////////////////
 void 
-	KLDivTerm::OnHistogramBinningChange(CObservableEvent *pSource, void *pValue)
+	KLDivTerm::OnHistogramBinningChange() // CObservableEvent *pSource, void *pValue)
 	// flags recalc when histogram changes
 {
 	// recompute target

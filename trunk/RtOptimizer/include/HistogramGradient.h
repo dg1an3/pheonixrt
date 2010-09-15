@@ -20,6 +20,9 @@ public:
 	const CVectorN<>& Get_dBins(int nAt) const;
 	const CVectorN<>& Get_dGBins(int nAt) const;
 
+	const CVectorN<>* vInput;
+	const CVectorN<>* vInputTrans;
+
 protected:
 	// helpers
 

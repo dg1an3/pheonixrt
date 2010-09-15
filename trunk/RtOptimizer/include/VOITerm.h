@@ -15,7 +15,7 @@ class Prescription;
 // 
 // base class for objective function terms
 ///////////////////////////////////////////////////////////////////////////////
-class VOITerm : public CModelObject
+class VOITerm : public itk::DataObject
 {
 public:
 	// constructor / destructor

@@ -99,7 +99,7 @@ void
 	for (int nAt = m_nBeamCount-1; nAt >= 0; nAt--)
 	{
 		// create the new beam
-		CBeam *pBeam = new CBeam();
+		CBeam::Pointer pBeam = dH::Beam::New(); // new CBeam();
 		m_pPlanPyramid->GetPlan()->AddBeam(pBeam);
 
 		// calculate gantry for the beam

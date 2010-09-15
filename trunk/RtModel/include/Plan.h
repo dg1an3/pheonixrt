@@ -1,7 +1,7 @@
 // Copyright (C) 2nd Messenger Systems
 // $Id: Plan.h 640 2009-06-13 05:06:50Z dglane001 $
-#if !defined(PLAN_H)
-#define PLAN_H
+#if !defined(_PLAN_H__INCLUDED_)
+#define _PLAN_H__INCLUDED_
 
 #if _MSC_VER > 1000
 #pragma once
@@ -23,118 +23,83 @@ class CEnergyDepKernel;
 
 namespace dH
 {
-	class PlanPyramid;
-}
 
-//////////////////////////////////////////////////////////////////////
-// class CPlan
-//
-// represents a treatment plan
-//////////////////////////////////////////////////////////////////////
-class CPlan : public CModelObject
+// forward declaration for pyramid class
+class PlanPyramid;
+
+/**
+ * Plan represents a treatment plan: beams, dose, DVHs
+ */
+class Plan : public DataObject
 {
+	Plan();
+	virtual ~Plan();
+
 public:
-	// constructor
-	CPlan();
-	virtual ~CPlan();
+	/** itk typedefs */
+	typedef Plan Self;
+	typedef DataObject Superclass;
+	typedef SmartPointer<Self> Pointer;
+	typedef SmartPointer<const Self> ConstPointer;
 
-#ifdef USE_MFC_SERIALIZATION
-	// dynamic create
-	DECLARE_SERIAL(CPlan)
-#endif
+	itkNewMacro(Self);
 
-	// series accessor
+	/** series accessor */
 	DECLARE_ATTRIBUTE_PTR_GI(Series, dH::Series);
 
-	// histogram accessor / creator
+	/** histogram accessor / creator */
 	CHistogram *GetHistogram(dH::Structure *pSurface, bool bCreate);
 	void RemoveHistogram(dH::Structure *pStructure);
 
-	// the beams for this plan
+	/** the beams for this plan */
 	int GetBeamCount() const;
 	CBeam * GetBeamAt(int nAt);
 	int AddBeam(CBeam *pBeam);
 
-	// helper functions
+	/** helper functions */
 	int GetTotalBeamletCount();
 
-	// helper to get formatted mass density volume
-	/// TODO: move this to dose calc
+	/** helper to get formatted mass density volume */
 	VolumeReal * GetMassDensity();
 
-	// the computed dose for this plan (NULL if no dose exists)
+	/** the computed dose for this plan (NULL if no dose exists) */
 	VolumeReal * GetDoseMatrix();
 
-	// calls update on all internal histograms
+	/** calls update on all internal histograms */
 	void UpdateAllHisto();
 
-	// sets shape for dose matrix
+	/** sets shape for dose matrix */
 	DECLARE_ATTRIBUTE_GI(DoseResolution, REAL);
 
-// Overrides
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CPlan)
-	public:
-#ifdef USE_MFC_SERIALIZATION
-	virtual void Serialize(CArchive& ar);
-#endif
-	//}}AFX_VIRTUAL
-
-// Implementation
-public:
-
-	// stores the energy dep kernel
-	/// TODO: move this elsewhere
+	/** stores the energy dep kernel */
 	CEnergyDepKernel * m_pKernel;
-
-
-#ifdef _DEBUG
-	virtual void AssertValid() const;
-	virtual void Dump(CDumpContext& dc) const;
-#endif
 
 protected:
 	friend class dH::PlanPyramid;
 
-	// the plan's beams
-	CTypedPtrArray<CPtrArray, CBeam*> m_arrBeams;
+	/** the plan's beams */
+	std::vector< dH::Beam::Pointer > m_arrBeams;
 
 private:
-	// storing resampled mass density
+	/** storing resampled mass density */
 	VolumeReal::Pointer m_pMassDensity;
 
 public:
-	// the dose matrix for the plan
+	/** the dose matrix for the plan */
 	VolumeReal::Pointer m_pDose;
 
-	// helper volumes for dose summation
+	/** helper volumes for dose summation */
 	VolumeReal::Pointer m_pTempBuffer;
 	VolumeReal::Pointer m_pBeamDoseRot;
 
 private:
-	// the histograms
+	/** the histograms */
 	CTypedPtrMap<CMapStringToOb, CString, CHistogram*> m_mapHistograms;
 
-};	// class CPlan
-
-#ifdef USING_CLI
-namespace dH
-{
-
-public ref class Plan : public System::Object
-{
-	Plan();
-
-	property System::String Name;
-	property System::Collection::Generic::List<Beam^>^ Beams;
-};
+};	// class Plan
 
 }
-#endif
 
-/////////////////////////////////////////////////////////////////////////////
+typedef dH::Plan CPlan;
 
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
-
-#endif // !defined(AFX_PLAN_H__71D1495A_EE39_11D4_9E36_00B0D0609AB0__INCLUDED_)
+#endif // !defined(_PLAN_H__INCLUDED_)

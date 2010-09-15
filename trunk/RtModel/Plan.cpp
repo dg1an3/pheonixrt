@@ -6,15 +6,11 @@
 
 #include <EnergyDepKernel.h>
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
+namespace dH 
+{
 
 ///////////////////////////////////////////////////////////////////////////////
-CPlan::CPlan()
+Plan::Plan()
 	: m_pSeries(NULL)
 	, m_DoseResolution(4.0) // 
 		// 2.0)
@@ -28,17 +24,11 @@ CPlan::CPlan()
 	m_pBeamDoseRot = VolumeReal::New();
 	m_pTempBuffer = VolumeReal::New();
 
-}	// CPlan::CPlan
+}
 
 ///////////////////////////////////////////////////////////////////////////////
-CPlan::~CPlan()
+Plan::~Plan()
 {
-	// delete the beams
-	for (int nAt = 0; nAt < m_arrBeams.GetSize(); nAt++)
-	{
-		delete m_arrBeams[nAt];
-	}
-
 	// delete the histograms
 	POSITION pos = m_mapHistograms.GetStartPosition();
 	while (NULL != pos)
@@ -52,32 +42,29 @@ CPlan::~CPlan()
 
 	// delete the kernel
 	delete m_pKernel;
-
-}	// CPlan::~CPlan
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 void 
-	CPlan::SetSeries(dH::Series *pSeries)
+	Plan::SetSeries(dH::Series *pSeries)
 {
 	// store the series pointer
 	m_pSeries = pSeries;
 
 	// trigger calc of dose matrix basis
 	SetDoseResolution(GetDoseResolution());
-
-}	// CPlan::SetSeries
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 int 
-	CPlan::GetBeamCount() const
+	Plan::GetBeamCount() const
 {
-	return (int) m_arrBeams.GetSize();
-
-}	// CPlan::GetBeamCount
+	return (int) m_arrBeams.size();
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 int 
-	CPlan::GetTotalBeamletCount()
+	Plan::GetTotalBeamletCount()
 {
 	int nBeamlets = 0;
 
@@ -87,34 +74,32 @@ int
 	}
 
 	return nBeamlets;
-
-}	// CPlan::GetTotalBeamletCount
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 CBeam * 
-	CPlan::GetBeamAt(int nAt)
+	Plan::GetBeamAt(int nAt)
 {
-	return m_arrBeams.GetAt(nAt);
-
-}	// CPlan::GetBeamAt
+	return m_arrBeams.at(nAt);
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 int 
-	CPlan::AddBeam(CBeam *pBeam)
+	Plan::AddBeam(CBeam *pBeam)
 {
-	int nIndex = (int) m_arrBeams.Add(pBeam);
+	m_arrBeams.push_back(pBeam);
+	int nIndex = (int) m_arrBeams.size();
 	pBeam->SetPlan(this);
 
 	// a change has occurred, so fire
 	// GetChangeEvent().Fire();
 
 	return nIndex;
-
-}	// CPlan::AddBeam
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 VolumeReal * 
-	CPlan::GetDoseMatrix()
+	Plan::GetDoseMatrix()
 {
 	// total the dose for all beams
 	if (GetBeamCount() > 0)
@@ -159,11 +144,11 @@ VolumeReal *
 
 	return m_pDose;
 
-}	// CPlan::GetDoseMatrix
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 void 
-	CPlan::UpdateAllHisto()
+	Plan::UpdateAllHisto()
 {
 #ifdef USE_RTOPT
 	// first recalc dose matrix
@@ -176,7 +161,7 @@ void
 	while (pos != NULL)
 	{
 		m_mapHistograms.GetNextAssoc(pos, strName, pHisto);
-		pHisto->OnVolumeChange(NULL, NULL);
+		pHisto->OnVolumeChange(); // NULL, NULL);
 	}
 #endif
 }
@@ -184,7 +169,7 @@ void
 
 ///////////////////////////////////////////////////////////////////////////////
 void
-	CPlan::SetDoseResolution(const REAL& res)
+	Plan::SetDoseResolution(const REAL& res)
 	// sets shape for dose matrix
 {
 	m_DoseResolution = res;
@@ -213,12 +198,12 @@ void
 	m_pDose->SetSpacing(
 		MakeVector<3>(m_DoseResolution, m_DoseResolution, m_DoseResolution));
 
-}	// CPlan::SetDoseResolution
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////
 CHistogram *
-	CPlan::GetHistogram(dH::Structure *pStructure, bool bCreate)
+	Plan::GetHistogram(dH::Structure *pStructure, bool bCreate)
 {
 	CHistogram *pHisto = NULL;
 #ifdef USE_RTOPT
@@ -255,11 +240,11 @@ CHistogram *
 
 	return pHisto;
 
-}	// CPlan::GetHistogram
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 void 
-	CPlan::RemoveHistogram(dH::Structure *pStructure)
+	Plan::RemoveHistogram(dH::Structure *pStructure)
 {
 #ifdef USE_RTOPT
 	CHistogram *pHisto = NULL;
@@ -269,13 +254,11 @@ void
 		delete pHisto;
 	}
 #endif
-}	// CPlan::RemoveHistogram
-
-
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 VolumeReal * 
-	CPlan::GetMassDensity()
+	Plan::GetMassDensity()
 	// used to format the mass density array, conformant to dose matrix
 {
 	// fix mass density
@@ -306,147 +289,6 @@ VolumeReal *
 
 	return m_pMassDensity;
 
-}	// CPlan::GetMassDensity
-
-#ifdef USE_MFC_SERIALIZATION
-
-/////////////////////////////////////////////////////////////////////////////
-// CPlan serialization
-
-#define PLAN_SCHEMA 5
-	// Schema 1: initial plan schema
-	// Schema 2: + target DVH curves
-	// Schema 3: + number of fields
-	// Schema 4: + target DVH count
-	// Schema 5: + DVHs
-
-IMPLEMENT_SERIAL(CPlan, CModelObject, VERSIONABLE_SCHEMA | PLAN_SCHEMA)
-
-///////////////////////////////////////////////////////////////////////////////
-// CPlan::Serialize
-// 
-// <description>
-///////////////////////////////////////////////////////////////////////////////
-void CPlan::Serialize(CArchive& ar)
-{
-	// schema for the plan object
-	UINT nSchema = ar.IsLoading() ? ar.GetObjectSchema() : PLAN_SCHEMA;
-
-	CModelObject::Serialize(ar);
-
-	if (ar.IsLoading())
-	{
-		// now clear out any existing beams
-		m_arrBeams.RemoveAll();
-	}
-
-	m_arrBeams.Serialize(ar);
-
-	if (ar.IsLoading())
-	{
-		// set up as change listener for beams
-		for (int nAt = 0; nAt < GetBeamCount(); nAt++)
-		{
-			GetBeamAt(nAt)->SetPlan(this);
-		}
-	}
-
-	// DEPRACATED flag to serialize dose matrix
-	BOOL bDoseValid = FALSE; 
-	SERIALIZE_VALUE(ar, bDoseValid);
-
-	// serialize the dose matrix
-	SerializeVolume<VOXEL_REAL>(ar, m_pDose);
-
-	// for the schema 2, serialize target DVHs
-	if (nSchema >= 2)
-	{
-		if (ar.IsLoading())
-		{
-			int nCount = 0;
-			if (nSchema >= 4)
-			{
-				ar >> nCount;
-			}
-
-			for (int nAt = 0; nAt < nCount; nAt++)
-			{
-				CString strStructureName;
-				ar >> strStructureName;
-
-				CMatrixNxM<> mTargetDVH;
-				ar >> mTargetDVH;
-			}
-		}
-		else 
-		{
-			if (nSchema >= 4)
-			{
-				// DEPRECATED
-				// ar << m_mapTargetDVHs.GetCount();
-				ar << 0;
-			}
-		}
-	}
-
-	if (nSchema >= 3)
-	{
-		int m_nFields = 0;
-		SERIALIZE_VALUE(ar, m_nFields);
-	}
-
-	if (nSchema >= 5)
-	{
-		SERIALIZE_VALUE(ar, m_pSeries);
-		ASSERT(m_pSeries != NULL);
-
-		m_mapHistograms.Serialize(ar);
-
-		if (ar.IsLoading())
-		{
-#ifdef USE_RTOPT
-			// set up regions and volumes for histograms
-			//		because serialization doesn't restore this
-			POSITION pos = m_mapHistograms.GetStartPosition();
-			while (NULL != pos)
-			{
-				CString strName;
-				CHistogram *pHistogram = NULL;
-				m_mapHistograms.GetNextAssoc(pos, strName, pHistogram); 
-
-				// set volume
-				pHistogram->SetVolume(GetDoseMatrix());
-
-				// set region
-				dH::Structure *pStruct = GetSeries()->GetStructureFromName(strName);
-				VolumeReal *pConformRegion = pStruct->GetConformRegion(GetDoseMatrix());
-				pHistogram->SetRegion(pConformRegion);
-			}
-#endif
-		}
-	}
-
-}	// CPlan::Serialize
-
-#endif
-
-
-/////////////////////////////////////////////////////////////////////////////
-// CPlan diagnostics
-
-#ifdef _DEBUG
-void CPlan::AssertValid() const
-{
-	CModelObject::AssertValid();
 }
 
-void CPlan::Dump(CDumpContext& dc) const
-{
-	CModelObject::Dump(dc);
-
-	int nOrigDepth = dc.GetDepth();
-	dc.SetDepth(nOrigDepth + 1);
-
-	dc.SetDepth(nOrigDepth);
-}
-#endif //_DEBUG
+}	// namespace dH

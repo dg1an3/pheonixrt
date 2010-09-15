@@ -290,19 +290,39 @@
 				>
 			</File>
 			<File
+				RelativePath="..\OptimizeN\ConjGradOptimizer.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\EnergyDepKernel.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\ModelObject.cpp"
+				RelativePath="..\RtOptimizer\Histogram.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Observer.cpp"
+				RelativePath="..\RtOptimizer\HistogramGradient.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\RtOptimizer\KLDivTerm.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\OptimizeN\ObjectiveFunction.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\Plan.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\RtOptimizer\PlanOptimizer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\RtOptimizer\PlanPyramid.cpp"
 				>
 			</File>
 			<File
@@ -311,6 +331,10 @@
 			</File>
 			<File
 				RelativePath=".\Polygon.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\RtOptimizer\Prescription.cpp"
 				>
 			</File>
 			<File
@@ -361,6 +385,10 @@
 				RelativePath=".\Structure.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\RtOptimizer\VOITerm.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -376,19 +404,39 @@
 				>
 			</File>
 			<File
+				RelativePath="..\OptimizeN\include\ConjGradOptimizer.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\EnergyDepKernel.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\ModelObject.h"
+				RelativePath="..\RtOptimizer\include\Histogram.h"
 				>
 			</File>
 			<File
-				RelativePath=".\include\Observer.h"
+				RelativePath="..\RtOptimizer\include\HistogramGradient.h"
+				>
+			</File>
+			<File
+				RelativePath="..\RtOptimizer\include\KLDivTerm.h"
+				>
+			</File>
+			<File
+				RelativePath="..\OptimizeN\include\ObjectiveFunction.h"
 				>
 			</File>
 			<File
 				RelativePath=".\include\Plan.h"
+				>
+			</File>
+			<File
+				RelativePath="..\RtOptimizer\include\PlanOptimizer.h"
+				>
+			</File>
+			<File
+				RelativePath="..\RtOptimizer\include\PlanPyramid.h"
 				>
 			</File>
 			<File
@@ -397,6 +445,10 @@
 			</File>
 			<File
 				RelativePath=".\include\Polygon.h"
+				>
+			</File>
+			<File
+				RelativePath="..\RtOptimizer\include\Prescription.h"
 				>
 			</File>
 			<File
@@ -413,6 +465,10 @@
 			</File>
 			<File
 				RelativePath=".\include\Structure.h"
+				>
+			</File>
+			<File
+				RelativePath="..\RtOptimizer\include\VOITerm.h"
 				>
 			</File>
 		</Filter>

@@ -20,7 +20,7 @@ public:
 
 	virtual const CMatrixNxM<>& GetDataMatrix();
 
-	void OnHistogramChanged(CObservableEvent *, void *);
+	void OnHistogramChanged(); // CObservableEvent *, void *);
 
 private:
 //	CHistogram *m_pHisto;

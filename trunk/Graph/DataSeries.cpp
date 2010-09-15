@@ -30,7 +30,7 @@ void
 	m_Color = color;
 	// GetChangeEvent().Fire();
 	if (m_pGraph)
-		m_pGraph->OnDataSeriesChanged(NULL, NULL);
+		m_pGraph->OnDataSeriesChanged(); // NULL, NULL);
 
 }	// CDataSeries::SetColor
 
@@ -54,7 +54,7 @@ void
 	// notify
 	// GetChangeEvent().Fire();
 	if (m_pGraph)
-		m_pGraph->OnDataSeriesChanged(NULL, NULL);
+		m_pGraph->OnDataSeriesChanged(); // NULL, NULL);
 
 }	// CDataSeries::SetDataMatrix
 

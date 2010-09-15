@@ -5,12 +5,12 @@
 //#include <VectorD.h>
 #include <MatrixNxM.h>
 
-#include <ModelObject.h>
+// #include <ModelObject.h>
 // #include <Attributes.h>
 
 class CGraph;
 
-class CDataSeries : public CModelObject
+class CDataSeries : public itk::DataObject
 {
 public:
 	CDataSeries(void);

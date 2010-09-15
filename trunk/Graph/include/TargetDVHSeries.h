@@ -15,11 +15,12 @@ public:
 	CTargetDVHSeries(dH::KLDivTerm *pKLDT);
 	virtual ~CTargetDVHSeries(void);
 
+	virtual const CMatrixNxM<>& GetDataMatrix();
 	virtual void SetDataMatrix(const CMatrixNxM<>& mData);
 
 #ifdef USE_RTOPT
 	// stores pointer to term
 	dH::KLDivTerm *m_pKLDivTerm;
 #endif
-	void OnKLDTChanged(CObservableEvent * pEv, void * pVoid);
+	void OnKLDTChanged(); // CObservableEvent * pEv, void * pVoid);
 };

@@ -11,15 +11,22 @@ CTargetDVHSeries::CTargetDVHSeries(dH::KLDivTerm *pKLDT)
 #endif
 {
 #ifdef USE_RTOPT
-	m_pKLDivTerm->GetChangeEvent().AddObserver(this, 
-		(dH::ListenerFunction) &CTargetDVHSeries::OnKLDTChanged);
+	//m_pKLDivTerm->GetChangeEvent().AddObserver(this, 
+	//	(dH::ListenerFunction) &CTargetDVHSeries::OnKLDTChanged);
 #endif
 
-	OnKLDTChanged(NULL, NULL);
+	OnKLDTChanged(); // NULL, NULL);
 }
 
 CTargetDVHSeries::~CTargetDVHSeries(void)
 {
+}
+
+const CMatrixNxM<>& 
+	CTargetDVHSeries::GetDataMatrix()
+{
+	OnKLDTChanged(); // NULL, NULL);
+	return CDataSeries::GetDataMatrix();
 }
 
 void CTargetDVHSeries::SetDataMatrix(const CMatrixNxM<>& mData)
@@ -38,7 +45,7 @@ void CTargetDVHSeries::SetDataMatrix(const CMatrixNxM<>& mData)
 #endif
 }
 
-void CTargetDVHSeries::OnKLDTChanged(CObservableEvent * pEv, void * pVoid)
+void CTargetDVHSeries::OnKLDTChanged() // CObservableEvent * pEv, void * pVoid)
 {
 #ifdef USE_RTOPT
 		// m_mData.Reshape(0, 2);
@@ -62,11 +69,11 @@ void CTargetDVHSeries::OnKLDTChanged(CObservableEvent * pEv, void * pVoid)
 //		binValue += m_pHisto->GetBinWidth();
 	}	
 
-	if (m_pGraph)
-	{
-		m_pGraph->AutoScale();
-		m_pGraph->SetAxesMin(MakeVector<2>(0.0, 0.0));
-		m_pGraph->Invalidate(TRUE);
-	}
+	//if (m_pGraph)
+	//{
+	//	m_pGraph->AutoScale();
+	//	m_pGraph->SetAxesMin(MakeVector<2>(0.0, 0.0));
+	//	m_pGraph->Invalidate(TRUE);
+	//}
 #endif
 }

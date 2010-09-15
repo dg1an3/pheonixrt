@@ -248,14 +248,14 @@ void
 	m_pOptThread->SetPlanOpt(GetDocument()->m_pOptimizer.get());
 #endif
 
-	if (GetDocument()->m_pSeries.get())
+	if (GetDocument()->m_pSeries)
 	{
-		m_wndPlanarView.SetSeries(GetDocument()->m_pSeries.get());
+		m_wndPlanarView.SetSeries(GetDocument()->m_pSeries);
 		//m_wndPlanarView.SetVolume(GetDocument()->m_pSeries->GetDensity(), 0);
 		//m_wndPlanarView.m_pSeries = GetDocument()->m_pSeries.get();
 
 	}
-	if (GetDocument()->m_pPlan.get())
+	if (GetDocument()->m_pPlan)
 	{
 		m_wndPlanarView.SetVolume(GetDocument()->m_pPlan->GetDoseMatrix(), 1);
 	}
@@ -263,7 +263,7 @@ void
 
 	// set the initial view center
 	m_wndPlanarView.InitZoomCenter();
-	if (GetDocument()->m_pPlan.get()
+	if (GetDocument()->m_pPlan
 		&& GetDocument()->m_pPlan->GetBeamCount() > 0)
 	{
 		Vector<REAL> vIsocenter = GetDocument()->m_pPlan->GetBeamAt(0)->GetIsocenter();
@@ -398,7 +398,7 @@ LRESULT
 void 
 	CBrimstoneView::ScanBeamlets(int nLevel)
 {
-	CPlan *pPlan = GetDocument()->m_pPlan.get();
+	dH::Plan::Pointer pPlan = GetDocument()->m_pPlan;
 
 	if (nLevel == 0)
 	{

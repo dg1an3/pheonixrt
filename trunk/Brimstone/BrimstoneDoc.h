@@ -23,8 +23,8 @@ protected: // create from serialization only
 
 // Attributes
 public:
-	auto_ptr<dH::Series> m_pSeries;
-	auto_ptr<CPlan> m_pPlan;
+	dH::Series::Pointer m_pSeries;
+	dH::Plan::Pointer m_pPlan;
 
 #ifdef USE_RTOPT
 	// stores the PlanOptimizer object

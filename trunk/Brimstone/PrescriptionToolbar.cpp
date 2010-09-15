@@ -184,7 +184,7 @@ void
 	{
 		m_cbSSelect.ResetContent();
 
-		dH::Series *pSeries = GetDocument()->m_pSeries.get();
+		dH::Series::Pointer pSeries = GetDocument()->m_pSeries;
 		for (int nStruct = 0; nStruct < pSeries->GetStructureCount(); nStruct++)
 		{
 			dH::Structure *pStruct = pSeries->GetStructureAt(nStruct);

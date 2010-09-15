@@ -9,7 +9,7 @@
 
 #include <MatrixNxM.h>
 
-#include <ModelObject.h>
+// #include <ModelObject.h>
 #include <ItkUtils.h>
 
 //////////////////////////////////////////////////////////////////////
@@ -18,7 +18,7 @@
 // represents a polygon on a plane; includes change notification
 // and some computational geometry
 //////////////////////////////////////////////////////////////////////
-class CPolygon : public CModelObject
+class CPolygon : public itk::DataObject // CModelObject
 {
 public:
 	// constructors / destructors

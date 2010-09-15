@@ -11,34 +11,34 @@ namespace dH
 /**
  * Series groups structure and CT in to single object
  */
-class Series : public CModelObject
+class Series : public DataObject
 {
+	Series();    
 public:
-	Series();          
+	/** itk typedefs */
+	typedef Series Self;
+	typedef DataObject Superclass;
+	typedef SmartPointer<Self> Pointer;
+	typedef SmartPointer<const Self> ConstPointer;
 
-	/**
-	 * Volume data for the series
-	 */ 
+	/** defines itk's New and CreateAnother static functions */
+	itkNewMacro(Self);      
+
+	/** Volume data for the series */ 
 	VolumeReal *GetDensity();
 	void SetDensity(VolumeReal *pValue);
 
-	/**
-	 * Structures for the series
-	 */
+	/** Structures for the series */
 	int GetStructureCount() const;
 	Structure * GetStructureAt(int nAt);
 	Structure * GetStructureFromName(const std::string &strName);
 	void AddStructure(Structure *pStruct);
 
 private:
-	/**
-	 * density volume for the series
-	 */
+	/** density volume for the series */
 	VolumeReal::Pointer m_pDensity;
 
-	/**
-	 * the structure array
-	 */
+	/** the structure array */
 	std::vector<Structure::Pointer> m_arrStructures;
 };
 

@@ -3,7 +3,7 @@
 #if !defined(_STRUCTURE_H__INCLUDED_)
 #define _STRUCTURE_H__INCLUDED_
 
-#include <ModelObject.h>
+// #include <ModelObject.h>
 
 #include <Polygon.h>
 #include <ItkUtils.h>
@@ -21,7 +21,7 @@ class Series;
  * represents a structure (ROI) defined in the CT coordinate system.
  * read in as a stack a contours, it is converted to a binary volume
  */
-class Structure : public ModelObject
+class Structure : public itk::DataObject
 {
 	Structure();
 	virtual ~Structure();
@@ -29,7 +29,7 @@ class Structure : public ModelObject
 public:
 	/** itk typedefs */
 	typedef Structure Self;
-	typedef ModelObject Superclass;
+	typedef itk::DataObject Superclass;
 	typedef SmartPointer<Self> Pointer;
 	typedef SmartPointer<const Self> ConstPointer;
 

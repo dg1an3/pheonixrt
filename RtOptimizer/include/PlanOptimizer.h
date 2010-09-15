@@ -52,14 +52,12 @@ protected:
 	void GetInitStateVector(CVectorN<>& vInit);
 
 	// helper functions for state vector
-	//void StateVectorToBeamletWeights(int nScale, const CVectorN<>& vState, CMatrixNxM<>& mBeamletWeights);
 	void StateVectorToIntensityMap(int nScale, int nBeam,
 		const CVectorN<>& vState, 
 		CBeam::IntensityMap *pIntensityMap); // CMatrixNxM<>& mBeamletWeights)
 
-	// void BeamletWeightsToStateVector(int nScale, const CMatrixNxM<>& mBeamletWeights, CVectorN<>& vState);
 	void IntensityMapToStateVector(int nScale, int nBeam,
-			const CBeam::IntensityMap *pIntensityMap/*CMatrixNxM<>& mBeamletWeights */, CVectorN<>& vState);
+			const CBeam::IntensityMap *pIntensityMap, CVectorN<>& vState);
 
 private:
 	// pointers to the other prescription objects

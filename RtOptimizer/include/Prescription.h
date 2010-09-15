@@ -1,6 +1,6 @@
 // Copyright (C) 2nd Messenger Systems - U. S. Patent 7,369,645
 // $Id: Prescription.h 640 2009-06-13 05:06:50Z dglane001 $
-#include <ModelObject.h>
+// #include <ModelObject.h>
 
 #include <ObjectiveFunction.h>
 #include <Optimizer.h>

@@ -293,7 +293,7 @@ void
 		// calculate the variance range for this level
 		const REAL sigma = GetProfileRealAt(LEVELSIGMA_KEY, nLevel, DEFAULT_LEVELSIGMA[nLevel]);
 		const REAL binVar = pow(GBinSigma / sigma, 2);
-		const REAL varMin = binVar * 0.125;
+		const REAL varMin = binVar * 0.25;
 		const REAL varMax = binVar;
 
 		// set the variance range in the objective function
@@ -359,17 +359,6 @@ void
 		}
 	}
 
-	//int nBeamletOffset = nBeamletCount / 2;
-	//mBeamletWeights.Reshape(pPlan->GetBeamCount(), nBeamletCount);
-	//for (int nAtElem = 0; nAtElem < pPlan->GetTotalBeamletCount(); nAtElem++)
-	//{
-	//	int nBeam;
-	//	int nBeamlet;
-	//	GetPrescription(nScale)->GetBeamletFromSVElem(nAtElem, &nBeam, &nBeamlet);
-
-	//	mBeamletWeights[nBeam][nBeamlet + nBeamletOffset] = vState[nAtElem];
-	//}
-
 }	// PlanOptimizer::StateVectorToBeamletWeights
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -396,19 +385,6 @@ void
 			vState[nAtElem] = pIntensityMap->GetBufferPointer()[nCurrBeamlet + nBeamletOffset];
 		}
 	}
-
-	//CPlan *pPlan = GetPyramid()->GetPlan(nScale);
-	//int nBeamletCount = pPlan->GetBeamAt(0)->GetBeamletCount();
-	//vState.SetDim(pPlan->GetTotalBeamletCount());
-	//int nBeamletOffset = nBeamletCount / 2;
-	//for (int nAtElem = 0; nAtElem < pPlan->GetTotalBeamletCount(); nAtElem++)
-	//{
-	//	int nBeam;
-	//	int nBeamlet;
-	//	GetPrescription(nScale)->GetBeamletFromSVElem(nAtElem, &nBeam, &nBeamlet);
-
-	//	vState[nAtElem] = mBeamletWeights[nBeam][nBeamlet + nBeamletOffset];
-	//}
 
 }	// PlanOptimizer::BeamletWeightsToStateVector
 

@@ -41,9 +41,6 @@ void
 
 
 	// generate sub-plans
-	//for (int nLevel = 1; nLevel < m_arrPlans.size(); nLevel++)
-	//	delete m_arrPlans[nLevel];
-	//m_arrPlans.clear();
 	CPlan *pPrevPlan = GetPlan();
 	if (m_arrPlans.size() == 0)
 		m_arrPlans.push_back(pPrevPlan);
@@ -68,10 +65,10 @@ void
 		for (int nAt = 0; nAt < GetPlan()->GetBeamCount(); nAt++)
 		{
 			CBeam *pPrevBeam = pPrevPlan->GetBeamAt(nAt);
-			CBeam *pNextBeam = NULL;
+			CBeam::Pointer pNextBeam;
 			if (pNextPlan->GetBeamCount() <= nAt)
 			{
-				pNextBeam = new CBeam(/*pPrevBeam*/);
+				pNextBeam = dH::Beam::New(); // CBeam(/*pPrevBeam*/);
 				// need to add the beam first, because the plan is needed to set gantry angle
 				pNextPlan->AddBeam(pNextBeam);
 			}
@@ -99,94 +96,10 @@ CPlan *
 
 }	// PlanPyramid::SetPlan
 
-REAL GetSliceMax(VolumeReal *pVol, int nSlice)
-{
-	typedef itk::ImageRegionConstIterator< VolumeReal > ConstIteratorType;
-	typedef itk::ImageRegionIterator< VolumeReal > IteratorType;
-
-	VolumeReal::RegionType inputRegion;
-	VolumeReal::RegionType::IndexType inputStart = pVol->GetBufferedRegion().GetIndex();
-	inputStart[0] = 0;
-	inputStart[1] = 0;
-	inputStart[2] = nSlice;
-
-	VolumeReal::RegionType::SizeType size = pVol->GetBufferedRegion().GetSize();
-	//size[0] = ;
-	//size[1] = ;
-	size[2] = 1;
-
-	inputRegion.SetSize( size );
-	inputRegion.SetIndex( inputStart );
-
-	ConstIteratorType inputIt( pVol, inputRegion );
-
-	REAL maxVoxel = -1e+6;
-	for ( inputIt.GoToBegin(); !inputIt.IsAtEnd(); ++inputIt)
-	{
-		maxVoxel = __max(inputIt.Get(), maxVoxel);
-	}
-
-	return maxVoxel;
-}
-
-
 ///////////////////////////////////////////////////////////////////////////////
 void 
 	PlanPyramid::CalcPencilSubBeamlets(int nBeam)
 {
-	// this re-generates all sub-plans
-	// SetPlan(m_pPlan);
-
-	//REAL doseResolution = GetPlan()->GetDoseResolution();
-	//CPlan *pPrevPlan = GetPlan();
-	//for (int nLevel = 1; nLevel < MAX_SCALES; nLevel++)
-	//{
-	//	doseResolution *= 2.0;
-	//	CPlan *pNextPlan = GetPlan(nLevel); // new CPlan();
-	//	//pNextPlan->SetSeries(m_pPlan->GetSeries());
-	//	//pNextPlan->SetDoseResolution(doseResolution);
-	//	//for (int nAt = 0; nAt < GetPlan()->GetBeamCount(); nAt++)
-	//	//{
-	//		CBeam *pPrevBeam = pPrevPlan->GetBeamAt(nBeam);
-	//		CBeam *pNextBeam = new CBeam(/*pPrevBeam*/);
-	//		// need to add the beam first, because the plan is needed to set gantry angle
-	//		pNextPlan->AddBeam(pNextBeam);
-
-	//		pNextBeam->SetGantryAngle(pPrevBeam->GetGantryAngle());
-	//		pNextBeam->SetIsocenter(pPrevBeam->GetIsocenter());
-
-	//	// }
-	//	//m_arrPlans.push_back(pNextPlan);
-	//	pPrevPlan = pNextPlan;
-	//}
-
-	// TODO: fix this -- should actually check whether beamlets need recalc
-	//if (GetPlan(1)->GetBeamCount() > 0)
-	//	return;
-
-#ifdef NEVER
-	// replicated from SetPlan
-	CPlan *pPrevPlan = m_pPlan;
-	for (int nLevel = 1; nLevel < MAX_SCALES; nLevel++)
-	{
-		CPlan *pNextPlan = GetPlan(nLevel); // new CPlan();
-		pNextPlan->m_arrBeams.RemoveAll();
-		ASSERT(pNextPlan->GetBeamCount() == 0);
-
-		// pNextPlan->SetSeries(m_pPlan->GetSeries());
-		for (int nAt = 0; nAt < GetPlan()->GetBeamCount(); nAt++)
-		{
-			CBeam *pPrevBeam = pPrevPlan->GetBeamAt(nAt);
-			CBeam *pNextBeam = new CBeam(/*pPrevBeam*/);
-			// need to add the beam first, because the plan is needed to set gantry angle
-			pNextPlan->AddBeam(pNextBeam);
-
-			pNextBeam->SetGantryAngle(pPrevBeam->GetGantryAngle());
-			pNextBeam->SetIsocenter(pPrevBeam->GetIsocenter());
-		}
-	}
-#endif
-
 	// make sure pencil subbeamlets are properly generated
 	for (int nAt = ((nBeam == -1) ? (GetPlan()->GetBeamCount()-1) : nBeam); nAt >= ((nBeam == -1) ? 0 : nBeam); nAt--)
 	{
@@ -197,8 +110,7 @@ void
 			return;
 
 			// stores beamlet count for level N
-		int nBeamletCount = /*m_nBeamletCount*/ // 5; // 
-			19;
+		int nBeamletCount = 19;
 		// TODO: reconcile this with nBeamletCount used in PlanPyramid
 
 		REAL beamletSpacing = 4.0; // 2.0;
@@ -293,32 +205,6 @@ void
 
 				// check that resolution is correct
 				ASSERT(pBeamSub->GetBeamlet(nAtShift)->GetSpacing()[0] == pBeamSub->GetPlan()->GetDoseResolution());
-
-				//pPyramid->SetOutput(0, NULL);
-				//pPyramid->GetOutput(1)->DisconnectPipeline();
-				//pPyramid->GetOutput(0)->DisconnectPipeline();
-				// pPyramid->SetInput(NULL);
-
-				// explicitly release: why?
-				// pPyramid->UnRegister();
-				//pPyramid = NULL;
-
-				//VolumeReal *pOutput = pBeamSub->GetBeamlet(nAtShift);
-				//REAL maxOutput = GetSliceMax(pOutput, 0);
-				//REAL maxInput = GetSliceMax(beamlet, 0);
-
-				//VolumeReal::RegionType inputRegion;
-				//VolumeReal::RegionType::IndexType inputStart = pOutput->GetBufferedRegion().GetIndex();
-				//VolumeReal::RegionType::SizeType size = pOutput->GetBufferedRegion().GetSize();
-
-				//inputRegion.SetSize( size );
-				//inputRegion.SetIndex( inputStart );
-
-				//VolumeRealIterator voxelIt( pOutput, inputRegion );
-				//for ( voxelIt.GoToBegin(); !voxelIt.IsAtEnd(); ++voxelIt)
-				//{
-				//	voxelIt.Set(voxelIt.Get() / maxOutput * maxInput);
-				//}
 			}
 		}
 
@@ -376,90 +262,7 @@ PlanPyramid::InvFiltIntensityMap(int nLevel, const CBeam::IntensityMap * vWeight
 	}
 #endif
 
-// #define FUCK_FILTER
-#ifdef FUCK_FILTER
-	{
-	typedef itk::ResampleImageFilter<CBeam::IntensityMap, CBeam::IntensityMap> ResamplerType;
-	ResamplerType::Pointer filter = ResamplerType::New();
-
-	typedef itk::AffineTransform< REAL, 1 > TransformType;
-	TransformType::Pointer transform = TransformType::New();
-	transform->SetIdentity();
-	filter->SetTransform( transform );
-
-	typedef itk::LinearInterpolateImageFunction<CBeam::IntensityMap, REAL> InterpolatorType;
-	InterpolatorType::Pointer interpolator = InterpolatorType::New();
-	filter->SetInterpolator( interpolator );
-
-	filter->SetDefaultPixelValue( 1e-4 );
-
-	filter->SetInput(vWeights);
-	filter->SetReferenceImage(vFiltWeights);
-	filter->SetUseReferenceImage(true);
-	// filter->SetOutputParametersFromImage( vFiltWeights );
-
-	//filter->SetOutputSpacing( vFiltWeights->GetSpacing() );
-	//filter->SetOutputOrigin(  vFiltWeights->GetOrigin() );
-	//filter->GetOutput()->SetRegions(vFiltWeights->GetBufferedRegion());
-	//filter->GetOutput()->Allocate();
-	// filter->SetSize( vFiltWeights->GetBufferedRegion() );
-
-	filter->Update();
-
-
-	CBeam::IntensityMap::Pointer ptrOutput = filter->GetOutput();
-	ASSERT(ptrOutput->GetBufferedRegion().GetSize()[0] == vFiltWeights->GetBufferedRegion().GetSize()[0]);
-	for (int nAt = 0; nAt < vFiltWeights->GetBufferedRegion().GetSize()[0]; nAt++)
-	{
-		vFiltWeights->GetBufferPointer()[nAt] = /*2.0 **/ ptrOutput->GetBufferPointer()[nAt];
-		ASSERT(_finite(vFiltWeights->GetBufferPointer()[nAt]));
-	}
-	TRACE("1 Input int map: ");
-	for (int nAt = 0; nAt < vWeights->GetBufferedRegion().GetSize()[0]; nAt++)
-	{
-		TRACE("%f\t", vWeights->GetBufferPointer()[nAt]);
-	}
-	TRACE("\n1Output int map: ");
-	for (int nAt = 0; nAt < vFiltWeights->GetBufferedRegion().GetSize()[0]; nAt++)
-	{
-		TRACE("%f\t", vFiltWeights->GetBufferPointer()[nAt]);
-	}
-	}
-#endif
 
 }	// PlanPyramid::InvFiltIntensityMap
-//
-/////////////////////////////////////////////////////////////////////////////////
-//const CMatrixNxM<>& 
-//	PlanPyramid::GetFilterMat(int nLevel)
-//{
-//	int nBeamletCount = GetPlan(nLevel)->GetBeamAt(0)->GetBeamletCount();
-//
-//	if (m_mFilter[nLevel].GetCols() != nBeamletCount)
-//	{
-//		// set up the filter matrix
-//		m_mFilter[nLevel].Reshape(nBeamletCount, nBeamletCount);
-//		ZeroMemory(m_mFilter[nLevel], 
-//			m_mFilter[nLevel].GetRows() * m_mFilter[nLevel].GetCols() * sizeof(REAL));
-//
-//		for (int nAt = 0; nAt < m_mFilter[nLevel].GetRows(); nAt++)
-//		{
-//			if (nAt > 0)
-//			{
-//				m_mFilter[nLevel][nAt - 1][nAt] = m_vWeightFilter[0];
-//			}
-//
-//			m_mFilter[nLevel][nAt][nAt] = m_vWeightFilter[1];
-//
-//			if (nAt < m_mFilter[nLevel].GetRows()-1)
-//			{
-//				m_mFilter[nLevel][nAt + 1][nAt] = m_vWeightFilter[2];
-//			}
-//		}
-//	}
-//
-//	return m_mFilter[nLevel];
-//
-//}	// PlanPyramid::GetFilterMat
 
 }	// namespace dH

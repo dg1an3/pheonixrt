@@ -4,7 +4,7 @@
 
 #include <VectorN.h>
 #include <ItkUtils.h>
-#include <ModelObject.h>
+// #include <ModelObject.h>
 
 const REAL GBINS_BUFFER = R(8.0);
 
@@ -14,7 +14,7 @@ const REAL GBINS_BUFFER = R(8.0);
 // forms a histogram of a volume, possibly within a "region" which
 //		is a binary volume
 //////////////////////////////////////////////////////////////////////
-class CHistogram : public CModelObject  
+class CHistogram : public itk::DataObject  
 {
 public:
 	// constructor from a volume and a "region"
@@ -58,7 +58,7 @@ public:
 	void SetVarFracVolumes(VolumeReal *pVarMinVolume, VolumeReal *pVarMaxVolume);
 
 	// returns a reference to change event representing changes in binning parameters
-	CObservableEvent& GetBinningChangeEvent() { return m_eventBinningChange; }
+	// CObservableEvent& GetBinningChangeEvent() { return m_eventBinningChange; }
 
 	// accessors for bin data
 	const CVectorN<>& GetBins() const;
@@ -76,10 +76,10 @@ public:
 							CVectorN<>& buffer_out) const;
 
 	// change handler for when the volume or region changes
-	void OnVolumeChange(CObservableEvent *pSource, void *);
+	void OnVolumeChange(); // CObservableEvent *pSource, void *);
 
 	// called when region updated
-	void OnRegionChanged(CObservableEvent * pEvt, void * pParam);
+	void OnRegionChanged(); // CObservableEvent * pEvt, void * pParam);
 
 protected:
 
@@ -93,7 +93,7 @@ protected:
 	REAL m_binWidth;
 
 	// the change event for this object
-	CObservableEvent m_eventBinningChange;
+	// CObservableEvent m_eventBinningChange;
 
 	mutable CVectorN<> m_arrBins;
 	mutable CVectorN<> m_arrBinsVarMax;

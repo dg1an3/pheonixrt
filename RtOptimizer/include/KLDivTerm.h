@@ -33,10 +33,11 @@ public:
 	REAL GetMinDose(void) const;
 	REAL GetMaxDose(void) const;	
 	
+private:
 	// accessor for target bins
 	const CVectorN<>& GetTargetBins() const;
 	const CVectorN<>& GetTargetGBins() const;
-
+public:
 	// evaluates the term
 	virtual REAL Eval(CVectorN<> *pvGrad, const CArray<BOOL, BOOL>& arrInclude);
 
@@ -44,7 +45,7 @@ public:
 	virtual VOITerm *Clone();
 
 	// change handler for when the volume or region changes
-	void OnHistogramBinningChange(CObservableEvent *pSource = NULL, void *pVoid = NULL);
+	void OnHistogramBinningChange(); // CObservableEvent *pSource = NULL, void *pVoid = NULL);
 
 private:
 	// DVPs

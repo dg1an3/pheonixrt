@@ -282,38 +282,6 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\OptimizeN\ConjGradOptimizer.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Histogram.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\HistogramGradient.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\KLDivTerm.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\OptimizeN\ObjectiveFunction.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\PlanOptimizer.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\PlanPyramid.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Prescription.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\stdafx.cpp"
 				>
 				<FileConfiguration
@@ -349,10 +317,6 @@
 					/>
 				</FileConfiguration>
 			</File>
-			<File
-				RelativePath=".\VOITerm.cpp"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -360,43 +324,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\OptimizeN\include\ConjGradOptimizer.h"
-				>
-			</File>
-			<File
-				RelativePath=".\include\Histogram.h"
-				>
-			</File>
-			<File
-				RelativePath=".\include\HistogramGradient.h"
-				>
-			</File>
-			<File
-				RelativePath=".\include\KLDivTerm.h"
-				>
-			</File>
-			<File
-				RelativePath="..\OptimizeN\include\ObjectiveFunction.h"
-				>
-			</File>
-			<File
-				RelativePath=".\include\PlanOptimizer.h"
-				>
-			</File>
-			<File
-				RelativePath=".\include\PlanPyramid.h"
-				>
-			</File>
-			<File
-				RelativePath=".\include\Prescription.h"
-				>
-			</File>
-			<File
 				RelativePath=".\stdafx.h"
-				>
-			</File>
-			<File
-				RelativePath=".\include\VOITerm.h"
 				>
 			</File>
 		</Filter>

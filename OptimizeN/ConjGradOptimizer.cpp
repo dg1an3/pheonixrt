@@ -279,7 +279,7 @@ void
 	{
 		REAL scale = 1.0;
 		if (nScale < num_iterations_)
-			scale = pow(1.5, nScale) / pow(1.5, (double) num_iterations_);
+			scale = pow(4.0, nScale) / pow(4.0, (double) num_iterations_);
 
 		mScaling(nScale, nScale) = 1.0 / (scale * (m_varMax - m_varMin) + m_varMin);
 	}

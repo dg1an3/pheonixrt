@@ -10,7 +10,7 @@
 //#include <VectorD.h>
 #include <MatrixNxM.h>
 
-#include <ModelObject.h>
+//#include <ModelObject.h>
 
 // #include <Histogram.h>
 
@@ -94,7 +94,7 @@ public:
 	GraphCoord FromPlotCoord(const CPoint& vCoord);
 
 	// called when one of my data series changes
-	void OnDataSeriesChanged(CObservableEvent * pOE, void * pParam);
+	void OnDataSeriesChanged(); // CObservableEvent * pOE, void * pParam);
 
 private:
 	// the array of data series

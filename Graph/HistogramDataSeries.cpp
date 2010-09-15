@@ -67,7 +67,7 @@ const CMatrixNxM<>&
 
 ////////////////////////////////////////////////////////////////////////////
 void 
-	CHistogramDataSeries::OnHistogramChanged(CObservableEvent *, void *)
+	CHistogramDataSeries::OnHistogramChanged() // CObservableEvent *, void *)
 {
 	// flag recalc
 	m_bRecalcCurve = true;
@@ -75,7 +75,7 @@ void
 	// propagate change
 	// GetChangeEvent().Fire();
 	if (m_pGraph)
-		m_pGraph->OnDataSeriesChanged(NULL, NULL);
+		m_pGraph->OnDataSeriesChanged(); // NULL, NULL);
 
 }	// CHistogramDataSeries::OnHistogramChanged
 

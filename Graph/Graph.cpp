@@ -70,7 +70,7 @@ void CGraph::AddDataSeries(CDataSeries *pSeries)
 	// AddObserver(&pSeries->GetChangeEvent(), this, &CGraph::OnDataSeriesChanged);
 
 	m_arrDataSeries.Add(pSeries);
-	OnDataSeriesChanged(NULL, NULL);
+	OnDataSeriesChanged(); // NULL, NULL);
 
 }	// CGraph::AddDataSeries
 
@@ -624,7 +624,7 @@ CGraph::GraphCoord
 
 ////////////////////////////////////////////////////////////////////////////
 void 
-	CGraph::OnDataSeriesChanged(CObservableEvent * pOE, void * pParam)
+	CGraph::OnDataSeriesChanged() // CObservableEvent * pOE, void * pParam)
 	// called when one of my data series changes
 {
 	AutoScale();

@@ -48,7 +48,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\GenImaging\include;..\Graph\include;..\RtOptimizer\include;..\RtModel\include;..\OptimizeN\include;&quot;$(DCMTK_DIR)\dcmimgle\include&quot;;&quot;$(DCMTK_DIR)\dcmdata\include&quot;;&quot;$(DCMTK_DIR)\ofstd\include&quot;;&quot;$(DCMTK_DIR)\config\include&quot;;&quot;$(ITK_DIR)\Code\Algorithms&quot;;&quot;$(ITK_DIR)\Code\BasicFilters&quot;;&quot;$(ITK_DIR)\Code\Common&quot;;&quot;$(ITK_BUILD_DIR)&quot;;&quot;$(ITK_DIR)\Utilities\vxl\vcl&quot;;&quot;$(ITK_BUILD_DIR)\Utilities\vxl\vcl&quot;;&quot;$(ITK_DIR)\Utilities\vxl\core&quot;;&quot;$(ITK_BUILD_DIR)\Utilities\vxl\core&quot;"
+				AdditionalIncludeDirectories="..\Graph\include;..\RtOptimizer\include;..\RtModel\include;..\OptimizeN\include;&quot;$(DCMTK_DIR)\dcmimgle\include&quot;;&quot;$(DCMTK_DIR)\dcmdata\include&quot;;&quot;$(DCMTK_DIR)\ofstd\include&quot;;&quot;$(DCMTK_DIR)\config\include&quot;;&quot;$(ITK_DIR)\Code\Algorithms&quot;;&quot;$(ITK_DIR)\Code\BasicFilters&quot;;&quot;$(ITK_DIR)\Code\Common&quot;;&quot;$(ITK_BUILD_DIR)&quot;;&quot;$(ITK_DIR)\Utilities\vxl\vcl&quot;;&quot;$(ITK_BUILD_DIR)\Utilities\vxl\vcl&quot;;&quot;$(ITK_DIR)\Utilities\vxl\core&quot;;&quot;$(ITK_BUILD_DIR)\Utilities\vxl\core&quot;"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;USE_IPP;SBYTE_DEFINED;USE_RTOPT"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -220,7 +220,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\GenImaging\include;..\Graph\include;..\RtOptimizer\include;..\RtModel\include;..\OptimizeN\include;&quot;$(DCMTK_DIR)\dcmimgle\include&quot;;&quot;$(DCMTK_DIR)\dcmdata\include&quot;;&quot;$(DCMTK_DIR)\ofstd\include&quot;;&quot;$(DCMTK_DIR)\config\include&quot;;&quot;$(ITK_DIR)\Code\Algorithms&quot;;&quot;$(ITK_DIR)\Code\BasicFilters&quot;;&quot;$(ITK_DIR)\Code\Common&quot;;&quot;$(ITK_BUILD_DIR)&quot;;&quot;$(ITK_DIR)\Utilities\vxl\vcl&quot;;&quot;$(ITK_BUILD_DIR)\Utilities\vxl\vcl&quot;;&quot;$(ITK_DIR)\Utilities\vxl\core&quot;;&quot;$(ITK_BUILD_DIR)\Utilities\vxl\core&quot;"
+				AdditionalIncludeDirectories="..\Graph\include;..\RtOptimizer\include;..\RtModel\include;..\OptimizeN\include;&quot;$(DCMTK_DIR)\dcmimgle\include&quot;;&quot;$(DCMTK_DIR)\dcmdata\include&quot;;&quot;$(DCMTK_DIR)\ofstd\include&quot;;&quot;$(DCMTK_DIR)\config\include&quot;;&quot;$(ITK_DIR)\Code\Algorithms&quot;;&quot;$(ITK_DIR)\Code\BasicFilters&quot;;&quot;$(ITK_DIR)\Code\Common&quot;;&quot;$(ITK_BUILD_DIR)&quot;;&quot;$(ITK_DIR)\Utilities\vxl\vcl&quot;;&quot;$(ITK_BUILD_DIR)\Utilities\vxl\vcl&quot;;&quot;$(ITK_DIR)\Utilities\vxl\core&quot;;&quot;$(ITK_BUILD_DIR)\Utilities\vxl\core&quot;"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;USE_IPP;SBYTE_DEFINED;USE_RTOPT"
 				MinimalRebuild="false"
 				RuntimeLibrary="2"

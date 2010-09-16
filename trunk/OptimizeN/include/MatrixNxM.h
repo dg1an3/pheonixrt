@@ -7,7 +7,7 @@
 
 #include "VectorN.h"
 
-#include "MatrixOps.h"
+// #include "MatrixOps.h"
 
 //////////////////////////////////////////////////////////////////////
 // class CMatrixNxM<TYPE>

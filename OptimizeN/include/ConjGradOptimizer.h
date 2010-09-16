@@ -4,7 +4,9 @@
 #define CONJGRADOPTIMIZER_H
 
 // base class includes
-#include "Optimizer.h"
+//#include "Optimizer.h"
+#include <vnl/vnl_nonlinear_minimizer.h>
+#include "ObjectiveFunction.h"
 
 // subordinate brent optimizer
 // #include "BrentOptimizer.h"

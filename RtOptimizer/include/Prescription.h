@@ -3,7 +3,7 @@
 // #include <ModelObject.h>
 
 #include <ObjectiveFunction.h>
-#include <Optimizer.h>
+// #include <Optimizer.h>
 
 #include <Histogram.h>
 #include <KLDivTerm.h>

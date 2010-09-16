@@ -420,7 +420,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\ItkUtils.h"
+				>
+			</File>
+			<File
 				RelativePath="..\RtOptimizer\include\KLDivTerm.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\MathUtil.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\MatrixNxM.h"
 				>
 			</File>
 			<File
@@ -465,6 +477,18 @@
 			</File>
 			<File
 				RelativePath=".\include\Structure.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\utilmacros.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\VectorN.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\VectorOps.h"
 				>
 			</File>
 			<File

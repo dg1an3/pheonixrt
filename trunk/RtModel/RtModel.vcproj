@@ -298,15 +298,15 @@
 				>
 			</File>
 			<File
-				RelativePath="..\RtOptimizer\Histogram.cpp"
+				RelativePath=".\Histogram.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\RtOptimizer\HistogramGradient.cpp"
+				RelativePath=".\HistogramGradient.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\RtOptimizer\KLDivTerm.cpp"
+				RelativePath=".\KLDivTerm.cpp"
 				>
 			</File>
 			<File
@@ -318,11 +318,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\RtOptimizer\PlanOptimizer.cpp"
+				RelativePath=".\PlanOptimizer.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\RtOptimizer\PlanPyramid.cpp"
+				RelativePath=".\PlanPyramid.cpp"
 				>
 			</File>
 			<File
@@ -334,7 +334,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\RtOptimizer\Prescription.cpp"
+				RelativePath=".\Prescription.cpp"
 				>
 			</File>
 			<File
@@ -386,7 +386,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\RtOptimizer\VOITerm.cpp"
+				RelativePath=".\VOITerm.cpp"
 				>
 			</File>
 		</Filter>

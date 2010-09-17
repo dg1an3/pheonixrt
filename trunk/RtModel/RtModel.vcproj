@@ -290,7 +290,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\OptimizeN\ConjGradOptimizer.cpp"
+				RelativePath=".\ConjGradOptimizer.cpp"
 				>
 			</File>
 			<File
@@ -310,7 +310,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\OptimizeN\ObjectiveFunction.cpp"
+				RelativePath=".\ObjectiveFunction.cpp"
 				>
 			</File>
 			<File
@@ -404,7 +404,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\OptimizeN\include\ConjGradOptimizer.h"
+				RelativePath=".\include\ConjGradOptimizer.h"
 				>
 			</File>
 			<File
@@ -412,11 +412,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\RtOptimizer\include\Histogram.h"
+				RelativePath=".\include\Histogram.h"
 				>
 			</File>
 			<File
-				RelativePath="..\RtOptimizer\include\HistogramGradient.h"
+				RelativePath=".\include\HistogramGradient.h"
 				>
 			</File>
 			<File
@@ -424,7 +424,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\RtOptimizer\include\KLDivTerm.h"
+				RelativePath=".\include\KLDivTerm.h"
 				>
 			</File>
 			<File
@@ -436,7 +436,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\OptimizeN\include\ObjectiveFunction.h"
+				RelativePath=".\include\ObjectiveFunction.h"
 				>
 			</File>
 			<File
@@ -444,11 +444,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\RtOptimizer\include\PlanOptimizer.h"
+				RelativePath=".\include\PlanOptimizer.h"
 				>
 			</File>
 			<File
-				RelativePath="..\RtOptimizer\include\PlanPyramid.h"
+				RelativePath=".\include\PlanPyramid.h"
 				>
 			</File>
 			<File
@@ -460,7 +460,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\RtOptimizer\include\Prescription.h"
+				RelativePath=".\include\Prescription.h"
 				>
 			</File>
 			<File
@@ -492,7 +492,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\RtOptimizer\include\VOITerm.h"
+				RelativePath=".\include\VOITerm.h"
 				>
 			</File>
 		</Filter>

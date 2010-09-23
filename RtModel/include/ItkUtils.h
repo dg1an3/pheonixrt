@@ -24,6 +24,7 @@ typedef float VoxelReal;
 
 // helper typedef for the ITK Volume of pixel types
 typedef itk::OrientedImage<VOXEL_REAL,3> VolumeReal;
+typedef itk::OrientedImage<VOXEL_REAL,2> VolumeSliceReal;
 typedef itk::OrientedImage<short,3> VolumeShort;
 typedef itk::OrientedImage<unsigned char, 3> VolumeChar;
 

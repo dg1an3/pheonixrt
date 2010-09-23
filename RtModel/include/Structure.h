@@ -5,11 +5,16 @@
 
 // #include <ModelObject.h>
 
-#include <Polygon.h>
+// #include <Polygon.h>
 #include <ItkUtils.h>
 using namespace itk;
 
+#include <itkPolygonSpatialObject.h>
 #include <itkMultiResolutionPyramidImageFilter.h> 
+
+#include <itkGroupSpatialObject.h>
+#include <itkSpatialObjectToImageFilter.h>
+#include <itkJoinSeriesImageFilter.h>
 
 namespace dH
 {
@@ -41,11 +46,12 @@ public:
 	void SetName(const std::string& strName);
 
 	/** contour accessors */
+	typedef itk::PolygonSpatialObject<2> PolygonType;
 	int GetContourCount() const;
-	CPolygon *GetContour(int nAt);
+	PolygonType *GetContour(int nAt);
 	REAL GetContourRefDist(int nIndex);
 
-	void AddContour(CPolygon *pPoly, REAL refDist);
+	void AddContour(PolygonType::Pointer pPoly, REAL refDist);
 
 	/** constant for maximum scales */
 	static const int MAX_SCALES = 5;
@@ -92,8 +98,18 @@ private:
 	std::string m_strName;
 
 	/** contours for the structure */
-	typedef std::multimap<REAL, itk::SmartPointer<CPolygon> > ContourMapType;
+	typedef std::multimap<REAL, PolygonType::Pointer> ContourMapType;
 	ContourMapType m_arrContours;
+
+	/** NEW: planar groups and regions */
+	typedef GroupSpatialObject<2> ContourPlanarGroupType;
+	typedef SpatialObjectToImageFilter<ContourPlanarGroupType, VolumeSliceReal> PlanarRegionFilterType;
+	typedef std::map<REAL, PlanarRegionFilterType::Pointer> PlanarRegionFilterMapType;
+	PlanarRegionFilterMapType m_mapPlanarRegionFilters;
+
+	/** NEW: slice-to-volume filter: joins slices in to a single volume */
+	typedef itk::JoinSeriesImageFilter<VolumeSliceReal, VolumeReal> SliceToVolumeFilterType;
+	SliceToVolumeFilterType::Pointer m_pSliceToVolumeFilter;
 
 	/** region (binary volume) representation (for base layer) */
 	VolumeReal::Pointer m_pRegion0;

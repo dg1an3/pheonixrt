@@ -29,10 +29,10 @@ public:
 
 	// sets contour mode for the selected structure
 	DECLARE_ATTRIBUTE_PTR(SelectedStructure, dH::Structure);
-	DECLARE_ATTRIBUTE_PTR(SelectedContour, CPolygon);
+	DECLARE_ATTRIBUTE(SelectedContour, dH::Structure::PolygonType::Pointer);
 
-	typedef itk::Vector<REAL,2> Vertex;
-	DECLARE_ATTRIBUTE_PTR(SelectedVertex, Vertex);
+	// typedef itk::Vector<REAL,2> Vertex;
+	DECLARE_ATTRIBUTE(SelectedVertex, int);
 
 	// display state
 	void SetWindowLevel(REAL win, REAL cen, int nVolumeAt = 0);
@@ -52,8 +52,8 @@ public:
 	void DrawImages(CDC *pDC);
 	void DrawIsocurves(VolumeReal *pVolume, REAL c, CDC *pDC);
 
-	bool ContourHitTest(CPoint& point, CPolygon *pContour, Vector<REAL, 2>*& pVertex);
-	CRgn *GetRgnForContour(CPolygon *pContour);
+	bool ContourHitTest(CPoint& point, dH::Structure::PolygonType *pContour, int *pnVertex);
+	CRgn *GetRgnForContour(dH::Structure::PolygonType *pContour);
 
 // Overrides
 	// ClassWizard generated virtual function overrides
@@ -105,7 +105,7 @@ public:
 	bool m_bAddContourMode;
 	bool m_bLockToSlice;
 
-	Vector<REAL,2> m_vVertexStart;
+	dH::Structure::PolygonType::PointType m_vVertexStart;
 
 	// Generated message map functions
 protected:

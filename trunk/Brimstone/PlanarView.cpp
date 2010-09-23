@@ -21,8 +21,8 @@ CPlanarView::CPlanarView()
 	, m_pSeries(NULL)
 	, m_pSelectedStructure(NULL)
 	// , m_pNewContour(NULL)
-	, m_pSelectedContour(NULL)
-	, m_pSelectedVertex(NULL)
+	//, m_pSelectedContour(NULL)
+	, m_SelectedVertex(-1)
 {
 	m_pVolume[0] = NULL;
 	m_pVolume[1] = NULL;
@@ -232,7 +232,7 @@ void CPlanarView::DrawImages(CDC *pDC)
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 CPoint 
-	ToDC(const itk::Vector<REAL,2>& vVert, const itk::Point<REAL>& origin, const itk::Vector<REAL>& spacing)
+	ToDC(const itk::Point<REAL,2>& vVert, const itk::Point<REAL>& origin, const itk::Vector<REAL>& spacing)
 {
 	CPoint pt;
 	pt.x = Round<LONG>((vVert[0] - origin[0]) / spacing[0]);
@@ -281,14 +281,14 @@ void
 			REAL zPos = pStruct->GetContourRefDist(nAtContour);
 			if (IsApproxEqual(zPos, origin[2]/*slicePos*/, spacing[2])) // 1.0))	// TODO: use actual slice spacing for volume
 			{
-				CPolygon *pPoly = pStruct->GetContour(nAtContour);
+				dH::Structure::PolygonType *pPoly = pStruct->GetContour(nAtContour);
 
-				pDC->MoveTo(ToDC(pPoly->GetVertexAt(0), origin, spacing));
-				for (int nAtVert = 1; nAtVert < pPoly->GetVertexCount(); nAtVert++)
+				pDC->MoveTo(ToDC(pPoly->GetPoint(0)->GetPosition(), origin, spacing));
+				for (int nAtVert = 1; nAtVert < pPoly->GetNumberOfPoints(); nAtVert++)
 				{
-					pDC->LineTo(ToDC(pPoly->GetVertexAt(nAtVert), origin, spacing));
+					pDC->LineTo(ToDC(pPoly->GetPoint(nAtVert)->GetPosition(), origin, spacing));
 				}
-				pDC->LineTo(ToDC(pPoly->GetVertexAt(0), origin, spacing));
+				pDC->LineTo(ToDC(pPoly->GetPoint(0)->GetPosition(), origin, spacing));
 			}
 		}
 
@@ -324,10 +324,10 @@ void
 					{
 						CPen penHandle(PS_SOLID, 1, RGB(224, 224, 224));
 						pDC->SelectObject(&penHandle);
-						CPolygon *pContour = GetSelectedContour();
-						for (int nAtVert = 0; nAtVert < pContour->GetVertexCount(); nAtVert++)
+						dH::Structure::PolygonType *pContour = GetSelectedContour();
+						for (int nAtVert = 0; nAtVert < pContour->GetNumberOfPoints(); nAtVert++)
 						{
-							CRect rect(ToDC(pContour->GetVertexAt(nAtVert), origin, spacing), CSize(5, 5));
+							CRect rect(ToDC(pContour->GetPoint(nAtVert)->GetPosition(), origin, spacing), CSize(5, 5));
 							rect -= CPoint(2, 2);
 							pDC->Rectangle(rect);
 						}
@@ -342,17 +342,18 @@ void
 }
 
 bool 
-	CPlanarView::ContourHitTest(CPoint& point, CPolygon *pContour, Vector<REAL, 2>*& pVertex)
+CPlanarView::ContourHitTest(CPoint& point, dH::Structure::PolygonType *pContour, int *pnVertex) // Vector<REAL, 2>*& pVertex)
 {	
 	// get geom parameters for display
 	const Point<REAL>& origin = m_volumeResamp[0]->GetOrigin();
 	const Vector<REAL>& spacing = m_volumeResamp[0]->GetSpacing();
 
 	// see if we hit a handle
-	for (int nVertex = 0; nVertex < pContour->GetVertexCount(); nVertex++)
+	for ((*pnVertex) = 0; (*pnVertex) < pContour->GetNumberOfPoints(); (*pnVertex)++)
 	{
-		pVertex = const_cast< Vector<REAL, 2> * >(&pContour->GetVertexAt(nVertex));
-		CRect rectHandle(ToDC(*pVertex, origin, spacing), CSize(4, 4));
+		// pVertex = // const_cast< Vector<REAL, 2> * >(&pContour->GetVertexAt(nVertex));
+
+		CRect rectHandle(ToDC(pContour->GetPoint(*pnVertex)->GetPosition(), origin, spacing), CSize(4, 4));
 		rectHandle -= CPoint(2, 2);
 		rectHandle.InflateRect(5, 5);
 		if (rectHandle.PtInRect(point))
@@ -362,7 +363,7 @@ bool
 	}
 
 	// no handle, so there is no selected vertex
-	pVertex = NULL;
+	(*pnVertex) = -1;
 
 	// see if we hit the region
 	CRgn *pRgn = GetRgnForContour(pContour);
@@ -374,7 +375,7 @@ bool
 }
 
 CRgn *
-	CPlanarView::GetRgnForContour(CPolygon *pContour)
+	CPlanarView::GetRgnForContour(dH::Structure::PolygonType *pContour)
 {
 	// generate a DC to draw the contour (conforms with current window)
 	CDC *pCommonDC = GetDC();
@@ -389,12 +390,12 @@ CRgn *
 	// draw the path
 	dc.BeginPath();
 
-	dc.MoveTo(ToDC(pContour->GetVertexAt(0), origin, spacing));
-	for (int nAtVert = 1; nAtVert < pContour->GetVertexCount(); nAtVert++)
+	dc.MoveTo(ToDC(pContour->GetPoint(0)->GetPosition(), origin, spacing));
+	for (int nAtVert = 1; nAtVert < pContour->GetNumberOfPoints(); nAtVert++)
 	{
-		dc.LineTo(ToDC(pContour->GetVertexAt(nAtVert), origin, spacing));
+		dc.LineTo(ToDC(pContour->GetPoint(nAtVert)->GetPosition(), origin, spacing));
 	}
-	dc.LineTo(ToDC(pContour->GetVertexAt(0), origin, spacing));
+	dc.LineTo(ToDC(pContour->GetPoint(0)->GetPosition(), origin, spacing));
 
 	dc.EndPath();
 
@@ -808,16 +809,16 @@ void CPlanarView::OnLButtonDown(UINT nFlags, CPoint point)
 		vCenter[2] = volumeOrigin[2] + (REAL) nOriginalSliceNumber * volumeSpacing[2]; 
 		SetCenter(vCenter);
 
-		if (GetSelectedContour() == NULL)
+		if (GetSelectedContour().IsNull())
 		{
 			// start a new polygon
-			SetSelectedContour(new CPolygon());
+			SetSelectedContour(dH::Structure::PolygonType::New());
 		}
 
-		Vector<REAL, 2> vVert;
+		dH::Structure::PolygonType::PointType vVert;
 		vVert[0] = point.x * sliceSpacing[0] + sliceOrigin[0];
 		vVert[1] = point.y * sliceSpacing[1] + sliceOrigin[1];
-		GetSelectedContour()->AddVertex(vVert);
+		GetSelectedContour()->AddPoint(vVert);
 		RedrawWindow(NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
 		return;
 	}
@@ -834,16 +835,16 @@ void CPlanarView::OnLButtonDown(UINT nFlags, CPoint point)
 			REAL zPos = pStruct->GetContourRefDist(nAtContour);
 			if (IsApproxEqual(zPos, sliceOrigin[2]/*slicePos*/, sliceSpacing[2])) // 1.0))	// TODO: use actual slice spacing for volume
 			{
-				CPolygon *pContour = pStruct->GetContour(nAtContour);
-				Vector<REAL, 2> *pvVertex = NULL;
-				if (ContourHitTest(point, pContour, pvVertex))
+				dH::Structure::PolygonType *pContour = pStruct->GetContour(nAtContour);
+				int nVertex = -1;
+				if (ContourHitTest(point, pContour, &nVertex))
 				{
 					SetSelectedContour(pContour);
-					if (pvVertex)
+					if (nVertex != -1)
 					{
-						SetSelectedVertex(pvVertex);
+						SetSelectedVertex(nVertex);
 						m_ptOpStart = point;
-						m_vVertexStart = *pvVertex;
+						m_vVertexStart = pContour->GetPoint(nVertex)->GetPosition();
 					}
 				}
 			}
@@ -858,9 +859,9 @@ void CPlanarView::OnLButtonDown(UINT nFlags, CPoint point)
 void CPlanarView::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	if (m_bEditContourMode
-		&& GetSelectedVertex() != NULL)
+		&& GetSelectedVertex() != -1)
 	{
-		SetSelectedVertex(NULL);
+		SetSelectedVertex(-1);
 	}
 }
 
@@ -870,7 +871,7 @@ void
 	CPlanarView::OnLButtonDblClk(UINT nFlags, CPoint point)
 {
 	if (m_bAddContourMode
-		&& GetSelectedContour() != NULL)
+		&& GetSelectedContour().IsNotNull())
 	{
 		const Point<REAL>& origin = m_volumeResamp[0]->GetOrigin();
 		GetSelectedStructure()->AddContour(GetSelectedContour(), origin[2]);
@@ -1010,18 +1011,19 @@ void
 		RedrawWindow(NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);
 	}
 	else if (m_bEditContourMode 
-		&& GetSelectedVertex() != NULL)
+		&& GetSelectedVertex() != -1)
 	{
 		// get geom parameters for display
 		const Point<REAL>& origin = m_volumeResamp[0]->GetOrigin();
 		const Vector<REAL>& spacing = m_volumeResamp[0]->GetSpacing();
 	
 		// compute shift of point
-		Vertex vShift;
+		dH::Structure::PolygonType::PointType vShift = GetSelectedContour()->GetPoint(GetSelectedVertex())->GetPosition();
 		vShift[0] = spacing[0] * ptDelta.x; // + origin[0];
 		vShift[1] = spacing[1] * ptDelta.y; // + origin[1];
 
-		(*GetSelectedVertex()) = m_vVertexStart + vShift;
+		GetSelectedContour()->ReplacePoint(GetSelectedContour()->GetPoint(GetSelectedVertex())->GetPosition(),
+			vShift);
 
 		// update display
 		RedrawWindow(NULL, NULL, RDW_INVALIDATE | RDW_UPDATENOW);

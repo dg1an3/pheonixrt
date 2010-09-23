@@ -50,7 +50,7 @@ int
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-CPolygon *
+Structure::PolygonType *
 	Structure::GetContour(int nIndex)
 	// returns the contour at the given index
 {
@@ -71,7 +71,7 @@ REAL
 
 ///////////////////////////////////////////////////////////////////////////////
 void 
-	Structure::AddContour(CPolygon *pPoly, REAL refDist)
+Structure::AddContour(Structure::PolygonType::Pointer pPoly, REAL refDist)
 	// adds a new contour to the structure
 {
 	m_arrContours.insert(std::make_pair(refDist, pPoly));
@@ -177,6 +177,86 @@ VolumeReal *
 	return resampler->GetOutput();
 }
 
+typedef itk::PolygonSpatialObject<2> PolygonType;
+
+///////////////////////////////////////////////////////////////////////////////
+// CreateRegion
+// 
+// Creates a region (bit mask) from a polygon
+///////////////////////////////////////////////////////////////////////////////
+template<class VOXEL_TYPE>
+void CreateRegionForPolygonSpatialObject(const CArray<PolygonType *, PolygonType *>& arrPolygons,
+				  itk::Image<VOXEL_TYPE,3> *pRegion, int nSlice)
+{
+	CDC dc;
+	BOOL bRes = dc.CreateCompatibleDC(NULL);
+
+	CBitmap bitmap;
+	bRes = bitmap.CreateBitmap(pRegion->GetBufferedRegion().GetSize()[0], 
+		pRegion->GetBufferedRegion().GetSize()[1], 1, 1, NULL);
+
+	CBitmap *pOldBitmap = (CBitmap *) dc.SelectObject(&bitmap);
+	dc.SelectStockObject(WHITE_PEN);
+	dc.SelectStockObject(WHITE_BRUSH);
+
+	itk::Point<REAL,3> vOrigin = pRegion->GetOrigin();
+	itk::Vector<REAL,3> vSpacing = pRegion->GetSpacing();
+	for (int nAtPoly = 0; nAtPoly < arrPolygons.GetSize(); nAtPoly++)
+	{
+		// static 
+			CArray<CPoint, CPoint&> arrPoints;
+		arrPoints.SetSize(arrPolygons[nAtPoly]->GetNumberOfPoints/*GetVertexCount*/());
+		for (int nAt = 0; nAt < arrPolygons[nAtPoly]->GetNumberOfPoints/*GetVertexCount*/(); nAt++)
+		{
+			itk::SpatialObjectPoint<2> vVert = *(arrPolygons[nAtPoly]->GetPoint/*GetVertexAt*/(nAt));
+			//vVert[0] = (vVert[0] - vOrigin[0]) / vSpacing[0];
+			//vVert[1] = (vVert[1] - vOrigin[1]) / vSpacing[1];
+
+			arrPoints[nAt].x = (vVert.GetPosition()[0] - vOrigin[0]) / vSpacing[0];
+			arrPoints[nAt].y = (vVert.GetPosition()[1] - vOrigin[1]) / vSpacing[1];
+		}
+		dc.Polygon(arrPoints.GetData(), arrPolygons[nAtPoly]->GetNumberOfPoints/*GetVertexCount*/());
+	}
+
+	// finished with DC
+	dc.SelectObject(pOldBitmap);
+	dc.DeleteDC();
+
+	// now get the bitmap descriptor (for scan width
+	BITMAP bm;
+	bitmap.GetBitmap(&bm);
+
+	// resize the buffer
+	// static 
+		CArray<BYTE, BYTE> arrBuffer;
+	arrBuffer.SetSize(pRegion->GetBufferedRegion().GetSize()[1] * bm.bmWidthBytes);
+	int nByteCount = bitmap.GetBitmapBits((DWORD) arrBuffer.GetSize(), arrBuffer.GetData());
+
+	// now populate region
+	// DON'T CLEAR REGION HERE -- this is called multiple times
+	// pRegion->FillBuffer(0.0); 
+
+	int nStride = pRegion->GetBufferedRegion().GetSize()[0];
+	int nStrideZ = pRegion->GetBufferedRegion().GetSize()[1] * nStride;
+	// now populate the region
+	for (int nY = 0; nY < pRegion->GetBufferedRegion().GetSize()[1]; nY++)
+	{
+		for (int nX = 0; nX < pRegion->GetBufferedRegion().GetSize()[0]; nX++)
+		{
+			if ((arrBuffer[nY * bm.bmWidthBytes + nX / 8] >> (7 - nX % 8)) & 0x01)
+			{
+				// (*pRegion)[0][nY][nX] 
+				pRegion->GetBufferPointer()[nSlice * nStrideZ + nY * nStride + nX]
+					= (VOXEL_TYPE) 1.0;
+			}
+		}
+	}
+
+	// done with bitmap
+	bitmap.DeleteObject();
+
+}	
+
 ///////////////////////////////////////////////////////////////////////////////
 void 
 	Structure::ContoursToRegion(VolumeReal *pRegion)
@@ -188,7 +268,7 @@ void
 	for (int nSlice = 0; nSlice < pRegion->GetBufferedRegion().GetSize()[2]; nSlice++)
 	{
 		REAL slicePos = pRegion->GetOrigin()[2] + pRegion->GetSpacing()[2] * nSlice;
-		CArray<CPolygon *, CPolygon *> arrContours;
+		CArray<PolygonType *, PolygonType *> arrContours;
 		for (int nAt = 0; nAt < GetContourCount(); nAt++)
 		{
 			REAL zPos = GetContourRefDist(nAt);
@@ -197,7 +277,7 @@ void
 				arrContours.Add(GetContour(nAt));
 			}
 		}
-		CreateRegion(arrContours, pRegion, nSlice);
+		CreateRegionForPolygonSpatialObject(arrContours, pRegion, nSlice);
 	}
 }
 

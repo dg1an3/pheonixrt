@@ -6,7 +6,7 @@
 #include <Series.h>
 #include <Structure.h>
 //#include <Volumep.h>
-#include <Polygon.h>
+//#include <Polygon.h>
 
 #include <dcmtk/dcmdata/dcmetinf.h>
 #include <dcmtk/dcmdata/dcdeftag.h>
@@ -361,38 +361,36 @@ void CSeriesDicomImporter::ImportDicomStructureSet(DcmFileFormat *pFileFormat)
 				OFString strContourData;
 				CHK_DCM(pContourItem->findAndGetOFStringArray(DCM_ContourData, strContourData));
 
-				CPolygon *pPoly = new CPolygon();
+				dH::Structure::PolygonType::Pointer pPoly = dH::Structure::PolygonType::New();
 
 				int nStart = 0;
 				int nNext = 0;
 				float slice_z = 0.0;
 				for (int nAtPoint = 0; nAtPoint < nContourPoints; nAtPoint++)
 				{
+					double coord[3];
+					// sscanf_s(strContourData.c_str(), "%lf\\%lf\\%lf", &coord[0], &coord[1], &coord[2]);
+
 					// now parse contour data, one vertex at a time
 					nNext = (int) strContourData.find('\\', nStart);
-					float coord_x;
-					sscanf_s(strContourData.substr(nStart, nNext-nStart).c_str(), "%f", &coord_x);
+					sscanf_s(strContourData.substr(nStart, nNext-nStart).c_str(), "%lf", &coord[0]);
 					nStart = nNext+1;
 
 					nNext = (int) strContourData.find('\\', nStart);
-					float coord_y;
-					sscanf_s(strContourData.substr(nStart, nNext-nStart).c_str(), "%f", &coord_y);
+					sscanf_s(strContourData.substr(nStart, nNext-nStart).c_str(), "%lf", &coord[1]);
 					nStart = nNext+1;
 
 					nNext = (int) strContourData.find('\\', nStart);
-					float coord_z;
-					sscanf_s(strContourData.substr(nStart, nNext-nStart).c_str(), "%f", &coord_z);
+					sscanf_s(strContourData.substr(nStart, nNext-nStart).c_str(), "%lf", &coord[2]);
 					nStart = nNext+1;
 
 					if (nAtPoint == 0)
 					{
-						slice_z = coord_z;
+						slice_z = coord[2];
 					}
 					ASSERT(IsApproxEqual(coord_z, slice_z));
-
-					pPoly->AddVertex(MakeVector<2>(coord_x, coord_y)); // (vVert);
+					pPoly->AddPoint(dH::Structure::PolygonType::PointType(coord)); // AddVertex(MakeVector<2>(coord_x, coord_y)); // (vVert);
 				}
-
 				pStruct->AddContour(pPoly, slice_z);
 			}
 		}

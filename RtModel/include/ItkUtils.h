@@ -9,7 +9,7 @@
 #pragma once
 
 #ifdef USE_IPP
-#include <ippi.h>
+//#include <ippi.h>
 #endif
 
 #include <itkOrientedImage.h>
@@ -772,44 +772,44 @@ int
 	return pImage->GetBufferedRegion().GetSize()[0] * sizeof(VOXEL_TYPE);
 }
 
-
-//////////////////////////////////////////////////////////////////////
-template<class VOXEL_TYPE> INLINE
-void Accumulate(const VolumeReal *pVolume, 
-				double weight,
-				VolumeReal *pSrcDst,
-				VolumeReal *pAccum,
-				int nSlice = 0)
-	// accumulates voxel values -- other volume must be conformant
-{
-	ASSERT(pSrcDst->GetBufferedRegion().GetSize() == pVolume->GetBufferedRegion().GetSize());
-
-	int nStrideZ = pSrcDst->GetBufferedRegion().GetSize()[0]
-		* pSrcDst->GetBufferedRegion().GetSize()[1];
-
-	IppStatus stat = ippiMulC_32f_C1R(
-		&pVolume->GetBufferPointer()[nStrideZ * nSlice], Stride<VOXEL_REAL>(pVolume), 
-		(VOXEL_REAL) weight,
-		&pAccum->GetBufferPointer()[nStrideZ * nSlice], Stride<VOXEL_REAL>(pAccum), 
-		MakeIppiSize(pVolume->GetBufferedRegion())); 
-
-	stat = ippiAdd_32f_C1IR(
-		&pAccum->GetBufferPointer()[nStrideZ * nSlice], Stride<VOXEL_REAL>(pAccum), 
-		&pSrcDst->GetBufferPointer()[nStrideZ * nSlice], Stride<VOXEL_REAL>(pSrcDst), 
-		MakeIppiSize(pVolume->GetBufferedRegion()));
-
-	//IppStatus stat = ippiMulC_32f_C1R(
-	//	pVolume->GetBufferPointer(), Stride<VOXEL_REAL>(pVolume), 
-	//	(VOXEL_REAL) weight,
-	//	pAccum->GetBufferPointer(), Stride<VOXEL_REAL>(pAccum), 
-	//	MakeIppiSize(pVolume->GetBufferedRegion())); 
-
-	//stat = ippiAdd_32f_C1IR(
-	//	pAccum->GetBufferPointer(), Stride<VOXEL_REAL>(pAccum), 
-	//	pSrcDst->GetBufferPointer(), Stride<VOXEL_REAL>(pSrcDst), 
-	//	MakeIppiSize(pVolume->GetBufferedRegion()));
-
-}	// Accumulate
+//
+////////////////////////////////////////////////////////////////////////
+//template<class VOXEL_TYPE> INLINE
+//void Accumulate(const VolumeReal *pVolume, 
+//				double weight,
+//				VolumeReal *pSrcDst,
+//				VolumeReal *pAccum,
+//				int nSlice = 0)
+//	// accumulates voxel values -- other volume must be conformant
+//{
+//	ASSERT(pSrcDst->GetBufferedRegion().GetSize() == pVolume->GetBufferedRegion().GetSize());
+//
+//	int nStrideZ = pSrcDst->GetBufferedRegion().GetSize()[0]
+//		* pSrcDst->GetBufferedRegion().GetSize()[1];
+//
+//	IppStatus stat = ippiMulC_32f_C1R(
+//		&pVolume->GetBufferPointer()[nStrideZ * nSlice], Stride<VOXEL_REAL>(pVolume), 
+//		(VOXEL_REAL) weight,
+//		&pAccum->GetBufferPointer()[nStrideZ * nSlice], Stride<VOXEL_REAL>(pAccum), 
+//		MakeIppiSize(pVolume->GetBufferedRegion())); 
+//
+//	stat = ippiAdd_32f_C1IR(
+//		&pAccum->GetBufferPointer()[nStrideZ * nSlice], Stride<VOXEL_REAL>(pAccum), 
+//		&pSrcDst->GetBufferPointer()[nStrideZ * nSlice], Stride<VOXEL_REAL>(pSrcDst), 
+//		MakeIppiSize(pVolume->GetBufferedRegion()));
+//
+//	//IppStatus stat = ippiMulC_32f_C1R(
+//	//	pVolume->GetBufferPointer(), Stride<VOXEL_REAL>(pVolume), 
+//	//	(VOXEL_REAL) weight,
+//	//	pAccum->GetBufferPointer(), Stride<VOXEL_REAL>(pAccum), 
+//	//	MakeIppiSize(pVolume->GetBufferedRegion())); 
+//
+//	//stat = ippiAdd_32f_C1IR(
+//	//	pAccum->GetBufferPointer(), Stride<VOXEL_REAL>(pAccum), 
+//	//	pSrcDst->GetBufferPointer(), Stride<VOXEL_REAL>(pSrcDst), 
+//	//	MakeIppiSize(pVolume->GetBufferedRegion()));
+//
+//}	// Accumulate
 
 //////////////////////////////////////////////////////////////////////
 template<class VOXEL_TYPE> INLINE
@@ -821,7 +821,18 @@ void Accumulate3D(const VolumeReal *pVolume,
 {
 	ASSERT(pSrcDst->GetBufferedRegion().GetSize() == pVolume->GetBufferedRegion().GetSize());
 
+	typedef itk::ImageRegionConstIterator< VolumeReal > ConstIteratorType;
+	typedef itk::ImageRegionIterator< VolumeReal > IteratorType;
 
+	IteratorType srcDstIt( pSrcDst, pSrcDst->GetBufferedRegion() );
+	ConstIteratorType volIt( pVolume, pVolume->GetBufferedRegion() );
+	for ( srcDstIt.GoToBegin(), volIt.GoToBegin(); 
+		!srcDstIt.IsAtEnd(); ++srcDstIt, ++volIt)
+	{
+		srcDstIt.Set(srcDstIt.Get() + weight*volIt.Get());
+	}
+
+#ifdef USE_IPP_ACCUMULATE
 	int nStrideZ = pSrcDst->GetBufferedRegion().GetSize()[0]
 		* pSrcDst->GetBufferedRegion().GetSize()[1];
 	for (int nPlane = 0; nPlane < pSrcDst->GetBufferedRegion().GetSize()[2]; nPlane++)
@@ -837,6 +848,7 @@ void Accumulate3D(const VolumeReal *pVolume,
 			&pSrcDst->GetBufferPointer()[nStrideZ * nPlane], Stride<VOXEL_REAL>(pSrcDst), 
 			MakeIppiSize(pVolume->GetBufferedRegion()));
 	}
+#endif
 
 }	// Accumulate
 
@@ -928,118 +940,68 @@ inline void CalcBinomialFilter(itk::Image<TYPE,3> *pVol)
 }	// CalcBinomialFilter
 #endif
 
-#ifdef USE_IPP
-///////////////////////////////////////////////////////////////////////////////
-inline void Resample(const VolumeReal *pOrig, 
-										 VolumeReal *pNew, 
-										 BOOL bBilinear = FALSE,
-										 int nSlice = 0)
-{
-	itk::Matrix<REAL, 4, 4> mBasisOrig;
-	CalcBasis<3>(pOrig, mBasisOrig);
+//#ifdef USE_IPP
 
-	itk::Matrix<REAL, 4, 4> mBasisNew;
-	CalcBasis<3>(pNew, mBasisNew);
-
-	itk::Matrix<REAL, 4, 4> mXform = mBasisOrig.GetInverse();
-	mXform *= mBasisNew;
-
-	// calculate plane
-	REAL planeZ = (pNew->GetOrigin()[2] - pOrig->GetOrigin()[2]) / pOrig->GetSpacing()[2];
-
-	// calculate original voxel starting position
-	const VOXEL_REAL *pOrigVoxel = pOrig->GetBufferPointer();
-	VolumeReal::IndexType idx;
-	idx[0] = 0;
-	idx[1] = 0;
-	idx[2] = // nSlice; // 
-		::Round<int>(planeZ);
-	if (!pOrig->GetBufferedRegion().IsInside(idx))
-	{
-		return;
-	}
-	pOrigVoxel += pOrig->ComputeOffset(idx);
-
-	double coeffs[2][3];
-	coeffs[0][0] = mXform(0, 0);
-	coeffs[0][1] = mXform(0, 1);
-	coeffs[0][2] = mXform(0, 3);
-	coeffs[1][0] = mXform(1, 0);
-	coeffs[1][1] = mXform(1, 1);
-	coeffs[1][2] = mXform(1, 3);
-
-	IppStatus stat = ippiWarpAffineBack_32f_C1R(
-		pOrigVoxel, 
-		MakeIppiSize(pOrig->GetBufferedRegion()),
-		pOrig->GetBufferedRegion().GetSize()[0] * sizeof(VOXEL_REAL), 
-		MakeIppiRect(pOrig->GetBufferedRegion()),
-		pNew->GetBufferPointer(), 
-		pNew->GetBufferedRegion().GetSize()[0] * sizeof(VOXEL_REAL), 
-		MakeIppiRect(pNew->GetBufferedRegion()),
-		coeffs, IPPI_INTER_LINEAR);
-
-}	// Resample
-
-
-///////////////////////////////////////////////////////////////////////////////
-inline void Resample3D(const VolumeReal *pOrig, 
-										 VolumeReal *pNew, 
-										 BOOL bBilinear = FALSE)
-{
-	itk::Matrix<REAL, 4, 4> mBasisOrig;
-	CalcBasis<3>(pOrig, mBasisOrig);
-
-	itk::Matrix<REAL, 4, 4> mBasisNew;
-	CalcBasis<3>(pNew, mBasisNew);
-
-	itk::Matrix<REAL, 4, 4> mXform = mBasisOrig.GetInverse();
-	mXform *= mBasisNew;
-
-	for (int nPlane = 0; nPlane < pNew->GetBufferedRegion().GetSize()[2]; nPlane++)
-	{
-		// calculate plane
-		REAL planeZ =
-			(pNew->GetOrigin()[2] + pNew->GetSpacing()[2] * nPlane - pOrig->GetOrigin()[2]) / pOrig->GetSpacing()[2];
-		// REAL planeZ = // (pNew->GetOrigin()[2] - pOrig->GetOrigin()[2]) / pOrig->GetSpacing()[2];
-		//	(pNew->GetOrigin()[2] + pNew->GetSpacing()[2] * nPlane - pOrig->GetOrigin()[2]) / pOrig->GetSpacing()[2];
-		// calculate original voxel starting position
-		const VOXEL_REAL *pOrigVoxel = pOrig->GetBufferPointer();
-		VolumeReal::IndexType idx;
-		idx[0] = 0;
-		idx[1] = 0;
-		idx[2] = // nPlane; // 
-			::Round<int>(planeZ);
-		if (!pOrig->GetBufferedRegion().IsInside(idx))
-		{
-			return;
-		}
-		pOrigVoxel += pOrig->ComputeOffset(idx);
-
-		VOXEL_REAL *pNewVoxel = pNew->GetBufferPointer();
-		idx[2] = nPlane;
-		pNewVoxel += pNew->ComputeOffset(idx);
-
-		double coeffs[2][3];
-		coeffs[0][0] = mXform(0, 0);
-		coeffs[0][1] = mXform(0, 1);
-		coeffs[0][2] = mXform(0, 3);
-		coeffs[1][0] = mXform(1, 0);
-		coeffs[1][1] = mXform(1, 1);
-		coeffs[1][2] = mXform(1, 3);
-
-		IppStatus stat = ippiWarpAffineBack_32f_C1R(
-			pOrigVoxel, 
-			MakeIppiSize(pOrig->GetBufferedRegion()),
-			pOrig->GetBufferedRegion().GetSize()[0] * sizeof(VOXEL_REAL), 
-			MakeIppiRect(pOrig->GetBufferedRegion()),
-			pNewVoxel, // pNew->GetBufferPointer(), 
-			pNew->GetBufferedRegion().GetSize()[0] * sizeof(VOXEL_REAL), 
-			MakeIppiRect(pNew->GetBufferedRegion()),
-			coeffs, IPPI_INTER_LINEAR);
-	}
-
-}	// Resample3D
-#endif
+//
+/////////////////////////////////////////////////////////////////////////////////
+//inline void Resample3D_(const VolumeReal *pOrig, 
+//										 VolumeReal *pNew, 
+//										 BOOL bBilinear = FALSE)
+//{
+//	itk::Matrix<REAL, 4, 4> mBasisOrig;
+//	CalcBasis<3>(pOrig, mBasisOrig);
+//
+//	itk::Matrix<REAL, 4, 4> mBasisNew;
+//	CalcBasis<3>(pNew, mBasisNew);
+//
+//	itk::Matrix<REAL, 4, 4> mXform = mBasisOrig.GetInverse();
+//	mXform *= mBasisNew;
+//
+//	for (int nPlane = 0; nPlane < pNew->GetBufferedRegion().GetSize()[2]; nPlane++)
+//	{
+//		// calculate plane
+//		REAL planeZ =
+//			(pNew->GetOrigin()[2] + pNew->GetSpacing()[2] * nPlane - pOrig->GetOrigin()[2]) / pOrig->GetSpacing()[2];
+//		// REAL planeZ = // (pNew->GetOrigin()[2] - pOrig->GetOrigin()[2]) / pOrig->GetSpacing()[2];
+//		//	(pNew->GetOrigin()[2] + pNew->GetSpacing()[2] * nPlane - pOrig->GetOrigin()[2]) / pOrig->GetSpacing()[2];
+//		// calculate original voxel starting position
+//		const VOXEL_REAL *pOrigVoxel = pOrig->GetBufferPointer();
+//		VolumeReal::IndexType idx;
+//		idx[0] = 0;
+//		idx[1] = 0;
+//		idx[2] = // nPlane; // 
+//			::Round<int>(planeZ);
+//		if (!pOrig->GetBufferedRegion().IsInside(idx))
+//		{
+//			return;
+//		}
+//		pOrigVoxel += pOrig->ComputeOffset(idx);
+//
+//		VOXEL_REAL *pNewVoxel = pNew->GetBufferPointer();
+//		idx[2] = nPlane;
+//		pNewVoxel += pNew->ComputeOffset(idx);
+//
+//		double coeffs[2][3];
+//		coeffs[0][0] = mXform(0, 0);
+//		coeffs[0][1] = mXform(0, 1);
+//		coeffs[0][2] = mXform(0, 3);
+//		coeffs[1][0] = mXform(1, 0);
+//		coeffs[1][1] = mXform(1, 1);
+//		coeffs[1][2] = mXform(1, 3);
+//
+//		IppStatus stat = ippiWarpAffineBack_32f_C1R(
+//			pOrigVoxel, 
+//			MakeIppiSize(pOrig->GetBufferedRegion()),
+//			pOrig->GetBufferedRegion().GetSize()[0] * sizeof(VOXEL_REAL), 
+//			MakeIppiRect(pOrig->GetBufferedRegion()),
+//			pNewVoxel, // pNew->GetBufferPointer(), 
+//			pNew->GetBufferedRegion().GetSize()[0] * sizeof(VOXEL_REAL), 
+//			MakeIppiRect(pNew->GetBufferedRegion()),
+//			coeffs, IPPI_INTER_LINEAR);
+//	}
+//
+//}	// Resample3D
+//#endif
 
 #ifdef DEPRECATED
 ///////////////////////////////////////////////////////////////////////////////

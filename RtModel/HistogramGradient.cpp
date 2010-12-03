@@ -4,6 +4,10 @@
 #include "HistogramGradient.h"
 #include <itkResampleImageFilter.h>
 
+#ifdef USE_IPP
+#include <ippi.h>
+#endif
+
 //////////////////////////////////////////////////////////////////////
 CHistogramWithGradient::CHistogramWithGradient()
 : vInput(NULL)
@@ -297,17 +301,29 @@ const VolumeReal *
 	{
 		int nGroup = m_arrVolumeGroups[nAt];
 
-		/// TODO: extend to 3D
-		int nStrideZ = m_groupVolRegion[nGroup]->GetBufferedRegion().GetSize()[0] 
-			* m_groupVolRegion[nGroup]->GetBufferedRegion().GetSize()[1];
-		for (int nZ = 0; nZ < m_groupVolRegion[nGroup]->GetBufferedRegion().GetSize()[2]; nZ++)
+		typedef itk::ImageRegionConstIterator< VolumeReal > ConstIteratorType;
+		typedef itk::ImageRegionIterator< VolumeReal > IteratorType;
+
+		IteratorType dstIt( m_arr_dVolumes_x_Region[nAt], m_arr_dVolumes_x_Region[nAt]->GetBufferedRegion() );
+		ConstIteratorType groupVolRegionIt( m_groupVolRegion[nGroup], m_groupVolRegion[nGroup]->GetBufferedRegion() );
+		ConstIteratorType dVolIt( Get_dVolume(nAt), Get_dVolume(nAt)->GetBufferedRegion() );
+		for ( dstIt.GoToBegin(), groupVolRegionIt.GoToBegin(), dVolIt.GoToBegin(); 
+			!dstIt.IsAtEnd(); ++dstIt, ++groupVolRegionIt, ++dVolIt )
 		{
-			CK_IPP( ippiMul_32f_C1R(
-				&m_groupVolRegion[nGroup]->GetBufferPointer()[nZ * nStrideZ], Stride<VOXEL_REAL,3>(m_groupVolRegion[nGroup]), 
-				&Get_dVolume(nAt)->GetBufferPointer()[nZ * nStrideZ], Stride<VOXEL_REAL,3>(Get_dVolume(nAt)), 
-				&m_arr_dVolumes_x_Region[nAt]->GetBufferPointer()[nZ * nStrideZ], Stride<VOXEL_REAL,3>(m_arr_dVolumes_x_Region[nAt]), 
-				MakeIppiSize<3>(m_arr_dVolumes_x_Region[nAt]->GetBufferedRegion())) ); 
+			dstIt.Set(groupVolRegionIt.Get() * dVolIt.Get());
 		}
+
+		/// TODO: extend to 3D
+		//int nStrideZ = m_groupVolRegion[nGroup]->GetBufferedRegion().GetSize()[0] 
+		//	* m_groupVolRegion[nGroup]->GetBufferedRegion().GetSize()[1];
+		//for (int nZ = 0; nZ < m_groupVolRegion[nGroup]->GetBufferedRegion().GetSize()[2]; nZ++)
+		//{
+		//	CK_IPP( ippiMul_32f_C1R(
+		//		&m_groupVolRegion[nGroup]->GetBufferPointer()[nZ * nStrideZ], Stride<VOXEL_REAL,3>(m_groupVolRegion[nGroup]), 
+		//		&Get_dVolume(nAt)->GetBufferPointer()[nZ * nStrideZ], Stride<VOXEL_REAL,3>(Get_dVolume(nAt)), 
+		//		&m_arr_dVolumes_x_Region[nAt]->GetBufferPointer()[nZ * nStrideZ], Stride<VOXEL_REAL,3>(m_arr_dVolumes_x_Region[nAt]), 
+		//		MakeIppiSize<3>(m_arr_dVolumes_x_Region[nAt]->GetBufferedRegion())) ); 
+		//}
 
 		m_arr_bRecompute_dVolumes_x_Region[nAt] = FALSE;
 	}
@@ -357,81 +373,155 @@ const VolumeShort *
 		// get the main volume voxels
 		ConformTo<short,3>(m_groupVolBinScaled, m_groupVolBinLoInt[nGroup]);
 		m_groupVolBinLoInt[nGroup]->FillBuffer(0.0); 
+
+		typedef itk::ImageRegionConstIterator< VolumeReal > ConstIteratorType;
+		typedef itk::ImageRegionIterator< VolumeReal > IteratorType;
+		typedef itk::ImageRegionIterator< VolumeShort > ShortIteratorType;
+		typedef itk::ImageRegionConstIterator< VolumeShort > ShortConstIteratorType;
+
+		{
+		ShortIteratorType dstIt( m_groupVolBinLoInt[nGroup], m_groupVolBinLoInt[nGroup]->GetBufferedRegion() );
+		ConstIteratorType groupVolBinScaledIt( m_groupVolBinScaled, m_groupVolBinScaled->GetBufferedRegion() );
+		for ( dstIt.GoToBegin(), groupVolBinScaledIt.GoToBegin(); 
+			!dstIt.IsAtEnd(); ++dstIt, ++groupVolBinScaledIt )
+		{
+			dstIt.Set((short)floor(groupVolBinScaledIt.Get()));
+		}
+		}
+
 		/// TODO: extend to 3D
 		int nStrideZ = m_groupVolRegion[nGroup]->GetBufferedRegion().GetSize()[0] 
 			* m_groupVolRegion[nGroup]->GetBufferedRegion().GetSize()[1];
-		for (int nZ = 0; nZ < m_groupVolRegion[nGroup]->GetBufferedRegion().GetSize()[2]; nZ++)
-		{
-			CK_IPP( ippiConvert_32f16s_C1R(
-				&m_groupVolBinScaled->GetBufferPointer()[nZ * nStrideZ], Stride<VOXEL_REAL,3>(m_groupVolBinScaled), 
-				&m_groupVolBinLoInt[nGroup]->GetBufferPointer()[nZ * nStrideZ], Stride<short,3>(m_groupVolBinLoInt[nGroup]), 
-				MakeIppiSize<3>(m_groupVolRegion[nGroup]->GetBufferedRegion()),
-				ippRndZero) ); // DGL: using zero for interp // ippRndNear) );
-		}
+		//for (int nZ = 0; nZ < m_groupVolRegion[nGroup]->GetBufferedRegion().GetSize()[2]; nZ++)
+		//{
+		//	CK_IPP( ippiConvert_32f16s_C1R(
+		//		&m_groupVolBinScaled->GetBufferPointer()[nZ * nStrideZ], Stride<VOXEL_REAL,3>(m_groupVolBinScaled), 
+		//		&m_groupVolBinLoInt[nGroup]->GetBufferPointer()[nZ * nStrideZ], Stride<short,3>(m_groupVolBinLoInt[nGroup]), 
+		//		MakeIppiSize<3>(m_groupVolRegion[nGroup]->GetBufferedRegion()),
+		//		ippRndZero) ); // DGL: using zero for interp // ippRndNear) );
+		//}
 
 		////////////////////////////////////////////////////////////////////
 		// get bin frac volume
 
 		ConformTo<VOXEL_REAL,3>(m_groupVolBinLoInt[nGroup], m_groupVolBinFracHi[nGroup]);
-		/// TODO: extend to 3D
-		for (int nZ = 0; nZ < m_groupVolRegion[nGroup]->GetBufferedRegion().GetSize()[2]; nZ++)
+
 		{
-			CK_IPP( ippiConvert_16s32f_C1R(
-				&m_groupVolBinLoInt[nGroup]->GetBufferPointer()[nZ * nStrideZ], Stride<short,3>(m_groupVolBinLoInt[nGroup]), 
-				&m_groupVolBinFracHi[nGroup]->GetBufferPointer()[nZ * nStrideZ], Stride<VOXEL_REAL,3>(m_groupVolBinFracHi[nGroup]),
-				MakeIppiSize<3>(m_groupVolRegion[nGroup]->GetBufferedRegion())) ); 
+		IteratorType dstIt(m_groupVolBinFracHi[nGroup], m_groupVolBinFracHi[nGroup]->GetBufferedRegion() );
+		ShortConstIteratorType groupVolBinLoIntIt( m_groupVolBinLoInt[nGroup], m_groupVolBinLoInt[nGroup]->GetBufferedRegion() );
+		for ( dstIt.GoToBegin(), groupVolBinLoIntIt.GoToBegin(); 
+			!dstIt.IsAtEnd(); ++dstIt, ++groupVolBinLoIntIt)
+		{
+			dstIt.Set(groupVolBinLoIntIt.Get());
+		}
 		}
 
-		// leaves Frac = -High Fraction
 		/// TODO: extend to 3D
-		for (int nZ = 0; nZ < m_groupVolRegion[nGroup]->GetBufferedRegion().GetSize()[2]; nZ++)
-		{		
-			CK_IPP( ippiSub_32f_C1IR(
-				&m_groupVolBinScaled->GetBufferPointer()[nZ * nStrideZ], Stride<VOXEL_REAL,3>(m_groupVolBinScaled),
-				&m_groupVolBinFracHi[nGroup]->GetBufferPointer()[nZ * nStrideZ], Stride<VOXEL_REAL,3>(m_groupVolBinFracHi[nGroup]),
-				MakeIppiSize<3>(m_groupVolRegion[nGroup]->GetBufferedRegion())) ); 
+		//for (int nZ = 0; nZ < m_groupVolRegion[nGroup]->GetBufferedRegion().GetSize()[2]; nZ++)
+		//{
+		//	CK_IPP( ippiConvert_16s32f_C1R(
+		//		&m_groupVolBinLoInt[nGroup]->GetBufferPointer()[nZ * nStrideZ], Stride<short,3>(m_groupVolBinLoInt[nGroup]), 
+		//		&m_groupVolBinFracHi[nGroup]->GetBufferPointer()[nZ * nStrideZ], Stride<VOXEL_REAL,3>(m_groupVolBinFracHi[nGroup]),
+		//		MakeIppiSize<3>(m_groupVolRegion[nGroup]->GetBufferedRegion())) ); 
+		//}
+
+		// leaves Frac = -High Fraction
+
+		{
+		IteratorType dstIt(m_groupVolBinFracHi[nGroup], m_groupVolBinFracHi[nGroup]->GetBufferedRegion() );
+		ConstIteratorType groupVolBinScaledIt( m_groupVolBinScaled, m_groupVolBinScaled->GetBufferedRegion() );
+		for ( dstIt.GoToBegin(), groupVolBinScaledIt.GoToBegin(); 
+			!dstIt.IsAtEnd(); ++dstIt, ++groupVolBinScaledIt)
+		{
+			dstIt.Set(-(groupVolBinScaledIt.Get()-dstIt.Get()));
 		}
+		}
+
+
+		/// TODO: extend to 3D
+		//for (int nZ = 0; nZ < m_groupVolRegion[nGroup]->GetBufferedRegion().GetSize()[2]; nZ++)
+		//{		
+		//	CK_IPP( ippiSub_32f_C1IR(
+		//		&m_groupVolBinScaled->GetBufferPointer()[nZ * nStrideZ], Stride<VOXEL_REAL,3>(m_groupVolBinScaled),
+		//		&m_groupVolBinFracHi[nGroup]->GetBufferPointer()[nZ * nStrideZ], Stride<VOXEL_REAL,3>(m_groupVolBinFracHi[nGroup]),
+		//		MakeIppiSize<3>(m_groupVolRegion[nGroup]->GetBufferedRegion())) ); 
+		//}
 
 		////////////////////////////////////////////////////////////////////
 		// get bin frac low volume
 
 		ConformTo<VOXEL_REAL,3>(m_groupVolBinFracHi[nGroup], m_groupVolBinFracLo[nGroup]);
-		/// TODO: extend to 3D
-		for (int nZ = 0; nZ < m_groupVolRegion[nGroup]->GetBufferedRegion().GetSize()[2]; nZ++)
-		{		
-			CK_IPP( ippiAddC_32f_C1R(
-				&m_groupVolBinFracHi[nGroup]->GetBufferPointer()[nZ * nStrideZ], Stride<VOXEL_REAL,3>(m_groupVolBinFracHi[nGroup]), 
-				1.0,
-				&m_groupVolBinFracLo[nGroup]->GetBufferPointer()[nZ * nStrideZ], Stride<VOXEL_REAL,3>(m_groupVolBinFracLo[nGroup]), 
-				MakeIppiSize<3>(m_groupVolRegion[nGroup]->GetBufferedRegion())) );
+
+		{
+		IteratorType dstIt(m_groupVolBinFracLo[nGroup], m_groupVolBinFracLo[nGroup]->GetBufferedRegion() );
+		ConstIteratorType groupVolBinFracHiIt( m_groupVolBinFracHi[nGroup], m_groupVolBinFracHi[nGroup]->GetBufferedRegion() );
+		for ( dstIt.GoToBegin(), groupVolBinFracHiIt.GoToBegin(); 
+			!dstIt.IsAtEnd(); ++dstIt, ++groupVolBinFracHiIt)
+		{
+			dstIt.Set(groupVolBinFracHiIt.Get()+1.0);
 		}
+		}
+
+		/// TODO: extend to 3D
+		//for (int nZ = 0; nZ < m_groupVolRegion[nGroup]->GetBufferedRegion().GetSize()[2]; nZ++)
+		//{		
+		//	CK_IPP( ippiAddC_32f_C1R(
+		//		&m_groupVolBinFracHi[nGroup]->GetBufferPointer()[nZ * nStrideZ], Stride<VOXEL_REAL,3>(m_groupVolBinFracHi[nGroup]), 
+		//		1.0,
+		//		&m_groupVolBinFracLo[nGroup]->GetBufferPointer()[nZ * nStrideZ], Stride<VOXEL_REAL,3>(m_groupVolBinFracLo[nGroup]), 
+		//		MakeIppiSize<3>(m_groupVolRegion[nGroup]->GetBufferedRegion())) );
+		//}
 
 		////////////////////////////////////////////////////////////////////
 		// now get final bin frac volume
 
 		// scale by region x beamlet
 		ConformTo<VOXEL_REAL,3>(m_groupVolBinFracLo[nGroup], m_groupVolBinFracLo_x_dVolume[nGroup]);
-		/// TODO: extend to 3D
-		for (int nZ = 0; nZ < m_groupVolRegion[nGroup]->GetBufferedRegion().GetSize()[2]; nZ++)
-		{		
-			CK_IPP( ippiMul_32f_C1R(
-				&Get_dVolume_x_Region(nAt)->GetBufferPointer()[nZ * nStrideZ], Stride<VOXEL_REAL,3>(Get_dVolume_x_Region(nAt)), 
-				&m_groupVolBinFracLo[nGroup]->GetBufferPointer()[nZ * nStrideZ], Stride<VOXEL_REAL,3>(m_groupVolBinFracLo[nGroup]), 
-				&m_groupVolBinFracLo_x_dVolume[nGroup]->GetBufferPointer()[nZ * nStrideZ], Stride<VOXEL_REAL,3>(m_groupVolBinFracLo_x_dVolume[nGroup]), 
-				MakeIppiSize<3>(m_arr_dVolumes_x_Region[nAt]->GetBufferedRegion())) ); 
+
+		{
+		IteratorType dstIt(m_groupVolBinFracLo_x_dVolume[nGroup], m_groupVolBinFracLo_x_dVolume[nGroup]->GetBufferedRegion() );
+		ConstIteratorType dVolume_x_RegionIt( Get_dVolume_x_Region(nAt), Get_dVolume_x_Region(nAt)->GetBufferedRegion() );
+		ConstIteratorType groupVolBinFracLoIt( m_groupVolBinFracLo[nGroup], m_groupVolBinFracLo[nGroup]->GetBufferedRegion() );
+		for ( dstIt.GoToBegin(), dVolume_x_RegionIt.GoToBegin(), groupVolBinFracLoIt.GoToBegin(); 
+			!dstIt.IsAtEnd(); ++dstIt, ++dVolume_x_RegionIt, ++groupVolBinFracLoIt )
+		{
+			dstIt.Set(dVolume_x_RegionIt.Get()*groupVolBinFracLoIt.Get());
 		}
+		}
+
+		/// TODO: extend to 3D
+		//for (int nZ = 0; nZ < m_groupVolRegion[nGroup]->GetBufferedRegion().GetSize()[2]; nZ++)
+		//{		
+		//	CK_IPP( ippiMul_32f_C1R(
+		//		&Get_dVolume_x_Region(nAt)->GetBufferPointer()[nZ * nStrideZ], Stride<VOXEL_REAL,3>(Get_dVolume_x_Region(nAt)), 
+		//		&m_groupVolBinFracLo[nGroup]->GetBufferPointer()[nZ * nStrideZ], Stride<VOXEL_REAL,3>(m_groupVolBinFracLo[nGroup]), 
+		//		&m_groupVolBinFracLo_x_dVolume[nGroup]->GetBufferPointer()[nZ * nStrideZ], Stride<VOXEL_REAL,3>(m_groupVolBinFracLo_x_dVolume[nGroup]), 
+		//		MakeIppiSize<3>(m_arr_dVolumes_x_Region[nAt]->GetBufferedRegion())) ); 
+		//}
 
 		// scale by region x beamlet
 		ConformTo<VOXEL_REAL,3>(m_groupVolBinFracHi[nGroup], m_groupVolBinFracHi_x_dVolume[nGroup]);
-		/// TODO: extend to 3D
-		for (int nZ = 0; nZ < m_groupVolRegion[nGroup]->GetBufferedRegion().GetSize()[2]; nZ++)
+
 		{
-			CK_IPP( ippiMul_32f_C1R(
-				&Get_dVolume_x_Region(nAt)->GetBufferPointer()[nZ * nStrideZ], Stride<VOXEL_REAL,3>(Get_dVolume_x_Region(nAt)),
-				&m_groupVolBinFracHi[nGroup]->GetBufferPointer()[nZ * nStrideZ], Stride<VOXEL_REAL,3>(m_groupVolBinFracHi[nGroup]), 
-				&m_groupVolBinFracHi_x_dVolume[nGroup]->GetBufferPointer()[nZ * nStrideZ], Stride<VOXEL_REAL,3>(m_groupVolBinFracHi_x_dVolume[nGroup]), 
-				MakeIppiSize<3>(m_arr_dVolumes_x_Region[nAt]->GetBufferedRegion())) ); 
+		IteratorType dstIt(m_groupVolBinFracHi_x_dVolume[nGroup], m_groupVolBinFracHi_x_dVolume[nGroup]->GetBufferedRegion() );
+		ConstIteratorType dVolume_x_RegionIt( Get_dVolume_x_Region(nAt), Get_dVolume_x_Region(nAt)->GetBufferedRegion() );
+		ConstIteratorType groupVolBinFracHiIt( m_groupVolBinFracHi[nGroup], m_groupVolBinFracHi[nGroup]->GetBufferedRegion() );
+		for ( dstIt.GoToBegin(), dVolume_x_RegionIt.GoToBegin(), groupVolBinFracHiIt.GoToBegin(); 
+			!dstIt.IsAtEnd(); ++dstIt, ++dVolume_x_RegionIt, ++groupVolBinFracHiIt )
+		{
+			dstIt.Set(dVolume_x_RegionIt.Get()*groupVolBinFracHiIt.Get());
 		}
+		}
+
+		/// TODO: extend to 3D
+		//for (int nZ = 0; nZ < m_groupVolRegion[nGroup]->GetBufferedRegion().GetSize()[2]; nZ++)
+		//{
+		//	CK_IPP( ippiMul_32f_C1R(
+		//		&Get_dVolume_x_Region(nAt)->GetBufferPointer()[nZ * nStrideZ], Stride<VOXEL_REAL,3>(Get_dVolume_x_Region(nAt)),
+		//		&m_groupVolBinFracHi[nGroup]->GetBufferPointer()[nZ * nStrideZ], Stride<VOXEL_REAL,3>(m_groupVolBinFracHi[nGroup]), 
+		//		&m_groupVolBinFracHi_x_dVolume[nGroup]->GetBufferPointer()[nZ * nStrideZ], Stride<VOXEL_REAL,3>(m_groupVolBinFracHi_x_dVolume[nGroup]), 
+		//		MakeIppiSize<3>(m_arr_dVolumes_x_Region[nAt]->GetBufferedRegion())) ); 
+		//}
 
 		// flag change
 		m_arr_bRecomputeBinVolume[nGroup] = FALSE;

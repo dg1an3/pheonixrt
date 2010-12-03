@@ -31,8 +31,8 @@
 #include <math.h>
 
 // IPP includes
-#include <ipps.h>
-#include <ippcv.h>
+//#include <ipps.h>
+//#include <ippcv.h>
 
 // utility macros
 #include <UtilMacros.h>

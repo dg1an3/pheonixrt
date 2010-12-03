@@ -436,12 +436,53 @@ void
 		ConformTo<VOXEL_REAL,3>(pVolume, m_volGroupMainMaxVar);
 		m_volGroupMainMaxVar->FillBuffer(0.0); 
 		//Resample(m_volGroupMaxVar, m_volGroupMainMaxVar, TRUE);
-		Resample3D(m_volGroupMaxVar, m_volGroupMainMaxVar, TRUE);
+		//Resample3D(m_volGroupMaxVar, m_volGroupMainMaxVar, TRUE);
+		itk::ResampleImageFilter<VolumeReal, VolumeReal>::Pointer resamplerMax = 
+			itk::ResampleImageFilter<VolumeReal, VolumeReal>::New();
+		resamplerMax->SetInput(m_volGroupMaxVar);
+
+		typedef itk::AffineTransform<REAL, 3> TransformType;
+		TransformType::Pointer transform = TransformType::New();
+		transform->SetIdentity();
+		resamplerMax->SetTransform(transform);
+
+		typedef itk::LinearInterpolateImageFunction<VolumeReal, REAL> InterpolatorType;
+		InterpolatorType::Pointer interpolator = InterpolatorType::New();
+		resamplerMax->SetInterpolator( interpolator );
+
+		VolumeReal::Pointer pPointToVolume = static_cast<VolumeReal*>(m_volGroupMainMaxVar);
+		resamplerMax->SetOutputParametersFromImage(pPointToVolume);
+		resamplerMax->Update();
+		CopyImage<VOXEL_REAL, 3>(resamplerMax->GetOutput(), m_volGroupMainMaxVar);
+
+
+
 
 		ConformTo<VOXEL_REAL,3>(pVolume, m_volGroupMainMinVar);
 		m_volGroupMainMinVar->FillBuffer(0.0); 
 		//Resample(m_volGroupMinVar, m_volGroupMainMinVar, TRUE);
-		Resample3D(m_volGroupMinVar, m_volGroupMainMinVar, TRUE);
+		//Resample3D(m_volGroupMinVar, m_volGroupMainMinVar, TRUE);
+
+
+		itk::ResampleImageFilter<VolumeReal, VolumeReal>::Pointer resamplerMin = 
+			itk::ResampleImageFilter<VolumeReal, VolumeReal>::New();
+		resamplerMin->SetInput(m_volGroupMinVar);
+
+		//typedef itk::AffineTransform<REAL, 3> TransformType;
+		//TransformType::Pointer transform = TransformType::New();
+		//transform->SetIdentity();
+		resamplerMin->SetTransform(transform);
+
+		//typedef itk::LinearInterpolateImageFunction<VolumeReal, REAL> InterpolatorType;
+		//InterpolatorType::Pointer interpolator = InterpolatorType::New();
+		resamplerMin->SetInterpolator( interpolator );
+
+		/*VolumeReal::Pointer*/ pPointToVolume = static_cast<VolumeReal*>(m_volGroupMainMinVar);
+		resamplerMin->SetOutputParametersFromImage(pPointToVolume);
+		resamplerMin->Update();
+		CopyImage<VOXEL_REAL, 3>(resamplerMin->GetOutput(), m_volGroupMainMinVar);
+
+
 
 		/// TODO check this
 		ConformTo<VOXEL_REAL,3>(m_volMainMinVar, m_volTemp);	

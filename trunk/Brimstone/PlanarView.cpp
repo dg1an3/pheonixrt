@@ -4,6 +4,10 @@
 #include "brimstone.h"
 #include "PlanarView.h"
 
+#ifdef USE_IPP
+#include <ippi.h>
+#endif
+
 #include <Series.h>
 
 /////////////////////////////////////////////////////////////////////////////
@@ -102,6 +106,58 @@ void
 {
 	m_arrLUT[nVolumeAt].Copy(arrLUT);
 }
+
+/////////////////////////////////////////////////////////////////////////////
+inline void Resample(const VolumeReal *pOrig, 
+										 VolumeReal *pNew, 
+										 BOOL bBilinear = FALSE,
+										 int nSlice = 0)
+{
+	itk::Matrix<REAL, 4, 4> mBasisOrig;
+	CalcBasis<3>(pOrig, mBasisOrig);
+
+	itk::Matrix<REAL, 4, 4> mBasisNew;
+	CalcBasis<3>(pNew, mBasisNew);
+
+	itk::Matrix<REAL, 4, 4> mXform = mBasisOrig.GetInverse();
+	mXform *= mBasisNew;
+
+	// calculate plane
+	REAL planeZ = (pNew->GetOrigin()[2] - pOrig->GetOrigin()[2]) / pOrig->GetSpacing()[2];
+
+	// calculate original voxel starting position
+	const VOXEL_REAL *pOrigVoxel = pOrig->GetBufferPointer();
+	VolumeReal::IndexType idx;
+	idx[0] = 0;
+	idx[1] = 0;
+	idx[2] = // nSlice; // 
+		::Round<int>(planeZ);
+	if (!pOrig->GetBufferedRegion().IsInside(idx))
+	{
+		return;
+	}
+	pOrigVoxel += pOrig->ComputeOffset(idx);
+
+	double coeffs[2][3];
+	coeffs[0][0] = mXform(0, 0);
+	coeffs[0][1] = mXform(0, 1);
+	coeffs[0][2] = mXform(0, 3);
+	coeffs[1][0] = mXform(1, 0);
+	coeffs[1][1] = mXform(1, 1);
+	coeffs[1][2] = mXform(1, 3);
+
+	IppStatus stat = ippiWarpAffineBack_32f_C1R(
+		pOrigVoxel, 
+		MakeIppiSize(pOrig->GetBufferedRegion()),
+		pOrig->GetBufferedRegion().GetSize()[0] * sizeof(VOXEL_REAL), 
+		MakeIppiRect(pOrig->GetBufferedRegion()),
+		pNew->GetBufferPointer(), 
+		pNew->GetBufferedRegion().GetSize()[0] * sizeof(VOXEL_REAL), 
+		MakeIppiRect(pNew->GetBufferedRegion()),
+		coeffs, IPPI_INTER_LINEAR);
+
+}	// Resample
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 void CPlanarView::DrawImages(CDC *pDC)

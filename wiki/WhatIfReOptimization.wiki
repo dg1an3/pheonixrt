@@ -1,4 +1,4 @@
-#summary One-sentence summary of this page.
+#summary One approach for incorporating novel optimization algorithms in clinical processes is to use as verification for existing optimizations
 
 = Introduction =
 

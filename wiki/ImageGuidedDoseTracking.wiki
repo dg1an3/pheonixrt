@@ -1,4 +1,4 @@
-#summary One-sentence summary of this page.
+#summary Why can't the additional registration information provided by image-guidance be fed back in to the simple dose tracking that existing systems already support?
 
 = Introduction =
 

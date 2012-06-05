@@ -9,7 +9,7 @@ Let's start with the typical product manager's job description:
  * Ability to act surprised that the new software that one has never touched acts differently than one's expectations
  * Ability to blame engineers for not being able to read minds
 
-I mean seriously people, don't you think that an open process of submitting feature enhancement requests, voting on the most valuable ones, and then have an expandable pool of resources available to work on them would do just as well at developing software?
+I mean, seriously people, don't you think that an open process of submitting feature enhancement requests, voting on the most valuable ones, and then have an expandable pool of resources available to work on them would do just as well at getting software developed?
 
 = Details =
 

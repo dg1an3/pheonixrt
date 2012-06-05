@@ -13,4 +13,4 @@ I mean seriously people, don't you think that an open process of submitting feat
 
 = Details =
 
-Of course, one of the tricks is to ensure that an open source development process produces software of the same high quality as proprietary processes.  Because proprietary processes _always_ produce high quality software, correct?  Then again, you never really know for sure because you can't see the source code.  Does this make sense.  Acme Medical Software produces very high-quality code, and you know this because Acme Medical Software told you so.  Is this a scientific approach to software development.
+Of course, one of the tricks is to ensure that an open source development process produces software of the same high quality as proprietary processes.  Because proprietary processes _always_ produce high quality software, correct?  Then again, you never really know for sure because you can't see the source code.  Does this make sense:  Acme Medical Software produces very high-quality code, and you know this because Acme Medical Software told you so.  Is this a scientific approach to software development?

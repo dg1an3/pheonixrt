@@ -14,3 +14,9 @@ I mean seriously people, don't you think that an open process of submitting feat
 = Details =
 
 Of course, one of the tricks is to ensure that an open source development process produces software of the same high quality as proprietary processes.  Because proprietary processes _always_ produce high quality software, correct?  Then again, you never really know for sure because you can't see the source code.  Does this make sense:  Acme Medical Software produces very high-quality code, and you know this because Acme Medical Software told you so.  Is this a scientific approach to software development?
+
+Being able to see the code may at least help you see how poorly written it is; but of course wants the source code is out in public then the belief is that it will improve as more eyeballs look at it.  But for very critical software, just having a lot of eyeballs looking at it isn't enough.  It needs to be well-tested, and the tests need to have a low cost to run (as multiple iterations of the software are rapidly produced).
+
+Which suggests that automated testing is useful, but in the context of verifying software correctness this leads to a bit of a chicken-and-egg problem:  if the tests are comprehensive then their complexity is going to tend toward the larger size, and then how can you be sure that the test themselves are correct?
+
+This is where the verification 'expert system' comes in; using declarative logic its possible to write relatively concise descriptions of correct program behavior.  These descriptions, in this case written in Prolog, are then available to directly verify the open implementations.  They take a while to run, but these days CPU cycles are fairly plentiful. 

@@ -11,7 +11,6 @@ At the time I had begun playing around with an open-source Prolog environment, S
 
 = Details =
 
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+More detailed explanation of the verification predicates can be found at this link:
+
+[http://pheonixrt.googlecode.com/files/Expert%20System%20for%20Geom%20RTP%20Algorithms.pdf Expert System for Geometric RTP Algorithms]

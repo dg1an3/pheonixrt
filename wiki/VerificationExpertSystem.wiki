@@ -15,4 +15,7 @@ More detailed explanation of the verification predicates can be found at this li
 
 [http://pheonixrt.googlecode.com/files/Expert%20System%20for%20Geom%20RTP%20Algorithms.pdf Expert System for Geometric RTP Algorithms]
 
+<wiki:comment>
+Generate the equation from the codecogs server:
 <img src="http://latex.codecogs.com/gif.latex?%5Cforall%20P_n%20%3A%20%5Cforall%20%5Cvec%7B%5Cmathbf%7Bv%7D%7D%20%5Cin%20P_n%20%3A%20%5Cvec%7B%5Cmathbf%7Bv%7D%7D%20%5Cin%20%7BM%7D%27" />
+</wiki:comment>

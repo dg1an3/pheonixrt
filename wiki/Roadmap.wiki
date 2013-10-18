@@ -1,7 +1,0 @@
-#summary This is the roadmap for the PheonixRT project
-#labels Featured
-
-  * [DicomImport Loading of DICOM CT and StructureSets]
-  * [PlanSetup Plan Setup and beamlet / influence matrix calculation]
-  * [PrescriptionDefinition Prescription Definition]
-  * [OptimizePlan Plan Optimization]

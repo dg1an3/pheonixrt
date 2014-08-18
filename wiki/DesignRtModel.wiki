@@ -10,3 +10,5 @@ RtModel contains the data model for plans, structures, and images, as well as lo
 = Details =
 
 Attached is a class diagram showing the main class relationships within the RtModel package.
+
+[https://lh6.googleusercontent.com/-4oG2ftBlqTc/U_KMW-tTVpI/AAAAAAAAlN8/dLFm8wyGmxY/w724-h762-no/phx.png]

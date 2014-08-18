@@ -3,12 +3,10 @@
 = Introduction =
 
 RtModel contains the data model for plans, structures, and images, as well as logic for persistence of the data.  It also contains algorithms for 
-  * Calculating Dose
-  * Calculating basic Dose-volume histograms
+  * Optimization from a prescription
+  * Calculating Dose-volume histograms
+  * Calculating Dose (in the case that dose hasn't been imported)
 
 = Details =
 
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+Attached is a class diagram showing the main class relationships within the RtModel package.

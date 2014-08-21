@@ -1,4 +1,4 @@
-#summary Or, how to use proprietary software to remove value from an ecosystem
+#summary or, how to use proprietary software to remove value from an ecosystem
 
 = Introduction =
 It's called Technical Debt, but it's the same thing that the FDA's [http://www.fda.gov/AboutFDA/CentersOffices/OfficeofMedicalProductsandTobacco/CDRH/CDRHOffices/ucm300017.htm software engineering lab] gets from static analysis.  While I doubt that there is an a priori relationship between proprietary software and technical debt...

@@ -1,0 +1,6 @@
+#summary or, how to show what we mean
+
+= Introduction =
+Interpretation of shift information is not the easiest thing in the world
+
+= Details =

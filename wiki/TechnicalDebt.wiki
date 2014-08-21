@@ -1,7 +1,7 @@
 #summary Or, how to use proprietary software to remove value from an ecosystem
 
 = Introduction =
-It's called Technical Debt, but it's the same thing that the FDA's [http://www.fda.gov/AboutFDA/CentersOffices/OfficeofMedicalProductsandTobacco/CDRH/CDRHOffices/ucm300017.htm| software engineering lab] gets from static analysis.  While I doubt that there is an a priori relationship between proprietary software and technical debt...
+It's called Technical Debt, but it's the same thing that the FDA's [http://www.fda.gov/AboutFDA/CentersOffices/OfficeofMedicalProductsandTobacco/CDRH/CDRHOffices/ucm300017.htm software engineering lab] gets from static analysis.  While I doubt that there is an a priori relationship between proprietary software and technical debt...
 
 = Details =
 Let's imagine two scenarios, one involving a proprietary application that has been around for > 10 years, and one involving an open source application.

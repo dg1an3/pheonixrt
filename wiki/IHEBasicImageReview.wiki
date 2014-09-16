@@ -1,8 +1,8 @@
-#summary Gap analysis of the UI conventions outlined in the IHE Basic Image Review transactions
+#summary Gap analysis of the UI conventions outlined in the IHE [http://wiki.ihe.net/index.php?title=Basic_Image_Review Basic Image Review] transactions
 
 = Introduction =
 
-http://wiki.ihe.net/index.php?title=Basic_Image_Review
+
 * Navigation mechanism
 * User interactions
 

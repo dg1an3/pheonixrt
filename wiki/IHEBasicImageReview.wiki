@@ -1,0 +1,14 @@
+#summary Gap analysis of the UI conventions outlined in the IHE Basic Image Review transactions
+
+= Introduction =
+
+http://wiki.ihe.net/index.php?title=Basic_Image_Review
+* Navigation mechanism
+* User interactions
+
+= Details =
+
+Add your content here.  Format your content with:
+  * Text in *bold* or _italic_
+  * Headings, paragraphs, and lists
+  * Automatic links to other wiki pages

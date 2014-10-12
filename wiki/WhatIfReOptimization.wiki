@@ -1,10 +1,13 @@
 #summary One approach for incorporating novel optimization algorithms in clinical processes is to use as verification for existing optimizations
 
 = Introduction =
+Assessing a large quantity of cone beam CTs has become a significant challenge in the current RT environment.  A method is needed to quickly filter images revealing information requiring in-depth analysis, as opposed to the majority of images that don't require in-depth analysis.
 
-"What-if" re-optimization asks the question: Given some additional information, how much better could an optimization become?  This may not be the same as re-optimizing as part of a replanning step, because the replanning may involve significantly more effort.  But if there is a means to quickly and easily perform a re-optimization based on additional data, then this could serve to aid the replanning decision process.
+If a method were available to quickly re-optimize a plan based on new information, this could provide an efficient filter based on the magnitude of improvement indicated by the re-optimization.
 
 = Details =
+
+"What-if" re-optimization asks the question: Given some additional information, how much better could an optimization become?  This may not be the same as re-optimizing as part of a replanning step, because the replanning may involve significantly more effort.  But if there is a means to quickly and easily perform a re-optimization based on additional data, then this could serve to aid the replanning decision process.
 
 Add your content here.  Format your content with:
   * Text in *bold* or _italic_

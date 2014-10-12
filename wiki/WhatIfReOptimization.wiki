@@ -7,9 +7,4 @@ If a method were available to quickly re-optimize a plan based on new informatio
 
 = Details =
 
-"What-if" re-optimization asks the question: Given some additional information, how much better could an optimization become?  This may not be the same as re-optimizing as part of a replanning step, because the replanning may involve significantly more effort.  But if there is a means to quickly and easily perform a re-optimization based on additional data, then this could serve to aid the replanning decision process.
-
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+"What-if" re-optimization asks the question: Given some additional information, how much better could the treatment be?  This may not be the same as re-optimizing as part of a replanning step, because the replanning may involve significantly more effort.  But if there is a means to quickly and easily perform a re-optimization based on additional data, then this could serve to aid the image assessment process.

@@ -1,4 +1,5 @@
 #summary A minimalist set of Prolog predicates to verify various image and geometry calculations
+#labels Phase-QA
 
 = Introduction =
 

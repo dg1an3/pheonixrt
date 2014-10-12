@@ -1,14 +1,11 @@
 #summary Gap analysis of the UI conventions outlined in the IHE transactions
+#labels Phase-Requirements,Phase-Design
 
 = Introduction =
+The IHE Basic Image Review profile contains a lot of the things that were being attempted at Siemens Oncology years ago, as well as at Elekta more recently.  Standardization of UIs for image review is an idea whose time has come.
 
- * [http://wiki.ihe.net/index.php?title=Basic_Image_Review Basic Image Review]
- * Navigation mechanism
- * User interactions
 
 = Details =
-
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+ * [http://wiki.ihe.net/index.php?title=Basic_Image_Review Basic Image Review]
+ * The main navigation is the use of interactive thumbnails, which is something we all know and love
+ * User interaction conventions for zoom/pan, window/level, and mouse wheel are all spelled out (including icons, which is a definite plus!)

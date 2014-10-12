@@ -1,7 +1,10 @@
 #summary or, how to use proprietary software to remove value from an ecosystem
+#labels Phase-QA,Phase-Support
 
 = Introduction =
-It's called Technical Debt, but it's the same thing that the FDA's [http://www.fda.gov/AboutFDA/CentersOffices/OfficeofMedicalProductsandTobacco/CDRH/CDRHOffices/ucm300017.htm software engineering lab] gets from static analysis.  While I doubt that there is an a priori relationship between proprietary software and technical debt...
+It's called Technical Debt, but it's the same thing that the FDA's [http://www.fda.gov/AboutFDA/CentersOffices/OfficeofMedicalProductsandTobacco/CDRH/CDRHOffices/ucm300017.htm software engineering lab] gets from static analysis.  The VerificationExpertSystem and related algorithmic verification techniques can establish the correct functioning of algorithms, but if the understanding of call paths is incomplete then it becomes difficult to ensure the correct operation of a complex piece of software under all relevent conditions.
 
 = Details =
-Let's imagine two scenarios, one involving a proprietary application that has been around for > 10 years, and one involving an open source application.
+Static analysis and code coverage analysis can both be used to relate the results of a VerificationExpertSystem to the aggregate behavior of a software product.  Correct test coverage can then be determined by looking at whether all essential pathways through the software have been covered.
+
+But if a proprietary company has very old software, and no one really understands how large parts of the software operate (as is the case with Elekta's Mosaiq), then it becomes nearly impossible to make any kind of assurances that changes to the software design will be properly regression tested.  The result is numerous complaints from the field, and a management that is typically paralyzed by inaction because they clearly don't have a grasp on the complexity of the intrinsic risk of the device.

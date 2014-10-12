@@ -1,4 +1,5 @@
 #summary One approach for incorporating novel optimization algorithms in clinical processes is to use as verification for existing optimizations
+#labels Phase-Requirements,Phase-Design,Featured
 
 = Introduction =
 Assessing a large quantity of cone beam CTs has become a significant challenge in the current RT environment.  A method is needed to quickly filter images revealing information requiring in-depth analysis, as opposed to the majority of images that don't require in-depth analysis.
@@ -8,3 +9,10 @@ If a method were available to quickly re-optimize a plan based on new informatio
 = Details =
 
 "What-if" re-optimization asks the question: Given some additional information, how much better could the treatment be?  This may not be the same as re-optimizing as part of a replanning step, because the replanning may involve significantly more effort.  But if there is a means to quickly and easily perform a re-optimization based on additional data, then this could serve to aid the image assessment process.
+
+The workflow for reviewing a CBCT would look like this:
+ # An initial registration would be done, or would be imported as an SRO
+ # A second landmark-based TPS would be done, based on a set of pre-defined landmarks specific to the anatomical site
+ # Further manual adjustment of the landmarks could then be done to fine-tune the fit
+ # As the landmarks are adjusted, the pheonixrt algorithm would run dynamically to demonstrate the resulting re-optimization result
+ # Significant variation in DVHs w.r.t. landmarks would indicate further investigation was needed.  Stable DVHs would indicate that the landmark shifts are not significantly affecting the treatment.

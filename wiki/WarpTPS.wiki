@@ -1,0 +1,7 @@
+#summary WarpTPS is a simple application to allow interactive deformable registration based on thin-plate splines
+
+= Introduction =
+One of the problems to be addressed for adaptive treatment paradigms is the need to visualize and interact with deformable vector fields (DVF).  While a number of techniques exist for visualizing vector fields, such as heat maps and hedgehog plots, a simple technique is to allow interactive morphing to examine how the vector field is altering the target image to match the source.
+
+= Details =
+This is a very old MFC program that allows loading two different PNG images, and then provides a slider to morph back and forth between them.  Also see the movie showing the application in action.

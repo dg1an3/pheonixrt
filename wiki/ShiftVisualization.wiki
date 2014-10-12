@@ -1,6 +1,7 @@
 #summary or, how to show what we mean
 
 = Introduction =
-Interpretation of shift information is not the easiest thing in the world
+Interpretation of IGRT shift information is not the easiest thing in the world.  Elekta's Mosaiq, for one, has had a terrible time defining a coherent interpretation of shifts that is robust irrespective of online device conventions, regional settings, and general user error
 
 = Details =
+Maybe the problem is that we are expecting people to be more adept at spatial reasoning than the actually are.

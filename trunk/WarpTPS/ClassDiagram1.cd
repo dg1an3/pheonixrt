@@ -1,0 +1,354 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="CDibView">
+    <Position X="3.75" Y="3.25" Width="2" />
+    <AssociationLine Name="m_pDoc" Type="CDocument" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="5.156" Y="3.25" />
+        <Point X="5.156" Y="1.188" />
+        <Point X="8" Y="1.188" />
+      </Path>
+    </AssociationLine>
+    <AssociationLine Name="m_pDib" Type="CDib" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="5.75" Y="7.625" />
+        <Point X="6.375" Y="7.625" />
+        <Point X="6.375" Y="10" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.133" Y="0.11" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AQCCACAAgAAADCAgAgAAAABAAJgAAAAAAAQAAQS4BIA=</HashCode>
+      <FileName>DibView.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="m_pDoc" />
+      <Field Name="m_pDib" />
+      <Field Name="m_pTransform" />
+      <Field Name="m_pInverseTransform" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="CTPSTransform">
+    <Position X="7.5" Y="4.5" Width="2.25" />
+    <AssociationLine Name="m_arrLandmarks" Type="std::vector&lt;_Ty, _Ax&gt;" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="9.75" Y="8.572" />
+        <Point X="10.625" Y="8.572" />
+        <Point X="10.625" Y="11.062" />
+        <Point X="10.25" Y="11.062" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.094" Y="0.255" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="m_presampledOffsets" Type="std::vector&lt;_Ty, _Ax&gt;" FixedToPoint="true">
+      <Path>
+        <Point X="9.5" Y="9.968" />
+        <Point X="9.5" Y="10.75" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.047" Y="0.217" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="m_vWx" Type="CVectorN&lt;TYPE&gt;">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.12" Y="-0.263" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>IEAAQBAAIAQIAIgAAAAARRAgQgAIAAAAEAIAgCAIEEU=</HashCode>
+      <FileName>TPSTransform.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="m_presampledOffsets" />
+      <Field Name="m_mL_inv" />
+      <Field Name="m_vWx" />
+      <Field Name="m_vWy" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Field Name="m_arrLandmarks" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="std::vector&lt;_Ty, _Ax&gt;" Collapsed="true">
+    <Position X="8.75" Y="10.75" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>IUgEEIEqCLBMQEBAAKMIAgISAAUESAIAxQEwgwAEQgI=</HashCode>
+      <FileName>c:\program files (x86)\microsoft visual studio 10.0\vc\include\vector</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CWarpTPSView">
+    <Position X="0.75" Y="0.5" Width="1.75" />
+    <AssociationLine Name="m_pTransform" Type="CTPSTransform" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="2.5" Y="2.312" />
+        <Point X="5.073" Y="2.312" Type="JumpStart" />
+        <Point X="5.239" Y="2.312" Type="JumpEnd" />
+        <Point X="8.25" Y="2.312" />
+        <Point X="8.25" Y="4.5" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.087" Y="1.879" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="m_pInverseTransform" Type="CTPSTransform" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="2.5" Y="2.781" />
+        <Point X="5.073" Y="2.781" Type="JumpStart" />
+        <Point X="5.239" Y="2.781" Type="JumpEnd" />
+        <Point X="7.875" Y="2.781" />
+        <Point X="7.875" Y="4.5" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.089" Y="1.311" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAAQFABAAAGABAgAAAgCAAgAKAACwIAAEADQA=</HashCode>
+      <FileName>WarpTPSView.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="m_morphSlider" />
+      <Field Name="m_pTransform" />
+      <Field Name="m_pInverseTransform" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Field Name="m_arrViews" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="MorphSlider">
+    <Position X="1.25" Y="8.5" Width="2" />
+    <NestedTypes>
+      <Enum Name="MorphSlider::__unnamed_enum_0198_1" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>MorphSlider.h</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <AssociationLine Name="m_pTransform" Type="CTPSTransform" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="3.25" Y="9" />
+        <Point X="5.375" Y="9" />
+        <Point X="5.375" Y="9" />
+        <Point X="6.292" Y="9" Type="JumpStart" />
+        <Point X="6.458" Y="9" Type="JumpEnd" />
+        <Point X="7.5" Y="9" />
+      </Path>
+    </AssociationLine>
+    <AssociationLine Name="m_pInverseTransform" Type="CTPSTransform">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="-0.003" Y="0.184" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="m_pSourceImage" Type="CDib" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="2.312" Y="11.79" />
+        <Point X="2.312" Y="13.233" />
+        <Point X="5.5" Y="13.233" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.181" Y="-0.294" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="m_pDestinationImage" Type="CDib" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="2.5" Y="11.79" />
+        <Point X="2.5" Y="12.934" />
+        <Point X="5.5" Y="12.934" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.151" Y="0.061" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="m_pWarpedSourceImage" Type="CDib" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="2.625" Y="11.79" />
+        <Point X="2.625" Y="12.395" />
+        <Point X="5.5" Y="12.395" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.127" Y="0.091" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="m_pWarpedDestinationImage" Type="CDib" FixedFromPoint="true">
+      <Path>
+        <Point X="3.25" Y="11.212" />
+        <Point X="5.5" Y="11.212" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.166" Y="0.113" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="m_pWarpedView" Type="CDibView" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="2.75" Y="8.5" />
+        <Point X="2.75" Y="6.312" />
+        <Point X="3.75" Y="6.312" />
+      </Path>
+    </AssociationLine>
+    <AssociationLine Name="m_rSlider" Type="CSliderCtrl" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="1.25" Y="11.312" />
+        <Point X="0.667" Y="11.312" />
+        <Point X="0.667" Y="14.375" />
+        <Point X="1.75" Y="14.375" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.089" Y="0.07" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="m_morphSlider" Type="CSliderCtrl" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="1.25" Y="11.562" />
+        <Point X="0.844" Y="11.562" />
+        <Point X="0.844" Y="14.062" />
+        <Point X="1.75" Y="14.062" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="-0.505" Y="0.154" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="m_blendSlider" Type="CSliderCtrl" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="1.25" Y="11.062" />
+        <Point X="0.5" Y="11.062" />
+        <Point X="0.5" Y="14.562" />
+        <Point X="1.75" Y="14.562" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.079" Y="-0.294" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAAAIAIkAEEMBBAAABAAhAAAAAAAAgIAACQEAAEAAEA=</HashCode>
+      <FileName>MorphSlider.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="m_pTransform" />
+      <Field Name="m_pInverseTransform" />
+      <Field Name="m_pSourceImage" />
+      <Field Name="m_pDestinationImage" />
+      <Field Name="m_pWarpedSourceImage" />
+      <Field Name="m_pWarpedDestinationImage" />
+      <Field Name="m_pBlendedImage" />
+      <Field Name="m_pWarpedView" />
+      <Field Name="m_rSlider" />
+      <Field Name="m_morphSlider" />
+      <Field Name="m_blendSlider" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="CDib">
+    <Position X="5.5" Y="10" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AQAAgAAAAAAAAgCAAIKAAAEAgIhgBAACJAAAAAAAAAA=</HashCode>
+      <FileName>Dib.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="m_bm" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="CDocument" Collapsed="true">
+    <Position X="8" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>F0iRGAEE3hIQGAghCcMKuCJisGjggtJWHCDsAwAQ4qA=</HashCode>
+      <FileName>c:\program files (x86)\microsoft visual studio 10.0\vc\atlmfc\include\afxwin.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CView" Collapsed="true">
+    <Position X="3.25" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIKBACQAAEBSEACCmABgjSAAgCQQEISAAAwYKgEoFQA=</HashCode>
+      <FileName>c:\program files (x86)\microsoft visual studio 10.0\vc\atlmfc\include\afxwin.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="m_pDocument" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="CWarpTPSDoc">
+    <Position X="11" Y="1.75" Width="2" />
+    <InheritanceLine Type="CDocument" FixedFromPoint="true">
+      <Path>
+        <Point X="9.5" Y="1.125" />
+        <Point X="12" Y="1.125" />
+        <Point X="12" Y="1.75" />
+      </Path>
+    </InheritanceLine>
+    <AssociationLine Name="m_transform" Type="CTPSTransform">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.178" Y="0.15" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="m_inversetransform" Type="CTPSTransform" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="11" Y="3.625" />
+        <Point X="8.75" Y="3.625" />
+        <Point X="8.75" Y="4.5" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="-1.489" Y="1.116" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="m_pImage" Type="CDib" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="12.812" Y="5.098" />
+        <Point X="12.812" Y="12.222" />
+        <Point X="7.25" Y="12.222" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.326" Y="-0.354" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>ACAAAAEIAAAAQAABCABAgCIQASAgAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>WarpTPSDoc.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="m_transform" />
+      <Field Name="m_inversetransform" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Field Name="m_pImage" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="CMatrixNxM&lt;TYPE&gt;" Collapsed="true">
+    <Position X="10.75" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAACAAAAAAAAQJAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>c:\users\uslander\skydrive\projects\warptps\src\vecmat\matrixnxm.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CVectorN&lt;TYPE&gt;" Collapsed="true">
+    <Position X="10.75" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>c:\users\uslander\skydrive\projects\warptps\src\vecmat\vectorn.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CSliderCtrl" Collapsed="true">
+    <Position X="1.75" Y="14" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AYAQRAEAABQAACAQARQCAAkSAAAAQOQAQApTJBAAAAA=</HashCode>
+      <FileName>c:\program files (x86)\microsoft visual studio 10.0\vc\atlmfc\include\afxcmn.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Typedef Name="BITMAP" Collapsed="true">
+    <Position X="8.5" Y="13.25" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>c:\program files (x86)\microsoft sdks\windows\v7.0a\include\wingdi.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Enum Name="ImageRole">
+    <Position X="13" Y="10.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAACAAAAAAAAgAAAAAAAAAAAAAAAAAAAACRAAAAAA=</HashCode>
+      <FileName>WarpTPSDoc.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

@@ -15,5 +15,6 @@ The workflow for reviewing a CBCT with what-if re-optimization:
  # A second landmark-based TPS registration is based on a set of pre-defined landmarks specific to the anatomical site
  # Further manual adjustment of the landmarks fine-tune the fit
  # As the landmarks are adjusted, the pheonixrt algorithm dynamically updates the resulting re-optimization result
- # Significant variation in DVHs w.r.t. landmarks -> further investigation is needed
- # Stable DVHs -> landmark shifts do not significantly affect the treatment
+ # Decision:
+    * Stable DVHs >> landmark shifts do not significantly affect the treatment  
+    * Significant variation in DVHs w.r.t. landmarks >> further investigation is warranted

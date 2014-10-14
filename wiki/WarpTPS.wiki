@@ -7,6 +7,10 @@ One of the problems to be addressed for adaptive treatment paradigms is the need
 = Details =
 This is a very old MFC program that allows loading two different PNG images, and then provides a slider to morph back and forth between them.
 
+First is a video of Grumpy to Hedgy:
+
+<wiki:video url="http://youtu.be/watch?v=ggDMs3GozSU" />
+
 This video shows one MR slice being morphed on to another one:
 
 <wiki:video url="http://www.youtube.com/watch?v=1w0Gk1YRcuI"/>

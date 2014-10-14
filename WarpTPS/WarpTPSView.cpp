@@ -254,10 +254,10 @@ void CWarpTPSView::OnUpdateShowmarks(CCmdUI* pCmdUI)
 
 void CWarpTPSView::OnFileOpenImages() 
 {
-	CFileDialog imageFileOpen1(TRUE, "bmp", NULL, OFN_HIDEREADONLY, NULL, 
+	CFileDialog imageFileOpen1(TRUE, _T("bmp"), NULL, OFN_HIDEREADONLY, NULL, 
 		::AfxGetMainWnd());
 
-	CFileDialog imageFileOpen2(TRUE, "bmp", NULL, OFN_HIDEREADONLY, NULL, 
+	CFileDialog imageFileOpen2(TRUE, _T("bmp"), NULL, OFN_HIDEREADONLY, NULL, 
 		::AfxGetMainWnd());
 
 	if (IDOK == imageFileOpen1.DoModal() && IDOK == imageFileOpen2.DoModal())

@@ -46,8 +46,8 @@ public:
 // Operations
 public:
 	// loads the two specified images
-	BOOL LoadImages(const char *pszFilename1, const char *pszFilename2);
-
+	BOOL LoadImages(LPCTSTR pszFilename1, LPCTSTR pszFilename2);
+	
 // Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CWarpTPSDoc)

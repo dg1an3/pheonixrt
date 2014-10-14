@@ -53,7 +53,7 @@ BOOL CWarpTPSDoc::OnNewDocument()
 
 	// load the images
 
-	if (!LoadImages(".\\001.bmp", ".\\002.bmp"))
+	if (!LoadImages(_T(".\\TestData\\001.bmp"), _T(".\\TestData\\002.bmp")))
 	{
 		return FALSE;
 	}
@@ -113,7 +113,7 @@ void CWarpTPSDoc::Dump(CDumpContext& dc) const
 /////////////////////////////////////////////////////////////////////////////
 // CWarpTPSDoc commands
 
-BOOL CWarpTPSDoc::LoadImages(const char *pszFilename1, const char *pszFilename2)
+BOOL CWarpTPSDoc::LoadImages(LPCTSTR pszFilename1, LPCTSTR pszFilename2)
 {
 	for (int nAt = 0; nAt < 5; nAt++)
 	{
@@ -166,7 +166,7 @@ BOOL CWarpTPSDoc::LoadImages(const char *pszFilename1, const char *pszFilename2)
 	if (m_pImage[ImageRole::DestinationImage]->GetSize() 
 		!= m_pImage[ImageRole::SourceImage]->GetSize())
 	{
-		::AfxMessageBox("Images must have same dimensions");
+		::AfxMessageBox(_T("Images must have same dimensions"));
 		goto ERROR_CLEANUP;
 	}
 

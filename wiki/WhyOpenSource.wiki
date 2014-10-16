@@ -21,6 +21,8 @@ Which suggests that automated testing is useful, but in the context of verifying
 
 This is where the verification 'expert system' comes in; using declarative logic its possible to write relatively concise descriptions of correct program behavior.  These descriptions, in this case written in Prolog, are then available to directly verify the open implementations.  They take a while to run, but these days CPU cycles are fairly plentiful. 
 
+For the ITK point of view, see the chapter [http://www.aosabook.org/en/itk.html in The Architecture of Open Source] book.
+
 = New BSD License =
 Copyright (c) 2007-2014, Derek G. Lane
 All rights reserved.

@@ -42,10 +42,10 @@ public:
 
 	// graph to display iterations
 	CGraph m_graphIterations;
-	CDataSeries m_dsIter;
+	CDataSeries::Pointer m_dsIter;
 
 	// stores data series for iteration graph
-	CDataSeries *m_pIterDS[dH::Structure::MAX_SCALES];
+	CDataSeries::Pointer m_pIterDS[dH::Structure::MAX_SCALES];
 
 	// generates a histogram for the specified structure
 	void AddHistogram(dH::Structure * pStruct);

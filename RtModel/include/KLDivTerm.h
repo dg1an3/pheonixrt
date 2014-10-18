@@ -14,10 +14,19 @@ namespace dH
 ///////////////////////////////////////////////////////////////////////////////
 class KLDivTerm : public VOITerm
 {
-public:
 	// constructor / destructor
 	KLDivTerm(Structure *pStructure = NULL, REAL weight = 0.0);
 	virtual ~KLDivTerm();
+
+public:
+	// standard class typedefs
+	typedef KLDivTerm Self;
+	typedef VOITerm Superclass;
+	typedef itk::SmartPointer< Self > Pointer;
+	typedef itk::SmartPointer< const Self > ConstPointer;
+	
+	// defines a New for the object
+	itkNewMacro(KLDivTerm);
 
 	// update operator
 	virtual void UpdateFrom(const VOITerm *otherTerm);

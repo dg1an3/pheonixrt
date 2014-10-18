@@ -12,7 +12,7 @@
 //#include <ippi.h>
 #endif
 
-#include <itkOrientedImage.h>
+
 #include <itkImageRegionIterator.h>
 #include <itkImageRegionIteratorWithIndex.h>
 
@@ -23,10 +23,10 @@ typedef float VOXEL_REAL;
 typedef float VoxelReal;
 
 // helper typedef for the ITK Volume of pixel types
-typedef itk::OrientedImage<VOXEL_REAL,3> VolumeReal;
-typedef itk::OrientedImage<VOXEL_REAL,2> VolumeSliceReal;
-typedef itk::OrientedImage<short,3> VolumeShort;
-typedef itk::OrientedImage<unsigned char, 3> VolumeChar;
+typedef itk::Image<VOXEL_REAL,3> VolumeReal;
+typedef itk::Image<VOXEL_REAL,2> VolumeSliceReal;
+typedef itk::Image<short,3> VolumeShort;
+typedef itk::Image<unsigned char, 3> VolumeChar;
 
 typedef itk::ImageRegionConstIterator< VolumeReal > ConstVolumeRealIterator;
 typedef itk::ImageRegionIterator< VolumeReal > VolumeRealIterator;

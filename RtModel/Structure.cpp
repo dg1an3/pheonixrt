@@ -4,8 +4,6 @@
 
 #include <itkImageRegionConstIterator.h>
 #include <itkImageRegionIterator.h>
-#include <itkScalarImageToListAdaptor.h>
-#include <itkMeanCalculator.h>
 #include <itkResampleImageFilter.h>
 
 #include <Structure.h>

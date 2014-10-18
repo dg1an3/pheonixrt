@@ -7,15 +7,17 @@
 
 CTargetDVHSeries::CTargetDVHSeries(dH::KLDivTerm *pKLDT)
 #ifdef USE_RTOPT
-: m_pKLDivTerm(pKLDT)
+// : m_pKLDivTerm(pKLDT)
 #endif
 {
 #ifdef USE_RTOPT
+	SetForKLDivTerm(pKLDT);
 	//m_pKLDivTerm->GetChangeEvent().AddObserver(this, 
 	//	(dH::ListenerFunction) &CTargetDVHSeries::OnKLDTChanged);
 #endif
 
-	OnKLDTChanged(); // NULL, NULL);
+	if (GetForKLDivTerm().IsNotNull())
+		OnKLDTChanged(); // NULL, NULL);
 }
 
 CTargetDVHSeries::~CTargetDVHSeries(void)
@@ -41,7 +43,7 @@ void CTargetDVHSeries::SetDataMatrix(const CMatrixNxM<>& mData)
 		mTemp[nAt][1] /= R(100.0);
 	}
 #ifdef USE_RTOPT
-	m_pKLDivTerm->SetDVPs(mTemp);
+	GetForKLDivTerm()->SetDVPs(mTemp);
 #endif
 }
 
@@ -50,8 +52,13 @@ void CTargetDVHSeries::OnKLDTChanged() // CObservableEvent * pEv, void * pVoid)
 #ifdef USE_RTOPT
 		// m_mData.Reshape(0, 2);
 
+	if (GetForKLDivTerm().IsNull())
+	{
+		throw new exception("Didn't initialize");
+	}
+
 	// now draw the histogram
-	const CMatrixNxM<>& mDVPs = m_pKLDivTerm->GetDVPs();
+	const CMatrixNxM<>& mDVPs = GetForKLDivTerm()->GetDVPs();
 	m_mData.Reshape(mDVPs.GetCols(), mDVPs.GetRows());
 	m_mData = mDVPs;
 

@@ -85,10 +85,13 @@ void
 	CHistogram *pHisto = GetDocument()->m_pPlan->GetHistogram(pStruct, true);
 	ASSERT(pHisto != NULL);
 
-	CHistogramDataSeries *pSeries = new CHistogramDataSeries(pHisto);
-	pSeries->m_pGraph = &m_graphDVH;
-	pSeries->SetColor(pStruct->GetColor());
+	CHistogramDataSeries::Pointer pHistogramSeries = CHistogramDataSeries::New();
+	pHistogramSeries->SetHistogram(pHisto);
 
+	pHistogramSeries->m_pGraph = &m_graphDVH;
+	pHistogramSeries->SetColor(pStruct->GetColor());
+
+	CDataSeries::Pointer pSeries = pHistogramSeries;
 	m_graphDVH.AddDataSeries(pSeries);
 	m_graphDVH.AutoScale();
 	m_graphDVH.SetAxesMin(MakeVector<2>(0.0f, 0.0f));
@@ -128,10 +131,15 @@ void
 	dH::Structure *pStruct = pVOIT->GetVOI();
 
 	// form the data series
-	CTargetDVHSeries *pSeries = new CTargetDVHSeries((dH::KLDivTerm *) pVOIT);
-	pSeries->SetColor(pStruct->GetColor());
-	pSeries->SetPenStyle(PS_DASHDOT);
-	pSeries->SetHasHandles(TRUE);
+	CTargetDVHSeries::Pointer pTargetDvhSeries = CTargetDVHSeries::New();
+	pTargetDvhSeries->SetForKLDivTerm((dH::KLDivTerm*)pVOIT);
+	pTargetDvhSeries->OnKLDTChanged();
+
+	pTargetDvhSeries->SetColor(pStruct->GetColor());
+	pTargetDvhSeries->SetPenStyle(PS_DASHDOT);
+	pTargetDvhSeries->SetHasHandles(TRUE);
+
+	CDataSeries::Pointer pSeries = pTargetDvhSeries;
 	m_graphDVH.AddDataSeries(pSeries);
 #endif
 }
@@ -216,7 +224,7 @@ int
 		CRect(0, 200, 200, 400), this, /* nID */ 114);
 
 	for (int nD = 0; nD < dH::Structure::MAX_SCALES; nD++)
-		m_pIterDS[nD] = new CDataSeries();
+		m_pIterDS[nD] = CDataSeries::New();
 	m_pIterDS[0]->SetColor(RGB(255, 0, 0));
 	m_graphIterations.AddDataSeries(m_pIterDS[0]);
 	m_pIterDS[1]->SetColor(RGB(0, 255, 0));

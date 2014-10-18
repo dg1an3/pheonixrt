@@ -388,7 +388,7 @@ void CSeriesDicomImporter::ImportDicomStructureSet(DcmFileFormat *pFileFormat)
 					{
 						slice_z = coord[2];
 					}
-					ASSERT(IsApproxEqual(coord_z, slice_z));
+					// ASSERT(IsApproxEqual(coord_z, slice_z));
 					pPoly->AddPoint(dH::Structure::PolygonType::PointType(coord)); // AddVertex(MakeVector<2>(coord_x, coord_y)); // (vVert);
 				}
 				pStruct->AddContour(pPoly, slice_z);

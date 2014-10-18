@@ -22,3 +22,9 @@ The workflow for reviewing a CBCT with what-if re-optimization:
 = The phoenixrt algorithm =
 
 The algorithm is a multi-resolution beamlet weight (influence matrix) optimization, based on matching of target DVH curve shapes using relative entropy.  More details can be found [http://www.google.com/patents/US7369645 here].
+
+A video of the optimization for a simple "2.5D" case:
+
+<wiki:video url="http://www.youtube.com/watch?v=eITwG8UhxOs"/>
+
+The "2.5D" case is a shallow volume of 5 slices with contours on the central slice, being optimized by a single row of beamlets on each beam.  

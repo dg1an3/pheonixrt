@@ -18,3 +18,7 @@ The workflow for reviewing a CBCT with what-if re-optimization:
  # Decision:
     * Stable DVHs >> landmark shifts do not significantly affect the treatment  
     * Significant variation in DVHs w.r.t. landmarks >> further investigation is warranted
+
+= The phoenixrt algorithm =
+
+The algorithm is a multi-resolution beamlet weight (influence matrix) optimization, based on matching of target DVH curve shapes using relative entropy.  More details can be found [http://www.google.com/patents/US7369645 here].

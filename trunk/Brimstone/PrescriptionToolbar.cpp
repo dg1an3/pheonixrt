@@ -259,7 +259,9 @@ void
 		if (NULL == pVOIT)
 		{
 			// need to create new term
-			dH::KLDivTerm *pKLDT = new dH::KLDivTerm(pStruct, 2.5);
+			dH::KLDivTerm::Pointer pKLDT = dH::KLDivTerm::New(); // pStruct); // , 2.5);
+			pKLDT->SetVOI(pStruct);
+			pKLDT->SetWeight(2.5);
 
 			// NOTE: must AddStructureTerm before SetInterval, because it sets up binning parameters
 			GetView()->AddStructTerm(pKLDT);

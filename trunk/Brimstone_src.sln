@@ -1,20 +1,12 @@
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RtModel", "RtModel\RtModel.vcproj", "{7C848FBB-2C50-4F47-81C9-B872E9B504C1}"
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RtModel", "RtModel\RtModel.vcxproj", "{7C848FBB-2C50-4F47-81C9-B872E9B504C1}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Brimstone", "Brimstone\Brimstone.vcproj", "{80AB664E-B56A-4A59-91D6-A8201FC00859}"
-	ProjectSection(ProjectDependencies) = postProject
-		{21687638-397B-43A4-B462-C71A741C0C04} = {21687638-397B-43A4-B462-C71A741C0C04}
-		{7C848FBB-2C50-4F47-81C9-B872E9B504C1} = {7C848FBB-2C50-4F47-81C9-B872E9B504C1}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Brimstone", "Brimstone\Brimstone.vcxproj", "{80AB664E-B56A-4A59-91D6-A8201FC00859}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Graph", "Graph\Graph.vcproj", "{21687638-397B-43A4-B462-C71A741C0C04}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Graph", "Graph\Graph.vcxproj", "{21687638-397B-43A4-B462-C71A741C0C04}"
 EndProject
 Global
-	GlobalSection(SubversionScc) = preSolution
-		Svn-Managed = True
-		Manager = AnkhSVN - Subversion Support for Visual Studio
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -121,5 +113,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(SubversionScc) = preSolution
+		Svn-Managed = True
+		Manager = AnkhSVN - Subversion Support for Visual Studio
 	EndGlobalSection
 EndGlobal

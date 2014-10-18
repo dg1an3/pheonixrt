@@ -74,7 +74,7 @@ int
 		return -1;
 
 	if (!m_wndPrescToolBar.Create(this, IDD_PRESCDLG, 
-		CBRS_ALIGN_LEFT | CBRS_ALIGN_RIGHT | CBRS_GRIPPER | CBRS_TOOLTIPS, 
+		CBRS_ALIGN_TOP | CBRS_ALIGN_BOTTOM | CBRS_GRIPPER | CBRS_TOOLTIPS, 
 		IDC_PRESCTOOLBAR))
 	{
 		TRACE0("Failed to create mainbar\n");
@@ -94,8 +94,8 @@ int
 
 	EnableDocking(CBRS_ALIGN_ANY);
 
-	m_wndPrescToolBar.EnableDocking(CBRS_ALIGN_LEFT | CBRS_ALIGN_RIGHT);
-	DockControlBar(&m_wndPrescToolBar, AFX_IDW_DOCKBAR_RIGHT);
+	m_wndPrescToolBar.EnableDocking(CBRS_ALIGN_TOP | CBRS_ALIGN_BOTTOM);
+	DockControlBar(&m_wndPrescToolBar, AFX_IDW_DOCKBAR_BOTTOM);
 
 	return 0;
 }

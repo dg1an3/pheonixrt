@@ -48,6 +48,7 @@ void
 	KLDivTerm::UpdateFrom(const VOITerm *otherTerm)
 {
 	VOITerm::UpdateFrom(otherTerm);
+	ASSERT(otherTerm->GetVOI() == this->GetVOI());
 
 	const KLDivTerm * otherKLDT = static_cast<const KLDivTerm *>(otherTerm);
 	SetDVPs(otherKLDT->GetDVPs());

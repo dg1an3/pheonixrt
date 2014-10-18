@@ -3,6 +3,7 @@
 #include "StdAfx.h"
 #include "HistogramGradient.h"
 #include <itkResampleImageFilter.h>
+#include <itkAffineTransform.h>
 
 #ifdef USE_IPP
 #include <ippi.h>
@@ -135,7 +136,7 @@ const CVectorN<>&
 	// computes and returns the d/dx bins
 {
 	// recompute dBins if needed
-	if (true) // m_arr_bRecompute_dBins[nAt])
+	if (m_arr_bRecompute_dBins[nAt_dBin])
 	{
 		// set size of dBins & dGBins
 
@@ -198,10 +199,8 @@ const CVectorN<>&
 		REAL binKernelSigma = sqrt(m_varMax);
 		if (binKernelSigma > 0.0)
 		{	
-			//static 
-				CVectorN<> arr_dGBinsVarMin;
-			//static 
-				CVectorN<> arr_dGBinsVarMax;
+			static CVectorN<> arr_dGBinsVarMin;
+			static CVectorN<> arr_dGBinsVarMax;
 
 			Conv_dGauss(arr_dBins, m_bin_dKernelVarMax, arr_dGBinsVarMax);
 			Conv_dGauss(arr_dBins, m_bin_dKernelVarMin, arr_dGBinsVarMin);
@@ -297,7 +296,7 @@ const VolumeReal *
 	CHistogramWithGradient::Get_dVolume_x_Region(int nAt/*Group*/) const
 	// calculates / returns the masked dVolume
 {
-	if (true) // m_arr_bRecompute_dVolumes_x_Region[nAt])
+	if (m_arr_bRecompute_dVolumes_x_Region[nAt])
 	{
 		int nGroup = m_arrVolumeGroups[nAt];
 
@@ -340,7 +339,7 @@ const VolumeShort *
 {
 	int nGroup = m_arrVolumeGroups[nAt];
 
-	if (true) // m_arr_bRecomputeBinVolume[nGroup])
+	if (m_arr_bRecomputeBinVolume[nGroup])
 	{
 		CalcBinningVolumes();
 
@@ -524,7 +523,7 @@ const VolumeShort *
 		//}
 
 		// flag change
-		m_arr_bRecomputeBinVolume[nGroup] = FALSE;
+		m_arr_bRecomputeBinVolume[nGroup] = TRUE;
 	}
 
 	return m_groupVolBinLoInt[nGroup];

@@ -41,7 +41,6 @@ public:
 
 //protected:
 //	friend class dH::Prescription;
-
 };	// class VOITerm
 
 }	// namespace dH

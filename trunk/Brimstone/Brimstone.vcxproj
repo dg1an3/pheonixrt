@@ -1,0 +1,367 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{80AB664E-B56A-4A59-91D6-A8201FC00859}</ProjectGuid>
+    <RootNamespace>Brimstone</RootNamespace>
+    <Keyword>MFCProj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <UseOfMfc>Dynamic</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <UseOfMfc>Dynamic</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <UseOfMfc>Dynamic</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <UseOfMfc>Dynamic</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>11.0.60610.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <GenerateManifest>true</GenerateManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <ValidateAllParameters>false</ValidateAllParameters>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>
+        ..\Graph\include;
+        ..\RtModel\include;
+        $(DCMTKDIR)\dcmimgle\include;
+        $(DCMTKDIR)\dcmdata\include;
+        $(DCMTKDIR)\ofstd\include;
+        $(DCMTKDIR)\config\include;
+        $(ITK_DIR)\Modules\Core\SpatialObjects\include;
+        $(ITK_DIR)\Modules\Numerics\Statistics\include;
+        $(ITK_DIR)\Modules\Core\Transform\include;
+        $(ITK_DIR)\Modules\Registration\Common\include;
+        $(ITK_DIR)\Modules\Filtering\Path\include;
+        $(ITK_DIR)\Modules\Filtering\ImageCompose\include;
+        $(ITK_DIR)\Modules\Filtering\ImageGrid\include;
+        $(ITK_DIR)\Modules\Filtering\Smoothing\include;
+        $(ITK_DIR)\Modules\Filtering\ImageFilterBase\include;
+        $(ITK_DIR)\Modules\Core\ImageFunction\include;
+        $(ITK_DIR)\Modules\Core\Common\include;
+        $(ITK_DIR)\Modules\IO\ImageBase\include;
+        $(ITK_BUILD_DIR)\Modules\IO\ImageBase;
+        $(ITK_DIR)\Modules\IO\XML\include;
+        $(ITK_DIR)\Modules\ThirdParty\Expat\src\expat;
+        $(ITK_BUILD_DIR)\Modules\ThirdParty\Expat\src\expat;
+        $(ITK_BUILD_DIR)\Modules\Core\Common;
+        $(ITK_DIR)\Modules\ThirdParty\VNL\src\vxl\vcl;
+        $(ITK_BUILD_DIR)\Modules\ThirdParty\VNL\src\vxl\vcl;
+        $(ITK_DIR)\Modules\ThirdParty\VNL\src\vxl\core;
+        $(ITK_BUILD_DIR)\Modules\ThirdParty\VNL\src\vxl\core;
+        $(ITK_BUILD_DIR)\Modules\ThirdParty\KWSys\src;
+        C:\Program Files (x86)\Intel\IPP\5.0\ia32\include;
+        %(AdditionalIncludeDirectories)
+      </AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;USE_IPP;SBYTE_DEFINED;USE_RTOPT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>dcmimgle.lib;dcmdata.lib;ofstd.lib;ITKCommon-4.3.lib;itkvnl_algo-4.3.lib;itkv3p_netlib-4.3.lib;itkvnl-4.3.lib;itkvcl-4.3.lib;itksys-4.3.lib;ippi.lib;ipps.lib;ippm.lib;ippcore.lib;ws2_32.lib;netapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Packages\IPP\stublib;$(ITK_BUILD_DIR)\lib\Debug;$(DCMTKDIR)\lib\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Message>copy the kernel data</Message>
+      <Command>copy *kernel.dat $(OutDir)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\GenImaging\include;..\Graph\include;..\RtOptimizer\include;..\RtModel\include;..\OptimizeN\include;$(DCMTK_DIR)\dcmimgle\include;$(DCMTK_DIR)\dcmdata\include;$(DCMTK_DIR)\ofstd\include;$(DCMTK_DIR)\config\include;$(ITK_DIR)\Code\Algorithms;$(ITK_DIR)\Code\BasicFilters;$(ITK_DIR)\Code\Common;$(ITK_BUILD_DIR);$(ITK_DIR)\Utilities\vxl\vcl;$(ITK_BUILD_DIR)\Utilities\vxl\vcl;$(ITK_DIR)\Utilities\vxl\core;$(ITK_BUILD_DIR)\Utilities\vxl\core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;USE_IPP;SBYTE_DEFINED;USE_RTOPT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>$(DCMTK_BUILD_DIR)\dcmimgle\libsrc\release\dcmimgle.lib;$(DCMTK_BUILD_DIR)\dcmdata\libsrc\release\dcmdata.lib;$(DCMTK_BUILD_DIR)\ofstd\libsrc\release\ofstd.lib;ITKAlgorithms.lib;ITKBasicFilters.lib;ITKCommon.lib;itkvnl_inst.lib;itkvnl_algo.lib;itkv3p_netlib.lib;itkvnl.lib;itkvcl.lib;itksys.lib;ippi.lib;ipps.lib;ippm.lib;ippcore.lib;ws2_32.lib;netapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ITK_BUILD_DIR_32)\bin\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Message>copy the kernel data</Message>
+      <Command>copy *kernel.dat $(OutDir)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <ValidateAllParameters>false</ValidateAllParameters>
+    </Midl>
+    <ClCompile>
+      <AdditionalIncludeDirectories>..\Graph\include;..\RtModel\include;$(DCMTKDIR)\dcmimgle\include;$(DCMTKDIR)\dcmdata\include;$(DCMTKDIR)\ofstd\include;$(DCMTKDIR)\config\include;$(ITK_DIR)\Modules\Core\SpatialObjects\include;$(ITK_DIR)\Modules\Numerics\Statistics\include;$(ITK_DIR)\Modules\Core\Transform\include;$(ITK_DIR)\Modules\Registration\Common\include;$(ITK_DIR)\Modules\Filtering\Path\include;$(ITK_DIR)\Modules\Filtering\ImageCompose\include;$(ITK_DIR)\Modules\Filtering\ImageGrid\include;$(ITK_DIR)\Modules\Filtering\Smoothing\include;$(ITK_DIR)\Modules\Filtering\ImageFilterBase\include;$(ITK_DIR)\Modules\Core\ImageFunction\include;$(ITK_DIR)\Modules\Core\Common\include;$(ITK_DIR)\Modules\IO\ImageBase\include;$(ITK_BUILD_DIR)\Modules\IO\ImageBase;$(ITK_DIR)\Modules\IO\XML\include;$(ITK_DIR)\Modules\ThirdParty\Expat\src\expat;$(ITK_BUILD_DIR)\Modules\ThirdParty\Expat\src\expat;$(ITK_BUILD_DIR)\Modules\Core\Common;$(ITK_DIR)\Modules\ThirdParty\VNL\src\vxl\vcl;$(ITK_BUILD_DIR)\Modules\ThirdParty\VNL\src\vxl\vcl;$(ITK_DIR)\Modules\ThirdParty\VNL\src\vxl\core;$(ITK_BUILD_DIR)\Modules\ThirdParty\VNL\src\vxl\core;$(ITK_BUILD_DIR)\Modules\ThirdParty\KWSys\src;C:\Program Files (x86)\Intel\IPP\5.0\ia32\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;USE_IPP;SBYTE_DEFINED;USE_RTOPT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>dcmimgle.lib;dcmdata.lib;ofstd.lib;ITKCommon-4.3.lib;itkvnl_algo-4.3.lib;itkv3p_netlib-4.3.lib;itkvnl-4.3.lib;itkvcl-4.3.lib;itksys-4.3.lib;ippi.lib;ipps.lib;ippm.lib;ippcore.lib;ws2_32.lib;netapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Packages\IPP\stublib;$(ITK_BUILD_DIR)\lib\Release;$(DCMTKDIR)\lib\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <TargetMachine>MachineX86</TargetMachine>
+      <EnableUAC>false</EnableUAC>
+    </Link>
+    <PostBuildEvent>
+      <Message>copy the kernel data</Message>
+      <Command>copy *kernel.dat $(OutDir)</Command>
+    </PostBuildEvent>
+    <Manifest>
+      <EnableDpiAwareness>false</EnableDpiAwareness>
+    </Manifest>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <AdditionalIncludeDirectories>..\GenImaging\include;..\Graph\include;..\RtOptimizer\include;..\RtModel\include;..\OptimizeN\include;$(DCMTK_DIR)\dcmimgle\include;$(DCMTK_DIR)\dcmdata\include;$(DCMTK_DIR)\ofstd\include;$(DCMTK_DIR)\config\include;$(ITK_DIR)\Code\Algorithms;$(ITK_DIR)\Code\BasicFilters;$(ITK_DIR)\Code\Common;$(ITK_BUILD_DIR);$(ITK_DIR)\Utilities\vxl\vcl;$(ITK_BUILD_DIR)\Utilities\vxl\vcl;$(ITK_DIR)\Utilities\vxl\core;$(ITK_BUILD_DIR)\Utilities\vxl\core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;USE_IPP;SBYTE_DEFINED;USE_RTOPT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>$(DCMTK_BUILD_DIR)\dcmimgle\libsrc\release\dcmimgle.lib;$(DCMTK_BUILD_DIR)\dcmdata\libsrc\release\dcmdata.lib;$(DCMTK_BUILD_DIR)\ofstd\libsrc\release\ofstd.lib;ITKAlgorithms.lib;ITKBasicFilters.lib;ITKCommon.lib;itkvnl_inst.lib;itkvnl_algo.lib;itkv3p_netlib.lib;itkvnl.lib;itkvcl.lib;itksys.lib;ippi.lib;ipps.lib;ippm.lib;ippcore.lib;ws2_32.lib;netapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ITK_BUILD_DIR_32)\bin\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Message>copy the kernel data</Message>
+      <Command>copy *kernel.dat $(OutDir)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="Brimstone.cpp" />
+    <ClCompile Include="BrimstoneDoc.cpp" />
+    <ClCompile Include="BrimstoneView.cpp" />
+    <ClCompile Include="MainFrm.cpp" />
+    <ClCompile Include="OptThread.cpp" />
+    <ClCompile Include="PlanarView.cpp" />
+    <ClCompile Include="PlanSetupDlg.cpp" />
+    <ClCompile Include="PrescriptionBar.cpp">
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</CompileAsManaged>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</MinimalRebuild>
+      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</BasicRuntimeChecks>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Async</ExceptionHandling>
+      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</CompileAsManaged>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</MinimalRebuild>
+      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Default</BasicRuntimeChecks>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Async</ExceptionHandling>
+    </ClCompile>
+    <ClCompile Include="PrescriptionToolbar.cpp" />
+    <ClCompile Include="SeriesDicomImporter.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Brimstone.h" />
+    <ClInclude Include="BrimstoneDoc.h" />
+    <ClInclude Include="BrimstoneView.h" />
+    <ClInclude Include="MainFrm.h" />
+    <ClInclude Include="OptThread.h" />
+    <ClInclude Include="PlanarView.h" />
+    <ClInclude Include="PlanSetupDlg.h" />
+    <ClInclude Include="PrescriptionBar.h">
+      <FileType>CppControl</FileType>
+    </ClInclude>
+    <ClInclude Include="PrescriptionToolbar.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="SeriesDicomImporter.h" />
+    <ClInclude Include="stdafx.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\Brimstone.ico" />
+    <Image Include="res\BrimstoneDoc.ico" />
+    <Image Include="res\legend.bmp" />
+    <Image Include="res\rainbow.bmp" />
+    <Image Include="res\Toolbar.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Brimstone.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\Brimstone.rc2" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Graph\Graph.vcxproj">
+      <Project>{21687638-397b-43a4-b462-c71a741c0c04}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\RtModel\RtModel.vcxproj">
+      <Project>{7c848fbb-2c50-4f47-81c9-b872e9b504c1}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="PrescriptionBar.resx">
+      <DependentUpon>PrescriptionBar.h</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties RESOURCE_FILE="Brimstone.rc" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

@@ -35,7 +35,7 @@ public:
 	// accessors for data series
 	int GetDataSeriesCount();
 	CDataSeries *GetDataSeriesAt(int nAt);
-	void AddDataSeries(CDataSeries *pSeries);
+	void AddDataSeries(CDataSeries::Pointer pSeries);
 	void RemoveDataSeries(int nAt, bool bDelete = false);
 	void RemoveAllDataSeries(bool bDelete = false);
 
@@ -98,6 +98,7 @@ public:
 
 private:
 	// the array of data series
+	vector<CDataSeries::Pointer> m_arrDataSeriesPtr;
 	CTypedPtrArray<CPtrArray, CDataSeries*> m_arrDataSeries;
 
 	// graph plot area

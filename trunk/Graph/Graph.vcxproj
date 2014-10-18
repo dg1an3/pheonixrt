@@ -1,0 +1,245 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{21687638-397B-43A4-B462-C71A741C0C04}</ProjectGuid>
+    <RootNamespace>Graph</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <UseOfMfc>Dynamic</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <UseOfMfc>Dynamic</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <UseOfMfc>Dynamic</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <UseOfMfc>Dynamic</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>11.0.60610.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>
+        .\include;
+        ..\RtModel\include;
+        $(ITK_DIR)\Modules\Core\SpatialObjects\include;
+        $(ITK_DIR)\Modules\Numerics\Statistics\include;
+        $(ITK_DIR)\Modules\Core\Transform\include;
+        $(ITK_DIR)\Modules\Registration\Common\include;
+        $(ITK_DIR)\Modules\Filtering\Path\include;
+        $(ITK_DIR)\Modules\Filtering\ImageCompose\include;
+        $(ITK_DIR)\Modules\Filtering\ImageGrid\include;
+        $(ITK_DIR)\Modules\Filtering\Smoothing\include;
+        $(ITK_DIR)\Modules\Filtering\ImageFilterBase\include;
+        $(ITK_DIR)\Modules\Core\ImageFunction\include;
+        $(ITK_DIR)\Modules\Core\Common\include;
+        $(ITK_DIR)\Modules\IO\ImageBase\include;
+        $(ITK_BUILD_DIR)\Modules\IO\ImageBase;
+        $(ITK_DIR)\Modules\IO\XML\include;
+        $(ITK_DIR)\Modules\ThirdParty\Expat\src\expat;
+        $(ITK_BUILD_DIR)\Modules\ThirdParty\Expat\src\expat;
+        $(ITK_BUILD_DIR)\Modules\Core\Common;
+        $(ITK_DIR)\Modules\ThirdParty\VNL\src\vxl\vcl;
+        $(ITK_BUILD_DIR)\Modules\ThirdParty\VNL\src\vxl\vcl;
+        $(ITK_DIR)\Modules\ThirdParty\VNL\src\vxl\core;
+        $(ITK_BUILD_DIR)\Modules\ThirdParty\VNL\src\vxl\core;
+        $(ITK_BUILD_DIR)\Modules\ThirdParty\KWSys\src;
+        C:\Program Files (x86)\Intel\IPP\5.0\ia32\include;
+        %(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;USE_IPP;USE_RTOPT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>
+        .\include;
+        ..\RtModel\include;
+        $(ITK_DIR)\Modules\Core\SpatialObjects\include;
+        $(ITK_DIR)\Modules\Numerics\Statistics\include;
+        $(ITK_DIR)\Modules\Core\Transform\include;
+        $(ITK_DIR)\Modules\Registration\Common\include;
+        $(ITK_DIR)\Modules\Filtering\Path\include;
+        $(ITK_DIR)\Modules\Filtering\ImageCompose\include;
+        $(ITK_DIR)\Modules\Filtering\ImageGrid\include;
+        $(ITK_DIR)\Modules\Filtering\Smoothing\include;
+        $(ITK_DIR)\Modules\Filtering\ImageFilterBase\include;
+        $(ITK_DIR)\Modules\Core\ImageFunction\include;
+        $(ITK_DIR)\Modules\Core\Common\include;
+        $(ITK_DIR)\Modules\IO\ImageBase\include;
+        $(ITK_BUILD_DIR)\Modules\IO\ImageBase;
+        $(ITK_DIR)\Modules\IO\XML\include;
+        $(ITK_DIR)\Modules\ThirdParty\Expat\src\expat;
+        $(ITK_BUILD_DIR)\Modules\ThirdParty\Expat\src\expat;
+        $(ITK_BUILD_DIR)\Modules\Core\Common;
+        $(ITK_DIR)\Modules\ThirdParty\VNL\src\vxl\vcl;
+        $(ITK_BUILD_DIR)\Modules\ThirdParty\VNL\src\vxl\vcl;
+        $(ITK_DIR)\Modules\ThirdParty\VNL\src\vxl\core;
+        $(ITK_BUILD_DIR)\Modules\ThirdParty\VNL\src\vxl\core;
+        $(ITK_BUILD_DIR)\Modules\ThirdParty\KWSys\src;
+        C:\Program Files (x86)\Intel\IPP\5.0\ia32\include;
+        %(AdditionalIncludeDirectories)
+      </AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;USE_IPP;USE_RTOPT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>
+        .\include;
+        ..\RtModel\include;
+        $(ITK_DIR)\Modules\Core\SpatialObjects\include;
+        $(ITK_DIR)\Modules\Numerics\Statistics\include;
+        $(ITK_DIR)\Modules\Core\Transform\include;
+        $(ITK_DIR)\Modules\Registration\Common\include;
+        $(ITK_DIR)\Modules\Filtering\Path\include;
+        $(ITK_DIR)\Modules\Filtering\ImageCompose\include;
+        $(ITK_DIR)\Modules\Filtering\ImageGrid\include;
+        $(ITK_DIR)\Modules\Filtering\Smoothing\include;
+        $(ITK_DIR)\Modules\Filtering\ImageFilterBase\include;
+        $(ITK_DIR)\Modules\Core\ImageFunction\include;
+        $(ITK_DIR)\Modules\Core\Common\include;
+        $(ITK_DIR)\Modules\IO\ImageBase\include;
+        $(ITK_BUILD_DIR)\Modules\IO\ImageBase;
+        $(ITK_DIR)\Modules\IO\XML\include;
+        $(ITK_DIR)\Modules\ThirdParty\Expat\src\expat;
+        $(ITK_BUILD_DIR)\Modules\ThirdParty\Expat\src\expat;
+        $(ITK_BUILD_DIR)\Modules\Core\Common;
+        $(ITK_DIR)\Modules\ThirdParty\VNL\src\vxl\vcl;
+        $(ITK_BUILD_DIR)\Modules\ThirdParty\VNL\src\vxl\vcl;
+        $(ITK_DIR)\Modules\ThirdParty\VNL\src\vxl\core;
+        $(ITK_BUILD_DIR)\Modules\ThirdParty\VNL\src\vxl\core;
+        $(ITK_BUILD_DIR)\Modules\ThirdParty\KWSys\src;
+        C:\Program Files (x86)\Intel\IPP\5.0\ia32\include;
+        %(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;USE_IPP;USE_RTOPT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <AdditionalIncludeDirectories>.\include;..\GenImaging\include;..\RtOptimizer\include;..\RtModel\include;..\OptimizeN\include;$(ITK_DIR)\Code\Common;$(ITK_BUILD_DIR);$(ITK_DIR)\Utilities\vxl\vcl;$(ITK_BUILD_DIR)\Utilities\vxl\vcl;$(ITK_DIR)\Utilities\vxl\core;$(ITK_BUILD_DIR)\Utilities\vxl\core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;USE_IPP;USE_RTOPT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="DataSeries.cpp" />
+    <ClCompile Include="Dib.cpp" />
+    <ClCompile Include="Graph.cpp" />
+    <ClCompile Include="HistogramDataSeries.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="TargetDVHSeries.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\DataSeries.h" />
+    <ClInclude Include="include\Graph.h" />
+    <ClInclude Include="include\HistogramDataSeries.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="include\TargetDVHSeries.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

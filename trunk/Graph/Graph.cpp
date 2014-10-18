@@ -64,11 +64,12 @@ CDataSeries *CGraph::GetDataSeriesAt(int nAt)
 /////////////////////////////////////////////////////////////////////////////
 // CGraph::AddDataSeries
 /////////////////////////////////////////////////////////////////////////////
-void CGraph::AddDataSeries(CDataSeries *pSeries)
+void CGraph::AddDataSeries(CDataSeries::Pointer pSeries)
 {
 	pSeries->m_pGraph = this;
 	// AddObserver(&pSeries->GetChangeEvent(), this, &CGraph::OnDataSeriesChanged);
 
+	m_arrDataSeriesPtr.push_back(pSeries);
 	m_arrDataSeries.Add(pSeries);
 	OnDataSeriesChanged(); // NULL, NULL);
 
@@ -80,10 +81,10 @@ void CGraph::AddDataSeries(CDataSeries *pSeries)
 /////////////////////////////////////////////////////////////////////////////
 void CGraph::RemoveDataSeries(int nAt, bool bDelete)
 {
-	if (bDelete)
-	{
-		delete m_arrDataSeries[nAt];
-	}
+	//if (bDelete)
+	//{
+	//	delete m_arrDataSeries[nAt];
+	//}
 
 	m_arrDataSeries.RemoveAt(nAt);
 
@@ -96,10 +97,11 @@ void CGraph::RemoveAllDataSeries(bool bDelete)
 {
 	if (bDelete)
 	{
-		for (int nAt = 0; nAt < m_arrDataSeries.GetSize(); nAt++)
-		{
-			delete m_arrDataSeries[nAt];
-		}
+		m_arrDataSeriesPtr.clear();
+		//for (int nAt = 0; nAt < m_arrDataSeries.GetSize(); nAt++)
+		//{
+		//	delete m_arrDataSeries[nAt];
+		//}
 	}
 
 	m_arrDataSeries.RemoveAll();

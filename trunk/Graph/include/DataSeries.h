@@ -16,6 +16,14 @@ public:
 	CDataSeries(void);
 	virtual ~CDataSeries(void);
 
+	// standard class typedefs
+	typedef CDataSeries Self;
+	typedef itk::DataObject Superclass;
+	typedef itk::SmartPointer< Self > Pointer;
+	typedef itk::SmartPointer< const Self > ConstPointer;
+
+	itkNewMacro(CDataSeries);
+
 	// the object of the data series
 	DECLARE_ATTRIBUTE_PTR(Object, CObject);
 

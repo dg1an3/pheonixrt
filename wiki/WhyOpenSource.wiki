@@ -1,4 +1,5 @@
 #summary why does open source medical software make sense?
+#labels Featured
 
 = Introduction =
 

@@ -87,7 +87,7 @@ vnl_nonlinear_minimizer::ReturnCodes
 	// if we are too short,
 	if (m_vGrad.magnitude() < 1e-8)
 	{
-		LOG(_T("Gradient too small -- adding length"));
+		Log(_T("Gradient too small -- adding length"));
 		RandomVector(get_x_tolerance(), &m_vGrad[0], m_vGrad.size());
 	}
 

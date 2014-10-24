@@ -105,6 +105,9 @@ public:
 	int CopyElements(const CVectorN<TYPE>& v, int nStart, int nLength, 
 		int nDest = 0);
 
+	// create a printable string representation
+	CString ToString();
+
 };	// class CVectorN<TYPE>
 
 
@@ -585,20 +588,47 @@ void
 }	// CalcBinomialCoeff
 
 
+inline void Trace(LPTSTR label, double value)
+{
+	CString str;
+	str.Format(_T("%s =\t% .4lf\n"), label, value);
+	OutputDebugString(str.GetBuffer());
+}	
+
 //////////////////////////////////////////////////////////////////////
 template<class TYPE>
 void 
-	TraceVector(const CVectorN<TYPE>& vTrace)
+	TraceVector(LPTSTR label, const CVectorN<TYPE>& vTrace)
 	// helper function to output a vector for debugging
 {
-#ifdef _DEBUG
-	TRACE("<");
+	CString str;
+	str.Format(_T("%s[%d] =\t<"), label, vTrace.GetDim());
+#ifdef TRACE_VECTOR_NUMERIC
 	for (int nAt = 0; nAt < vTrace.GetDim(); nAt++)
 	{
-		TRACE("%lf\t", vTrace[nAt]);
+		str.AppendFormat(_T("% .4lf|"), vTrace[nAt]);
 	}
-	TRACE(">\n");
+#else
+	double maxElement = -1e-20;
+	for (int nAt = 0; nAt < vTrace.GetDim(); nAt++)
+		maxElement = __max(maxElement, vTrace[nAt]);
+
+	str.AppendFormat(_T("% .4lf"), maxElement);
+
+	for (int nAt = 0; nAt < vTrace.GetDim(); nAt++)
+	{
+		if (vTrace[nAt] < maxElement * 0.1)
+			str.AppendFormat(_T(" "));
+		else if (vTrace[nAt] < maxElement * 0.25)
+			str.AppendFormat(_T("."));
+		else if (vTrace[nAt] < maxElement * 0.85)
+			str.AppendFormat(_T(":"));
+		else
+			str.AppendFormat(_T("|"));
+	}
 #endif
+	str.AppendFormat(_T(">\n"));
+	OutputDebugString(str.GetBuffer());
 
 }	// TraceVector
 

@@ -237,9 +237,19 @@ REAL
 	Prescription::operator()(const CVectorN<>& vInput, CVectorN<> *pGrad ) const
 	// objective function evaluator
 {
+	USES_CONVERSION;
+
+	// initialize total sum of objective function
+	REAL totalSum = 0.0;
+
+	BeginLogSection(_T("Prescription::operator()"));
+
+	TraceVector(_T("vInput"), vInput);
+
 	// transform input for calc purposes
 	CVectorN<> vInputTrans = vInput;
 	Transform(&vInputTrans);
+	TraceVector(_T("vInputTrans"), vInputTrans);
 
 	// dTransform of the input -- flag is used to only calculate it if needed (if there is a gradient)
 	CVectorN<> v_dInputTrans;
@@ -255,10 +265,8 @@ REAL
 		v_dInputTrans.SetDim(vInput.GetDim());
 		v_dInputTrans = vInput;
 		dTransform(&v_dInputTrans);
+		TraceVector(_T("v_dInputTrans"), v_dInputTrans);
 	}
-
-	// initialize total sum of objective function
-	REAL totalSum = 0.0;
 
 	// flag to indicate need to call CalcSumSigmoid
 	bool bCalcSum = true;
@@ -280,6 +288,11 @@ REAL
 
 		if (pVOIT->GetWeight() >= DEFAULT_EPSILON)
 		{
+			CString strMessage;
+			strMessage.Format(_T("VOI = %s\n"), 
+				A2W(pVOIT->GetVOI()->GetName().c_str()));
+			OutputDebugString(strMessage);
+
 			// set fractions to histo
 			pVOIT->GetHistogram()->SetVarFracVolumes(m_volMainMinVar, m_volMainMaxVar);
 			dynamic_cast<CHistogramWithGradient*>(pVOIT->GetHistogram())->vInput = &vInput;
@@ -287,6 +300,7 @@ REAL
 
 			// trigger change
 			pVOIT->GetHistogram()->OnVolumeChange(); //NULL, NULL);
+			// TODO: what is updated here?
 
 			if (pGrad)
 			{
@@ -304,6 +318,8 @@ REAL
 					m_vPartGrad[nAt] *= v_dInputTrans[nAt]; 
 				}
 
+				TraceVector(_T("m_vPartGrad"), m_vPartGrad);
+
 				// add the partial gradient to the total
 				(*pGrad) += m_vPartGrad;
 			}
@@ -320,6 +336,8 @@ REAL
 	// DGL: adding 0.1 to hold it up off 0.0 
 	totalSum += 0.1;
 
+	EndLogSection();
+
 	return totalSum;
 
 }	// Prescription::operator()
@@ -333,6 +351,8 @@ void
 								   const CArray<BOOL, BOOL>& arrInclude) const
 	// computes the sum of weights from an input vector
 {
+	BeginLogSection(_T("Prescription::CalcSumSigmoid"));
+
 	// get the main volume
 	VolumeReal *pVolume = pHisto->GetVolume();
 	pVolume->FillBuffer(0.0);
@@ -521,6 +541,8 @@ void
 		m_volMainMinVar->GetBufferedRegion().GetSize());
 
 	// fire change???
+	EndLogSection();
+
 
 }	// Prescription::CalcSumSigmoid
 

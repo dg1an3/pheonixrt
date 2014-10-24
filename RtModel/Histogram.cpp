@@ -706,31 +706,26 @@ void
 	CHistogram::ConvGauss(const CVectorN<>& buffer_in, const CVectorN<>& kernel_in,
 						   CVectorN<>& buffer_out) const
 {
-	BEGIN_LOG_SECTION(CHistogram::ConvGauss);
+	BeginLogSection(_T("CHistogram::ConvGauss"));
+
+	TraceVector(_T("kernel_in"), kernel_in);
+	TraceVector(_T("buffer_in"), buffer_in);
 
 	buffer_out.SetDim(buffer_in.GetDim() + kernel_in.GetDim() - 1);
 	buffer_out.SetZero();
 
-#ifdef REAL_FLOAT
-#error REAL_FLOAT not supported!
-	IppStatus stat = ippsConv_32f(
-		&buffer_in[0], buffer_in.GetDim(),
-		&m_binKernel[0], m_binKernel.GetDim(),
-		&buffer_out_temp[0]);
-	ASSERT(stat == ippStsNoErr);
-#else
+	// make sure REAL is double
+	ASSERT(sizeof(REAL) == 8);
+
 	IppStatus stat = ippsConv_64f(
 		&buffer_in[0], buffer_in.GetDim(),
 		&kernel_in[0], kernel_in.GetDim(),
 		&buffer_out[0]);
 	ASSERT(stat == ippStsNoErr);
-#endif
 
-	LOG_EXPR_EXT(buffer_in);
-	LOG_EXPR_EXT(buffer_out);
-	LOG_EXPR_EXT(m_binKernelVarMax);
+	TraceVector(_T("buffer_out"), buffer_out);
 
-	END_LOG_SECTION(); // CHistogram::ConvGauss
+	EndLogSection();
 
 }	// CHistogram::ConvGauss
 

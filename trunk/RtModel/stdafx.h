@@ -18,21 +18,15 @@
 #define WINVER 0x0501		// Change this to the appropriate value to target Windows 98 and Windows 2000 or later.
 #endif
 
+// MFC includes
 #include <afx.h>
 #include <afxwin.h>
-
 #include <afxdisp.h>
-
 #include <afxtempl.h>
-
 #include <atlcoll.h>
 
 // math include
 #include <math.h>
-
-// IPP includes
-//#include <ipps.h>
-//#include <ippcv.h>
 
 // utility macros
 #include <UtilMacros.h>

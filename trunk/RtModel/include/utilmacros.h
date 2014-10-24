@@ -208,22 +208,17 @@ if (!(expr))				\
 }
 
 // log file utilities
-#define BEGIN_LOG_SECTION(name) { 
-#define BEGIN_LOG_SECTION_(name) {
-#define BEGIN_LOG_ONLY(name) if (0) {
-#define EXIT_LOG_SECTION() 
-#define END_LOG_SECTION() (void) 0; }
-#define FLUSH_LOG()
-#define LOG 1 ? (void) 0 : ::AfxTrace
-#define LOG_EXPR(expr)
-#define LOG_EXPR_DESC(expr, desc)
-#define LOG_EXPR_EXT(expr)
-#define LOG_EXPR_EXT_DESC(expr, desc) 
-#define LOG_STACK_DUMP(msg)
+#define BeginLogSection(section_name) { \
+	LPCTSTR __section_name = section_name; \
+	CString __formatMessage; \
+	__formatMessage.Format(_T("<log_section name=\"%s\">"), __section_name); \
+	OutputDebugString(__formatMessage.GetBuffer());
 
-static const char *fmt(const char *pszFormat, ...)	{ return NULL; }
+#define EndLogSection() \
+	OutputDebugString(_T("</log_section>\n")); }
 
-#define FMT fmt 
+#define Log OutputDebugString
+
 #endif
 
 // profile flag to control behavior

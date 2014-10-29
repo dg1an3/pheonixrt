@@ -2,7 +2,7 @@
 #labels Phase-QA,Phase-Support
 
 = Introduction =
-It's called Technical Debt, but it's the same thing that the FDA's [http://www.fda.gov/AboutFDA/CentersOffices/OfficeofMedicalProductsandTobacco/CDRH/CDRHOffices/ucm300540.htm software engineering lab] gets from static analysis.  The VerificationExpertSystem and related algorithmic verification techniques can establish the correct functioning of algorithms, but if the understanding of call paths is incomplete then it becomes difficult to ensure the correct operation of a complex piece of software under all relevent conditions.
+It's called Technical Debt, but it's the same thing that the FDA's [http://www.fda.gov/AboutFDA/CentersOffices/OfficeofMedicalProductsandTobacco/CDRH/CDRHOffices/ucm300540.htm software engineering lab] measures with its static analysis investigation.  The VerificationExpertSystem and related algorithmic verification techniques can establish the correct functioning of algorithms, but if the understanding of call paths is incomplete then it becomes difficult to ensure the correct operation of a complex piece of software under all relevent conditions.
 
 = Details =
 Static analysis and code coverage analysis can both be used to relate the results of a VerificationExpertSystem to the aggregate behavior of a software product.  Correct test coverage can then be determined by looking at whether all essential pathways through the software have been covered.

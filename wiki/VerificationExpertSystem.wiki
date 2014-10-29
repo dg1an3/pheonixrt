@@ -12,6 +12,8 @@ At the time I had begun playing around with an open-source Prolog environment, [
 
 = Details =
 
+A verification expert system is kinda like [http://agilemodeling.com/essays/agileRequirementsBestPractices.htm#ExecutableRequirements executable requirements] on steroids.
+
 The verification predicates included checks on the accuracy and correctness of:
  * Image geometry
  * Contour placement

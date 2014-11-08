@@ -7,6 +7,8 @@ One of the problems to be addressed for adaptive treatment paradigms is the need
 = Details =
 This is a very old MFC program that allows loading two different PNG images, and then provides a slider to morph back and forth between them.
 
+Note that currently the two images that can be loaded through File -> Open Images must be have the same width/height, and are both required to be in .BMP format.
+
 First is a video of Grumpy to Hedgy:
 
 <wiki:video url="http://youtu.be/watch?v=ggDMs3GozSU" />

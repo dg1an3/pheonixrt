@@ -1,0 +1,11 @@
+# Introduction #
+It's called Technical Debt, but it's the same thing that the FDA's [software engineering lab](http://www.fda.gov/AboutFDA/CentersOffices/OfficeofMedicalProductsandTobacco/CDRH/CDRHOffices/ucm300540.htm) measures with its static analysis investigation.  The VerificationExpertSystem and related algorithmic verification techniques can establish the correct functioning of algorithms, but if the understanding of call paths is incomplete then it becomes difficult to ensure the correct operation of a complex piece of software under all relevent conditions.
+
+# Details #
+Static analysis and code coverage analysis can both be used to relate the results of a VerificationExpertSystem to the aggregate behavior of a software product.  Correct test coverage can then be determined by looking at whether all essential pathways through the software have been covered.
+
+But if a proprietary company has very old software, and no one really understands how large parts of the software operate (as is the case with Elekta's Mosaiq), then it becomes nearly impossible to make any kind of assurances that changes to the software design will be properly regression tested.  The result is numerous complaints from the field, and a management that is typically paralyzed by inaction because they clearly don't have a grasp on the complexity of the intrinsic risk of the device.  This result in things like the Elekta Hexapod Calculator fiasco...
+
+One might argue that open source software would not magically remove this problem, but it would allow a wider audience (including knowledgeable users) to become involved in the collective understanding of the code base.  So refactoring decisions could be made by the more knowledgeable community members, as opposed to know-nothing middle managers with no real grasp of the software.
+
+Maybe the best compromise between open source and proprietary approaches to design control of medical device software would be if the FDA required proprietary manufacturers to disclose the results of their static analysis. This would at least allow users to see statistically was going on inside the proprietary code base, and whether management was making progress in retiring technical debt.

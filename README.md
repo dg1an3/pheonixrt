@@ -1,6 +1,6 @@
 # pheonixrt
 
-http://en.wikipedia.org/wiki/Thin_plate_spline
+pheonixrt is an experimental algorithm for inverse [treatment planning](https://en.wikipedia.org/wiki/Radiation_treatment_planning).
 
 New BSD License
 Copyright (c) 2007-2015, Derek G. Lane All rights reserved.

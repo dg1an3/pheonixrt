@@ -1,10 +1,7 @@
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
-from tensorflow.contrib.layers import fully_connected
-
 mnist=input_data.read_data_sets("/MNIST_data/",one_hot=True)
 
 

@@ -1,12 +1,12 @@
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
 import tensorflow as tf
-from tensorflow.examples.tutorials.mnist import input_data
-from tensorflow.contrib.layers import fully_connected
 
-mnist=input_data.read_data_sets("/MNIST_data/",one_hot=True)
-
+if tf.version !='2.0.0':
+    from tensorflow.examples.tutorials.mnist import input_data
+    mnist=input_data.read_data_sets("/MNIST_data/",one_hot=True)
+else:
+    raise Exception("only 1.0 supported")
 
 num_inputs=784    #28x28 pixels
 num_hid1=392
@@ -67,4 +67,6 @@ with tf.Session() as sess:
     for i in range(num_test_images):
         a[0][i].imshow(np.reshape(mnist.test.images[i],(28,28)))
         a[1][i].imshow(np.reshape(results[i],(28,28)))
+    plt.show()
+
         

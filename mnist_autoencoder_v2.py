@@ -2,11 +2,16 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import tensorflow as tf
-from tensorflow.examples.tutorials.mnist import input_data
-from tensorflow.contrib.layers import fully_connected
+# from tensorflow.contrib.layers import fully_connected
 
-mnist=input_data.read_data_sets("/MNIST_data/",one_hot=True)
-
+use_v2 = True
+if use_v2:
+    import tensorflow_datasets as tfds
+    datasets, info = tfds.load(name='mnist', with_info=True, as_supervised=True)
+    mnist  = datasets['train']
+else:
+    from tensorflow.examples.tutorials.mnist import input_data
+    mnist=input_data.read_data_sets("/MNIST_data/",one_hot=True)
 
 num_inputs=784    #28x28 pixels
 num_hid1=392
@@ -16,7 +21,8 @@ num_output=num_inputs
 lr=0.01
 actf=tf.nn.relu
 
-
+# need to turn off eager execution, because we are using placeholders
+tf.compat.v1.disable_eager_execution()
 X=tf.compat.v1.placeholder(tf.float32,shape=[None,num_inputs])
 initializer=tf.compat.v1.variance_scaling_initializer()
 

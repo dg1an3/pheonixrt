@@ -2,11 +2,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
 
-use_v2 = True
-if use_v2:
+# need to turn off eager execution, because we are using placeholders
+# tf.compat.v1.disable_eager_execution()
+
+if tf.version.VERSION == '2.0.0':
     import tensorflow_datasets as tfds
-    datasets, info = tfds.load(name='mnist', with_info=True, as_supervised=True)
+    datasets, info = tfds.load(name='mnist', with_info=True)
     mnist  = datasets['train']
+    # tfds.show_examples(info, mnist)
 else:
     from tensorflow.examples.tutorials.mnist import input_data
     mnist=input_data.read_data_sets("/MNIST_data/",one_hot=True)
@@ -19,8 +22,6 @@ num_output=num_inputs
 lr=0.01
 actf=tf.nn.relu
 
-# need to turn off eager execution, because we are using placeholders
-tf.compat.v1.disable_eager_execution()
 X=tf.compat.v1.placeholder(tf.float32,shape=[None,num_inputs])
 initializer=tf.compat.v1.variance_scaling_initializer()
 
@@ -53,12 +54,14 @@ batch_size=150
 num_test_images=10
 
 with tf.compat.v1.Session() as sess:
-    sess.run(init)
+    # sess.run(init)
+    mnist = mnist.batch(batch_size)
+    test_batch = mnist.take(1)
     for epoch in range(num_epoch):
-        
-        num_batches=mnist.train.num_examples//batch_size
+                
+        num_batches=info.splits['train'].num_examples//batch_size
         for iteration in range(num_batches):
-            X_batch,y_batch=mnist.train.next_batch(batch_size)
+            X_batch = mnist.take(1).as_numpy_iterator()
             sess.run(train,feed_dict={X:X_batch})
             
         train_loss=loss.eval(feed_dict={X:X_batch})

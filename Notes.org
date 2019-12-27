@@ -1,0 +1,7 @@
+* documents
+  - see zebrastack
+* notebook_zoo
+  - entropy_max
+* diy_ml
+  - pytorch tutorial
+  - CMatrixNxM

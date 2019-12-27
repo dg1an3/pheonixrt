@@ -1,5 +1,9 @@
 * documents
   - see zebrastack
+  - frame notes
+  - autoencoder, mdl, free energy
+  - em free energy
+  - free energy and the brain
 * notebook_zoo
   - entropy_max
 * diy_ml

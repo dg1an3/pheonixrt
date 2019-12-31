@@ -17,9 +17,13 @@ def uniform_noise(delta=1e-3):
 def calc_bins(img, width=.1):
     """
     """
-    # min, max = math.min(img), math.max(img)
+    min_px, max_px = min(img), max(img)
+    min_bin = math.floor(min_px/width)*width
+    bin_count = int((max_px - min_bin)/width)
     inf = 1.e+2
-    bins_at = [-inf] + [(x/16.)-.15 for x in range(24)] + [inf]
+    # bins_at = [-inf] + [(x/16.)-.15 for x in range(24)] + [inf]
+    bins_at = [-inf] + [x*width+min_bin 
+                    for x in range(bin_count+2)] + [inf]
     return bins_at
 
 def histogram(img, bins_at, dump=True):

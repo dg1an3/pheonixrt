@@ -3,7 +3,7 @@
 pheonixrt is an experimental algorithm for inverse [treatment planning](https://en.wikipedia.org/wiki/Radiation_treatment_planning).
 
 New BSD License
-Copyright (c) 2007-2015, Derek G. Lane All rights reserved.
+Copyright (c) 2007-2020, Derek G. Lane All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 

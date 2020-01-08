@@ -3,9 +3,7 @@ import matplotlib.pyplot as plt
 import pprint, math, random, inspect, numbers
 
 def create_img(sz, fn, dump=True):
-    """
-    creates a square image in the form of a sz*sz element list vector
-    """
+    """ creates a square image in the form of a sz*sz element list vector """
     img = [float(fn(c,r)) for c in range(sz) for r in range(sz)]
     if dump:
         print(inspect.getsource(fn))
@@ -16,8 +14,7 @@ def uniform_noise(delta=1e-3):
     return delta*(random.random()-0.5)
 
 def calc_bins(img, width=.1):
-    """
-    """
+    """ """
     min_px, max_px = min(img), max(img)
     min_bin = math.floor(min_px/width)*width
     bin_count = int((max_px - min_bin)/width)

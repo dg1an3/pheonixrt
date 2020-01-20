@@ -15,6 +15,7 @@ Copyright (c) 2007-2020, Derek G. Lane All rights reserved.
   - autoencoder, mdl, free energy
   - em free energy
   - free energy and the brain
+  - variational bayes inverse planning
 * notebook_zoo
   - entropy_max
 * diy_ml

@@ -1,0 +1,24 @@
+TensorFlow 2.0 Upgrade Script
+-----------------------------
+Converted 1 files
+Detected 0 issues that require attention
+--------------------------------------------------------------------------------
+================================================================================
+Detailed log follows:
+
+================================================================================
+--------------------------------------------------------------------------------
+Processing file '.\\mnist_autoencoder.py'
+ outputting to '.\\mnist_autoencoder_v2.py'
+--------------------------------------------------------------------------------
+
+20:2: INFO: Renamed 'tf.placeholder' to 'tf.compat.v1.placeholder'
+21:12: INFO: tf.variance_scaling_initializer requires manual check. Initializers no longer have the dtype argument in the constructor or partition_info argument in the __call__ method.
+The calls have been converted to compat.v1 for safety (even though they may already have been correct).
+21:12: INFO: Renamed 'tf.variance_scaling_initializer' to 'tf.compat.v1.variance_scaling_initializer'
+39:5: INFO: Added keywords to args of function 'tf.reduce_mean'
+41:10: INFO: Renamed 'tf.train.AdamOptimizer' to 'tf.compat.v1.train.AdamOptimizer'
+44:5: INFO: Renamed 'tf.global_variables_initializer' to 'tf.compat.v1.global_variables_initializer'
+51:5: INFO: Renamed 'tf.Session' to 'tf.compat.v1.Session'
+--------------------------------------------------------------------------------
+

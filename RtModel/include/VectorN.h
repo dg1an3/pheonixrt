@@ -4,7 +4,7 @@
 #define VECTORN_H
 
 #ifdef USE_IPP
-#include <ippm.h>
+#include <ipp.h>
 #endif
 
 #include <vnl/vnl_vector_ref.h>

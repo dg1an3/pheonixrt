@@ -39,3 +39,13 @@ except ImportError as e:
         f"Cython extensions not built. Please run 'pip install -e .' to build. Error: {e}"
     )
     __all__ = []
+
+
+# TG-263 nomenclature translator (optional, requires PyTorch)
+try:
+    from .tg263_model import TG263Translator, TG263Classifier
+
+    __all__.extend(["TG263Translator", "TG263Classifier"])
+except ImportError:
+    # PyTorch not installed - TG-263 features not available
+    pass

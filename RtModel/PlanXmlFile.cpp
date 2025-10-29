@@ -21,17 +21,12 @@ int
 const char *
 	FindAttributeValue(const char **atts, const char * name)
 {
-	// Attributes come in pairs: [name1, value1, name2, value2, ..., NULL]
 	for (const char **currentAttribute = atts; 
-		(*currentAttribute) != NULL; currentAttribute += 2)
+		(*currentAttribute) != NULL; currentAttribute++)
 	{
-		if (itksys::SystemTools::Strucmp((*currentAttribute), name) == 0)
-		{
-			// Return the value (next element after the name)
-			return *(currentAttribute + 1);
-		}
+		if (itksys::SystemTools::Strucmp((*currentAttribute),name))
+			return (*currentAttribute);
 	}
-	return NULL;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -47,11 +42,8 @@ void
 	{
 		assert(!m_pCurrentBeam.IsNull());
 		const char *strPosition = FindAttributeValue(atts, "position");
-		if (strPosition != NULL)
-		{
-			sscanf_s(strPosition, "%lf\\%lf", 
-				&m_currentBeamletPosition[0], &m_currentBeamletPosition[1]);
-		}
+		sscanf_s(strPosition, "%lf\\%lf", 
+			m_currentBeamletPosition[0], m_currentBeamletPosition[1]);
 	}
 	else if (itksys::SystemTools::Strucmp(name, "TARGET") == 0)
 	{
@@ -78,15 +70,12 @@ void
 	else if (itksys::SystemTools::Strucmp(name,"PHIANGLES") == 0)
 	{
 	}
-	else if (itksys::SystemTools::Strucmp(name,"ISOCENTER") == 0)
+	if (itksys::SystemTools::Strucmp(name,"ISOCENTER") == 0)
 	{
-		if (!m_pCurrentBeam.IsNull())
-		{
-			itk::Vector<REAL> vIsocenter;
-			sscanf_s(m_currentCharacterData.c_str(), "%lf\\%lf\\%lf", 
-				&vIsocenter[0], &vIsocenter[1], &vIsocenter[2]);
-			m_pCurrentBeam->SetIsocenter(vIsocenter);
-		}
+		itk::Vector<REAL> vIsocenter;
+		sscanf_s(m_currentCharacterData.c_str(), "%lf\\%lf\\%lf", 
+			&vIsocenter[0], &vIsocenter[1], &vIsocenter[2]);
+		m_pCurrentBeam->SetIsocenter(vIsocenter);
 	}
 	else if (itksys::SystemTools::Strucmp(name, "ENERGY") == 0)
 	{
@@ -96,34 +85,25 @@ void
 	}
 	else if (itksys::SystemTools::Strucmp(name, "GANTRY") == 0)
 	{
-		if (!m_pCurrentBeam.IsNull())
-		{
-			REAL gantry;
-			sscanf_s(m_currentCharacterData.c_str(), "%lf", &gantry);
-			m_pCurrentBeam->SetGantryAngle(gantry);
-		}
+		REAL gantry;
+		sscanf_s(m_currentCharacterData.c_str(), "%lf", &gantry);
+		m_pCurrentBeam->SetGantryAngle(gantry);
 	}
 	else if (itksys::SystemTools::Strucmp(name, "INTENSITYMAP") == 0)
 	{
-		if (!m_pCurrentBeam.IsNull())
-		{
-			ImageFileReader<Beam::IntensityMap>::Pointer reader = 
-				ImageFileReader<Beam::IntensityMap>::New();
-			reader->SetFileName(m_currentCharacterData.c_str());
-			reader->Update();
-			// m_pCurrentBeam->SetIntensityMap(reader->GetOutput());
-		}
+		ImageFileReader<Beam::IntensityMap>::Pointer reader = 
+			ImageFileReader<Beam::IntensityMap>::New();
+		reader->SetFileName(m_currentCharacterData.c_str());
+		reader->Update();
+		// m_pCurrentBeam->SetIntensityMap(reader->GetOutput());
 	}
 	else if (itksys::SystemTools::Strucmp(name, "BEAMLET") == 0)
 	{
-		if (!m_pCurrentBeam.IsNull())
-		{
-			ImageFileReader<VolumeReal>::Pointer reader = 
-				ImageFileReader<VolumeReal>::New();
-			reader->SetFileName(m_currentCharacterData.c_str());
-			reader->Update();
-			// m_pCurrentBeam->InsertBeamlet(m_currentBeamletPosition, reader->GetOutput());
-		}
+		ImageFileReader<VolumeReal>::Pointer reader = 
+			ImageFileReader<VolumeReal>::New();
+		reader->SetFileName(m_currentCharacterData.c_str());
+		reader->Update();
+		// m_pCurrentBeam->InsertBeamlet(m_currentBeamletPosition, reader->GetOutput());
 	}
 	else if (itksys::SystemTools::Strucmp(name,"BEAM") == 0)
 	{
@@ -147,14 +127,9 @@ void
 	PlanXmlReader::CharacterDataHandler(const char *inData, int inLength)
 {
 	// store character data for subsequent processing
-	if (inData != NULL && inLength > 0)
-	{
-		m_currentCharacterData.assign(inData, inLength);
-	}
-	else
-	{
-		m_currentCharacterData.clear();
-	}
+	m_currentCharacterData = "";
+	for(int i = 0; i < inLength; i++)
+		m_currentCharacterData = m_currentCharacterData + inData[i];
 }
 
 //////////////////////////////////////////////////////////////////////////////

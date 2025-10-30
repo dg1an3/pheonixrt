@@ -1,0 +1,81 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "Cython>=0.29", "numpy>=1.20"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pybrimstone"
+version = "0.1.0"
+description = "Python wrapper for Brimstone radiotherapy inverse planning algorithm"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "Proprietary - See LICENSE"}
+authors = [
+    {name = "Derek G. Lane", email = "derek@example.com"}
+]
+keywords = ["radiotherapy", "inverse planning", "optimization", "IMRT"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Healthcare Industry",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Cython",
+    "Programming Language :: C++",
+]
+
+dependencies = [
+    "numpy>=1.20",
+    "cython>=0.29",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "black>=23.0",
+    "mypy>=1.0",
+    "sphinx>=5.0",
+]
+viz = [
+    "matplotlib>=3.5",
+    "pydicom>=2.3",
+    "itk>=5.2",
+]
+all = [
+    "pybrimstone[dev,viz]",
+    "pymedphys>=0.39",
+    "ipywidgets>=8.0",
+    "jupyter>=1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/dg1an3/pheonixrt"
+Documentation = "https://pheonixrt.readthedocs.io"
+Repository = "https://github.com/dg1an3/pheonixrt"
+Issues = "https://github.com/dg1an3/pheonixrt/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["pybrimstone*"]
+exclude = ["tests*"]
+
+[tool.black]
+line-length = 100
+target-version = ['py38', 'py39', 'py310', 'py311']
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]

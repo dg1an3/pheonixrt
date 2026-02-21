@@ -1,5 +1,7 @@
 # pheonixrt
 
+THIS REPO IS ARCHIVED;  its content has been merged with the more historically complete [dH](https://github.com/dg1an3/dH) repo.
+
 **Brimstone**: A variational inverse planning algorithm for [radiotherapy treatment planning](https://en.wikipedia.org/wiki/Radiation_treatment_planning).
 
 pheonixrt is a research and development platform for radiation therapy optimization, implementing the Brimstone algorithm - a mathematically principled approach to inverse treatment planning based on information theory and variational methods.
